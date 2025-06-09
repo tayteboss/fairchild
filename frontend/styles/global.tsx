@@ -6,6 +6,8 @@ export const GlobalStyles = createGlobalStyle`
 	:root {
 		--colour-bg: ${theme.colours.black};
 		--colour-fg: ${theme.colours.white};
+		--colour-white: ${theme.colours.white};
+		--colour-black: ${theme.colours.black};
 		--font-default: ${theme.fonts.default};
 		--transition-speed-default: ${theme.transitionSpeed.default};
 		--transition-speed-fast: ${theme.transitionSpeed.fast};
@@ -100,7 +102,7 @@ export const GlobalStyles = createGlobalStyle`
 	button,
 	div {
 		font-size: ${pxToRem(10)};
-		line-height: ${pxToRem(10.5)};
+		line-height: ${pxToRem(12)};
 		text-transform: uppercase;
 		font-weight: 400;
 
