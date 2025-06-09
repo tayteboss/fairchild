@@ -1,12 +1,10 @@
 export type MediaType = {
-  media: {
-    mediaType: "video" | "image";
-    video: { asset: { playbackId: string } };
-    image: { asset: { url: string; metadata: { lqip: string } }; alt: string };
-    mobileImage?: { asset: { url: string; metadata: { lqip: string } } };
-    mobileVideo?: { asset: { playbackId: string } };
-    caption?: string;
-  };
+  mediaType: "video" | "image";
+  video: { asset: { playbackId: string } };
+  image: { asset: { url: string; metadata: { lqip: string } }; alt: string };
+  mobileImage?: { asset: { url: string; metadata: { lqip: string } } };
+  mobileVideo?: { asset: { playbackId: string } };
+  caption?: string;
 };
 
 export type TransitionsType = {
@@ -37,11 +35,18 @@ export type SlugType = {
   current: string;
 };
 
-export type SiteSettingsType = {};
+export type SiteSettingsType = {
+  referenceTitle: string;
+  tagline: string;
+  projectTypes: string[];
+  projectStyles: string[];
+};
 
 export type HomePageType = {
+  referenceTitle: string;
   seoTitle: string;
   seoDescription: string;
+  featuredProjects: ProjectType[];
 };
 
 export type WorkPageType = {
@@ -50,5 +55,50 @@ export type WorkPageType = {
 };
 
 export type ProjectType = {
+  title: string;
+  client: string;
+  type: string;
+  styles: string[];
+  year: string;
+  credits: {
+    role: string;
+    title: string;
+    link: string;
+  }[];
+  thumbnailColor: string;
+  video: { asset: { playbackId: string } };
+  fallbackImage: { asset: { url: string } };
+  colorTempFilter: {
+    minTemp: number;
+    maxTemp: number;
+  };
+  saturationFilter: number;
+  gallery: {
+    image: { asset: { url: string } };
+    thumbnailColor: string;
+    colorTempFilter: {
+      minTemp: number;
+      maxTemp: number;
+    };
+    saturationFilter: number;
+  }[];
   slug: SlugType;
+};
+
+export type GalleryPageType = {
+  title: string;
+  seoTitle: string;
+  seoDescription: string;
+};
+
+export type ProjectsPageType = {
+  title: string;
+  seoTitle: string;
+  seoDescription: string;
+};
+
+export type InformationPageType = {
+  title: string;
+  seoTitle: string;
+  seoDescription: string;
 };
