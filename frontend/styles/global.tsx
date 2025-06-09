@@ -4,8 +4,8 @@ import pxToRem from "../utils/pxToRem";
 
 export const GlobalStyles = createGlobalStyle`
 	:root {
-		--colour-bg: ${theme.colours.white};
-		--colour-fg: ${theme.colours.black};
+		--colour-bg: ${theme.colours.black};
+		--colour-fg: ${theme.colours.white};
 		--font-default: ${theme.fonts.default};
 		--transition-speed-default: ${theme.transitionSpeed.default};
 		--transition-speed-fast: ${theme.transitionSpeed.fast};
