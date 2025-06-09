@@ -1,11 +1,11 @@
-import {ControlsIcon} from '@sanity/icons'
+import {CaseIcon} from '@sanity/icons'
 import {Rule} from '@sanity/types'
 
 export default {
   title: 'Project',
   name: 'project',
   type: 'document',
-  icon: ControlsIcon,
+  icon: CaseIcon,
   fields: [
     {
       title: 'Title',
@@ -20,27 +20,32 @@ export default {
     {
       title: 'Type',
       name: 'type',
-      type: 'string',
-      options: {
-        list: {
+      type: 'array',
+      of: [
+        {
           type: 'reference',
-          to: [{type: 'siteSettings'}],
-          field: 'projectTypes',
+          to: [{type: 'projectType'}],
         },
-      },
+      ],
+      validation: (Rule: any) => [
+        Rule.required().error('Type is required'),
+        Rule.min(1).max(1).error('Exactly one type must be selected'),
+      ],
     },
     {
       title: 'Styles',
       name: 'styles',
       type: 'array',
-      of: [{type: 'string'}],
-      options: {
-        list: {
+      of: [
+        {
           type: 'reference',
-          to: [{type: 'siteSettings'}],
-          field: 'projectStyles',
+          to: [{type: 'projectStyles'}],
         },
-      },
+      ],
+      validation: (Rule: any) => [
+        Rule.required().error('Styles are required'),
+        Rule.min(1).error('At least one style must be selected'),
+      ],
     },
     {
       title: 'Year',

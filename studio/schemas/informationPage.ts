@@ -47,7 +47,35 @@ export default {
     {
       title: 'About Text',
       name: 'aboutText',
-      type: 'text',
+      type: 'array',
+      of: [
+        {
+          type: 'block',
+          styles: [{title: 'Normal', value: 'normal'}],
+          lists: [],
+          marks: {
+            decorators: [],
+            annotations: [
+              {
+                title: 'Link',
+                name: 'link',
+                type: 'object',
+                fields: [
+                  {
+                    title: 'URL',
+                    name: 'href',
+                    type: 'url',
+                    validation: (Rule: any) =>
+                      Rule.uri({
+                        scheme: ['http', 'https', 'mailto'],
+                      }),
+                  },
+                ],
+              },
+            ],
+          },
+        },
+      ],
     },
     {
       title: 'Services',
@@ -131,6 +159,11 @@ export default {
       name: 'featuredClientLogos',
       type: 'array',
       of: [{type: 'image'}],
+    },
+    {
+      title: 'Thank You Title',
+      name: 'thankYouTitle',
+      type: 'string',
     },
     {
       title: 'Thank You Message',

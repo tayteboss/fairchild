@@ -4,6 +4,8 @@ import project from './project'
 import galleryPage from './galleryPage'
 import projectsPage from './projectsPage'
 import informationPage from './informationPage'
+import projectType from './projectType'
+import projectStyles from './projectStyles'
 
 export const schemaTypes = [
   siteSettings,
@@ -12,4 +14,6 @@ export const schemaTypes = [
   galleryPage,
   projectsPage,
   informationPage,
+  projectType,
+  projectStyles,
 ]

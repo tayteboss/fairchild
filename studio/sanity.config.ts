@@ -4,7 +4,7 @@ import {visionTool} from '@sanity/vision'
 import {schemaTypes} from './schemas'
 import {muxInput} from 'sanity-plugin-mux-input'
 import {vercelDeployTool} from 'sanity-plugin-vercel-deploy'
-import {EarthGlobeIcon, DocumentIcon, UsersIcon, HomeIcon, ControlsIcon} from '@sanity/icons'
+import {EarthGlobeIcon, DocumentIcon, UsersIcon, HomeIcon, CaseIcon} from '@sanity/icons'
 import {colorInput} from '@sanity/color-input'
 
 export default defineConfig({
@@ -32,7 +32,7 @@ export default defineConfig({
             S.divider(),
             S.listItem()
               .title('Projects')
-              .icon(ControlsIcon)
+              .icon(CaseIcon)
               .child(
                 S.documentList()
                   .title('Projects')

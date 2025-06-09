@@ -101,4 +101,31 @@ export type InformationPageType = {
   title: string;
   seoTitle: string;
   seoDescription: string;
+  ideology: string;
+  businessDescription: string;
+  email: string;
+  instagramHandle: string;
+  instagramLink: string;
+  aboutText: any[];
+  services: string[];
+  press: {
+    title: string;
+    link: string;
+  }[];
+  news: {
+    title: string;
+    link: string;
+  }[];
+  clients: {
+    name: string;
+    title: string;
+    link: string;
+  }[];
+  featuredClientLogos: {
+    asset: {
+      url: string;
+    };
+  }[];
+  thankYouTitle: string;
+  thankYouMessage: string;
 };

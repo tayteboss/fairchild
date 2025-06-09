@@ -106,8 +106,26 @@ export const projectsPageQueryString = `
 
 export const informationPageQueryString = `
 	*[_type == 'informationPage'][0] {
+		...,
 		title,
 		seoTitle,
-		seoDescription
+		seoDescription,
+		ideology,
+		businessDescription,
+		email,
+		instagramHandle,
+		instagramLink,
+		aboutText,
+		services,
+		press,
+		news,
+		clients,
+		featuredClientLogos[] {
+			asset-> {
+				url
+			}
+		},
+		thankYouTitle,
+		thankYouMessage
 	}
 `;

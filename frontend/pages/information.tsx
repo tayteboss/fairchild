@@ -1,27 +1,30 @@
 import styled from "styled-components";
 import { NextSeo } from "next-seo";
 import {
-  GalleryPageType,
+  InformationPageType,
   SiteSettingsType,
   TransitionsType,
-} from "../../shared/types/types";
+} from "../shared/types/types";
 import { motion } from "framer-motion";
-import client from "../../client";
+import client from "../client";
 import {
-  galleryPageQueryString,
+  informationPageQueryString,
   siteSettingsQueryString,
-} from "../../lib/sanityQueries";
+} from "../lib/sanityQueries";
 
 const PageWrapper = styled(motion.div)``;
 
 type Props = {
-  data: GalleryPageType;
+  data: InformationPageType;
   siteSettings: SiteSettingsType;
   pageTransitionVariants: TransitionsType;
 };
 
 const Page = (props: Props) => {
   const { data, siteSettings, pageTransitionVariants } = props;
+
+  console.log("data", data);
+  console.log("siteSettings", siteSettings);
 
   return (
     <PageWrapper
@@ -34,14 +37,14 @@ const Page = (props: Props) => {
         title={data?.seoTitle || ""}
         description={data?.seoDescription || ""}
       />
-      Gallery
+      Information
     </PageWrapper>
   );
 };
 
 export async function getStaticProps() {
   const siteSettings = await client.fetch(siteSettingsQueryString);
-  const data = await client.fetch(galleryPageQueryString);
+  const data = await client.fetch(informationPageQueryString);
 
   return {
     props: {
