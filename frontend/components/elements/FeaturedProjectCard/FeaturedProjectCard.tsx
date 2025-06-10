@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { ProjectType } from "../../../shared/types/types";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import MuxPlayer from "@mux/mux-player-react";
 import { useMousePosition } from "../../../hooks/useMousePosition";
@@ -9,9 +9,10 @@ import { useMousePosition } from "../../../hooks/useMousePosition";
 // Base and max width variables for easy adjustment
 const INITIAL_WIDTH = "2vw";
 const BASE_WIDTH = "5vw";
-const MAX_WIDTH = "60vw";
+const HOVER_BASE_WIDTH = "10vw";
+const MAX_WIDTH = "50vw";
 const ADJACENT_WIDTH = "30vw";
-const STAGGER_CARDS = 5; // Number of cards to stagger over
+const STAGGER_CARDS = 5;
 
 const FeaturedProjectCardWrapper = styled(motion.div)<{ $bgColor: string }>`
   width: ${INITIAL_WIDTH};
@@ -19,15 +20,15 @@ const FeaturedProjectCardWrapper = styled(motion.div)<{ $bgColor: string }>`
   transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   z-index: 1;
-  transform-origin: center center;
+  transform-origin: top;
   will-change: width;
 `;
 
 const Inner = styled.div`
-  padding-top: 56.25%; // Maintains 16:9 aspect ratio
+  padding-top: 56.25%;
   position: relative;
   overflow: hidden;
-  transform-origin: center center;
+  transform-origin: top;
 
   img,
   mux-player {
@@ -167,14 +168,14 @@ const FeaturedProjectCard = (props: Props) => {
     const distanceFromHovered = Math.abs(index - hoveredIndex);
 
     // Return base width for cards beyond the stagger range
-    if (distanceFromHovered > STAGGER_CARDS + 1) return BASE_WIDTH;
+    if (distanceFromHovered > STAGGER_CARDS + 1) return HOVER_BASE_WIDTH;
 
     // Return specific widths for hovered and adjacent cards
     if (distanceFromHovered === 0) return MAX_WIDTH;
     if (distanceFromHovered === 1) return ADJACENT_WIDTH;
 
     // Calculate remaining cards' widths with more pronounced stagger
-    const widthDiff = parseFloat(ADJACENT_WIDTH) - parseFloat(BASE_WIDTH);
+    const widthDiff = parseFloat(ADJACENT_WIDTH) - parseFloat(HOVER_BASE_WIDTH);
     const staggerAmount = widthDiff / STAGGER_CARDS;
 
     return `${parseFloat(ADJACENT_WIDTH) - staggerAmount * (distanceFromHovered - 1)}vw`;

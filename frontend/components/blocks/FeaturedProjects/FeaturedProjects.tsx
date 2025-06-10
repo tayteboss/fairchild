@@ -46,7 +46,7 @@ const springTransition = {
   mass: 1,
 };
 
-const PARALLAX_STRENGTH = 1500;
+const PARALLAX_STRENGTH = 2000;
 
 const containerVariants = {
   hidden: {
@@ -78,11 +78,15 @@ const itemVariants = {
 
 const FeaturedProjects = (props: Props) => {
   const { data } = props;
-  const { y } = useMousePosition();
-  const hasData = data && data.length > 0;
+
+  const { setHeaderText, setIsHovering } = useHeader();
+
   const [windowHeight, setWindowHeight] = useState(0);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  const { setHeaderText, setIsHovering } = useHeader();
+
+  const { y } = useMousePosition();
+
+  const hasData = data && data.length > 0;
 
   useEffect(() => {
     setWindowHeight(window.innerHeight);
