@@ -1,11 +1,15 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 
+type HeaderTextType = {
+  logo: string;
+  tagline: string;
+  type?: { name: string }[];
+  year?: string;
+};
+
 type HeaderContextType = {
-  headerText: {
-    logo: string;
-    tagline: string;
-  };
-  setHeaderText: (text: { logo: string; tagline: string }) => void;
+  headerText: HeaderTextType;
+  setHeaderText: (text: HeaderTextType) => void;
   isHovering: boolean;
   setIsHovering: (isHovering: boolean) => void;
 };
@@ -13,7 +17,7 @@ type HeaderContextType = {
 const HeaderContext = createContext<HeaderContextType | undefined>(undefined);
 
 export const HeaderProvider = ({ children }: { children: ReactNode }) => {
-  const [headerText, setHeaderText] = useState({
+  const [headerText, setHeaderText] = useState<HeaderTextType>({
     logo: "Fairchild",
     tagline: "",
   });

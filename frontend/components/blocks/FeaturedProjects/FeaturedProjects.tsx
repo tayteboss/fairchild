@@ -46,7 +46,7 @@ const springTransition = {
   mass: 1,
 };
 
-const PARALLAX_STRENGTH = 2000;
+const PARALLAX_STRENGTH = 1000;
 
 const containerVariants = {
   hidden: {
@@ -113,6 +113,8 @@ const FeaturedProjects = (props: Props) => {
     setHeaderText({
       logo: project.client,
       tagline: project.title,
+      type: project.type,
+      year: project.year,
     });
     setIsHovering(true);
   };

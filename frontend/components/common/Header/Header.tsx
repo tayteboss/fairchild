@@ -5,7 +5,7 @@ import Link from "next/link";
 import useActiveLink from "../../../hooks/useActiveLink";
 import pxToRem from "../../../utils/pxToRem";
 import { SiteSettingsType } from "../../../shared/types/types";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useMousePosition } from "../../../hooks/useMousePosition";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -51,7 +51,7 @@ const NavigationWrapper = styled(motion.div)`
   }
 `;
 
-const Text = styled(motion.div)`
+const Text = styled.div`
   color: var(--colour-fg);
   position: absolute;
   width: 100%;
@@ -76,40 +76,6 @@ const springTransition = {
   stiffness: 300,
   damping: 20,
   mass: 0.5,
-};
-
-const textVariants = {
-  initial: {
-    y: 0,
-    opacity: 1,
-  },
-  exit: {
-    y: -25,
-    opacity: 0,
-  },
-  enter: {
-    y: 25,
-    opacity: 0,
-  },
-  animate: {
-    y: 0,
-    opacity: 1,
-  },
-};
-
-const introVariants = {
-  hidden: {
-    opacity: 0,
-    y: 20,
-  },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.6,
-      ease: [0.16, 1, 0.3, 1],
-    },
-  },
 };
 
 const Header = (props: Props) => {
@@ -166,48 +132,30 @@ const Header = (props: Props) => {
   };
 
   return (
-    <AnimatePresence>
-      {hasMoved && (
-        <HeaderWrapper
-          className="header"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: shouldShow ? 1 : 0, ...itemAnimateState }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <LayoutWrapper>
-            <LayoutGrid>
-              <LogoWrapper>
-                <AnimatePresence mode="wait">
-                  <Text
-                    key={isHovering ? headerText.logo : "default"}
-                    variants={textVariants}
-                    initial="enter"
-                    animate="animate"
-                    exit="exit"
-                    transition={{ duration: 0.1, ease: [0.16, 1, 0.3, 1] }}
-                  >
-                    <Link href="/">
-                      {isHovering ? headerText.logo : "Fairchild"}
-                    </Link>
-                  </Text>
-                </AnimatePresence>
-              </LogoWrapper>
-              <TaglineWrapper>
-                <AnimatePresence mode="wait">
-                  <Text
-                    key={isHovering ? headerText.tagline : "default"}
-                    variants={textVariants}
-                    initial="enter"
-                    animate="animate"
-                    exit="exit"
-                    transition={{ duration: 0.1, ease: [0.16, 1, 0.3, 1] }}
-                  >
-                    {isHovering ? headerText.tagline : tagline || ""}
-                  </Text>
-                </AnimatePresence>
-              </TaglineWrapper>
-              <NavigationWrapper>
+    <HeaderWrapper
+      className="header"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: shouldShow ? 1 : 0, ...itemAnimateState }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+    >
+      <LayoutWrapper>
+        <LayoutGrid>
+          <LogoWrapper>
+            <Text>
+              <Link href="/">{isHovering ? headerText.logo : "Fairchild"}</Link>
+            </Text>
+          </LogoWrapper>
+          <TaglineWrapper>
+            <Text>{isHovering ? headerText.tagline : tagline || ""}</Text>
+          </TaglineWrapper>
+          <NavigationWrapper>
+            {isHovering ? (
+              <Text>
+                {headerText.type?.[0]?.name} — {headerText.year}
+              </Text>
+            ) : (
+              <>
                 <Link href="/gallery">
                   <LinkText $isActive={activeLink === "/gallery"}>
                     Gallery
@@ -225,12 +173,12 @@ const Header = (props: Props) => {
                     Information
                   </LinkText>
                 </Link>
-              </NavigationWrapper>
-            </LayoutGrid>
-          </LayoutWrapper>
-        </HeaderWrapper>
-      )}
-    </AnimatePresence>
+              </>
+            )}
+          </NavigationWrapper>
+        </LayoutGrid>
+      </LayoutWrapper>
+    </HeaderWrapper>
   );
 };
 

@@ -51,6 +51,10 @@ export const homePageQueryString = `
 			thumbnailColor {
 				hex
 			},
+			year,
+			type[]-> {
+				name
+			},
 			fallbackImage {
 				asset-> {
 					url

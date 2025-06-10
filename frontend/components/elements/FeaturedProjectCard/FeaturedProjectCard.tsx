@@ -9,10 +9,10 @@ import { useMousePosition } from "../../../hooks/useMousePosition";
 // Base and max width variables for easy adjustment
 const INITIAL_WIDTH = "2vw";
 const BASE_WIDTH = "5vw";
-const HOVER_BASE_WIDTH = "10vw";
+const HOVER_BASE_WIDTH = "5vw";
 const MAX_WIDTH = "50vw";
-const ADJACENT_WIDTH = "30vw";
-const STAGGER_CARDS = 5;
+const ADJACENT_WIDTH = "25vw";
+const STAGGER_CARDS = 7;
 
 const FeaturedProjectCardWrapper = styled(motion.div)<{ $bgColor: string }>`
   width: ${INITIAL_WIDTH};
@@ -22,6 +22,7 @@ const FeaturedProjectCardWrapper = styled(motion.div)<{ $bgColor: string }>`
   z-index: 1;
   transform-origin: top;
   will-change: width;
+  cursor: crosshair;
 `;
 
 const Inner = styled.div`

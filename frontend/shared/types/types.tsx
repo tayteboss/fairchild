@@ -57,8 +57,12 @@ export type WorkPageType = {
 export type ProjectType = {
   title: string;
   client: string;
-  type: string;
-  styles: string[];
+  type: {
+    name: string;
+  }[];
+  styles: {
+    name: string;
+  }[];
   year: string;
   credits: {
     role: string;
