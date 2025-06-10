@@ -163,7 +163,7 @@ const FeaturedProjectCard = (props: Props) => {
 
   // Calculate the stagger effect based on distance from hovered card
   const getStaggeredWidth = () => {
-    if (!initialDelayComplete || !hasMoved) return INITIAL_WIDTH;
+    if (!initialDelayComplete) return INITIAL_WIDTH;
     if (hoveredIndex === null) return BASE_WIDTH;
 
     const distanceFromHovered = Math.abs(index - hoveredIndex);
