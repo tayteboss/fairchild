@@ -1,16 +1,9 @@
 import styled from "styled-components";
 import { NextSeo } from "next-seo";
-import {
-  InformationPageType,
-  SiteSettingsType,
-  TransitionsType,
-} from "../shared/types/types";
+import { InformationPageType, TransitionsType } from "../shared/types/types";
 import { motion } from "framer-motion";
 import client from "../client";
-import {
-  informationPageQueryString,
-  siteSettingsQueryString,
-} from "../lib/sanityQueries";
+import { informationPageQueryString } from "../lib/sanityQueries";
 import TitleTextBlock from "../components/blocks/TitleTextBlock";
 import pxToRem from "../utils/pxToRem";
 import LinksBlock from "../components/blocks/LinksBlock";
@@ -21,6 +14,9 @@ import CreditsBlock from "../components/blocks/CreditsBlock";
 import ThanksBlock from "../components/blocks/ThanksBlock";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useLenis } from "@studio-freight/react-lenis";
+import LayoutWrapper from "../components/layout/LayoutWrapper";
+import ThemeSwitchBlock from "../components/blocks/ThemeSwitchBlock";
+import LogoSaver from "../components/blocks/LogoSaver";
 
 const PageWrapper = styled(motion.div)`
   padding: ${pxToRem(120)} 0;
@@ -203,12 +199,13 @@ const Page = (props: Props) => {
       />
       <PressBlock press={data?.press || []} news={data?.news || []} />
       <ClientsBlock clients={data?.clients || []} />
-      <ClientLogosBlock logos={data?.featuredClientLogos || []} />
+      <ClientLogosBlock />
       <CreditsBlock />
       <ThanksBlock
         title={data?.thankYouTitle || ""}
         text={data?.thankYouMessage || ""}
       />
+      <ThemeSwitchBlock />
     </InnerWrapper>
   );
 
@@ -226,11 +223,14 @@ const Page = (props: Props) => {
         title={data?.seoTitle || ""}
         description={data?.seoDescription || ""}
       />
-      <Inner>
-        {Array.from({ length: contentSets }).map((_, index) => (
-          <div key={index}>{renderContent()}</div>
-        ))}
-      </Inner>
+      <LayoutWrapper>
+        <Inner>
+          {Array.from({ length: contentSets }).map((_, index) => (
+            <div key={index}>{renderContent()}</div>
+          ))}
+        </Inner>
+      </LayoutWrapper>
+      {/* <LogoSaver /> */}
     </PageWrapper>
   );
 };

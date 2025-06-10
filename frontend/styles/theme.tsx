@@ -4,7 +4,7 @@ export const theme = {
     white: "#FFFFFF",
   },
   fonts: {
-    default: "monospace",
+    default: "Fragment Mono",
   },
   mediaBreakpoints: {
     desktop: "(min-width: 1680px)",

@@ -17,6 +17,10 @@ const Block = styled.div`
   width: ${pxToRem(300)};
   flex: 1;
 
+  @media ${(props) => props.theme.mediaBreakpoints.tabletPortrait} {
+    width: auto;
+  }
+
   a {
     text-transform: initial !important;
 

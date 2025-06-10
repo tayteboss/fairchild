@@ -8,6 +8,10 @@ const TitleTextBlockWrapper = styled.div`
   max-width: ${pxToRem(620)};
   margin: 0 auto;
 
+  @media ${(props) => props.theme.mediaBreakpoints.tabletPortrait} {
+    max-width: unset;
+  }
+
   p {
     text-align: center;
     text-transform: initial !important;
@@ -77,7 +81,7 @@ const TitleTextBlock = (props: Props) => {
       {list && useList && (
         <List>
           {list.map((item) => (
-            <li>{item}</li>
+            <li key={item}>{item}</li>
           ))}
         </List>
       )}

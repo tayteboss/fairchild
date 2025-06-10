@@ -13,7 +13,6 @@ const HeaderWrapper = styled.header`
   left: 0;
   width: 100%;
   z-index: 100;
-  mix-blend-mode: difference;
 `;
 
 const LogoWrapper = styled.div`
@@ -32,17 +31,17 @@ const NavigationWrapper = styled.div`
 
   span {
     white-space: pre;
-    color: var(--colour-white);
+    color: var(--colour-fg);
   }
 `;
 
 const Text = styled.div`
-  color: var(--colour-white);
+  color: var(--colour-fg);
 `;
 
 const LinkText = styled.div<{ $isActive?: boolean }>`
   text-decoration: ${({ $isActive }) => ($isActive ? "underline" : "none")};
-  color: var(--colour-white);
+  color: var(--colour-fg);
 
   &:hover {
     text-decoration: underline;

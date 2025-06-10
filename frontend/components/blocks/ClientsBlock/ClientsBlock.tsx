@@ -2,7 +2,9 @@ import styled from "styled-components";
 import { InformationPageType } from "../../../shared/types/types";
 import pxToRem from "../../../utils/pxToRem";
 
-const ClientsBlockWrapper = styled.div``;
+const ClientsBlockWrapper = styled.div`
+  width: 100%;
+`;
 
 const Title = styled.h3`
   text-align: center;
@@ -23,18 +25,28 @@ const ClientWrapper = styled.div`
 
 const ClientName = styled.div`
   flex: 1;
-  width: 300px;
+  width: ${pxToRem(300)};
   text-align: right;
   text-transform: initial !important;
   white-space: nowrap;
+
+  @media ${(props) => props.theme.mediaBreakpoints.tabletPortrait} {
+    width: auto;
+    min-width: 150px;
+  }
 `;
 
 const ClientTitle = styled.div`
   flex: 1;
-  width: 300px;
+  width: ${pxToRem(300)};
   text-align: left;
   text-transform: initial !important;
   white-space: nowrap;
+
+  @media ${(props) => props.theme.mediaBreakpoints.tabletPortrait} {
+    width: auto;
+    min-width: 150px;
+  }
 `;
 
 type Props = {

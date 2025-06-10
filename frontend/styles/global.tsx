@@ -42,6 +42,8 @@ export const GlobalStyles = createGlobalStyle`
 		background: var(--colour-bg);
 		font-size: 16px;
 
+		transition: background var(--transition-speed-default) var(--transition-ease), color var(--transition-speed-default) var(--transition-ease);
+
 		&.no-scroll {
 			overflow-y: hidden;
 			
@@ -105,11 +107,6 @@ export const GlobalStyles = createGlobalStyle`
 		line-height: ${pxToRem(12)};
 		text-transform: uppercase;
 		font-weight: 400;
-
-		@media ${theme.mediaBreakpoints.tabletPortrait} {
-			font-size: ${pxToRem(38)};
-			line-height: ${pxToRem(38)};
-		}
 	}
 
 	mux-player {
