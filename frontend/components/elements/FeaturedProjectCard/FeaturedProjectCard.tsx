@@ -4,15 +4,17 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import MuxPlayer from "@mux/mux-player-react";
+import { useMousePosition } from "../../../hooks/useMousePosition";
 
 // Base and max width variables for easy adjustment
-const BASE_WIDTH = "7vw";
+const INITIAL_WIDTH = "2vw";
+const BASE_WIDTH = "5vw";
 const MAX_WIDTH = "60vw";
 const ADJACENT_WIDTH = "30vw";
 const STAGGER_CARDS = 5; // Number of cards to stagger over
 
 const FeaturedProjectCardWrapper = styled(motion.div)<{ $bgColor: string }>`
-  width: ${BASE_WIDTH};
+  width: ${INITIAL_WIDTH};
   background: ${({ $bgColor }) => $bgColor || "#000"};
   transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
@@ -91,13 +93,43 @@ const FeaturedProjectCard = (props: Props) => {
     hoveredIndex,
   } = props;
 
+  const { y } = useMousePosition();
   const hasVideo = video?.asset?.playbackId;
   const hasFallbackImage = fallbackImage?.asset?.url;
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [hasVideoLoaded, setHasVideoLoaded] = useState(false);
+  const [initialDelayComplete, setInitialDelayComplete] = useState(false);
+  const [hasMoved, setHasMoved] = useState(false);
+  const [initialY, setInitialY] = useState<number | null>(null);
 
   // Use refs for all video state to persist between re-renders
   const playerRef = useRef<any>(null);
+
+  useEffect(() => {
+    // Set initial cursor position
+    if (y !== null && initialY === null) {
+      setInitialY(y);
+    }
+  }, [y, initialY]);
+
+  useEffect(() => {
+    // Start the initial 2-second timer
+    const initialTimer = setTimeout(() => {
+      setInitialDelayComplete(true);
+    }, 2000);
+
+    return () => clearTimeout(initialTimer);
+  }, []);
+
+  useEffect(() => {
+    // After 2 seconds, check for cursor movement
+    if (initialDelayComplete && initialY !== null && y !== null && !hasMoved) {
+      if (Math.abs(y - initialY) > 5) {
+        // Small threshold to detect movement
+        setHasMoved(true);
+      }
+    }
+  }, [initialDelayComplete, initialY, y, hasMoved]);
 
   useEffect(() => {
     if (!playerRef.current) return;
@@ -129,6 +161,7 @@ const FeaturedProjectCard = (props: Props) => {
 
   // Calculate the stagger effect based on distance from hovered card
   const getStaggeredWidth = () => {
+    if (!initialDelayComplete || !hasMoved) return INITIAL_WIDTH;
     if (hoveredIndex === null) return BASE_WIDTH;
 
     const distanceFromHovered = Math.abs(index - hoveredIndex);

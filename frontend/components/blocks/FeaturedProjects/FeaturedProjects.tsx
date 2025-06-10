@@ -4,6 +4,7 @@ import FeaturedProjectCard from "../../elements/FeaturedProjectCard";
 import { motion } from "framer-motion";
 import { useMousePosition } from "../../../hooks/useMousePosition";
 import { useEffect, useState, useMemo } from "react";
+import { useHeader } from "../../layout/HeaderContext";
 
 const FeaturedProjectsWrapper = styled.div`
   position: fixed;
@@ -26,6 +27,14 @@ const Inner = styled(motion.div)`
   will-change: transform;
 `;
 
+const ParallaxWrapper = styled(motion.div)`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  will-change: transform;
+`;
+
 type Props = {
   data: ProjectType[];
 };
@@ -39,12 +48,41 @@ const springTransition = {
 
 const PARALLAX_STRENGTH = 1500;
 
+const containerVariants = {
+  hidden: {
+    opacity: 0,
+    y: 0,
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      delayChildren: 0.8,
+      staggerChildren: 0.03,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: {
+    opacity: 0,
+  },
+  visible: {
+    opacity: 1,
+    transition: {
+      duration: 0.3,
+      ease: [0.16, 1, 0.3, 1],
+    },
+  },
+};
+
 const FeaturedProjects = (props: Props) => {
   const { data } = props;
   const { y } = useMousePosition();
   const hasData = data && data.length > 0;
   const [windowHeight, setWindowHeight] = useState(0);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const { setHeaderText, setIsHovering } = useHeader();
 
   useEffect(() => {
     setWindowHeight(window.innerHeight);
@@ -65,38 +103,50 @@ const FeaturedProjects = (props: Props) => {
     [liveNormalizedY]
   );
 
-  const itemInitialState = {
-    y: 0,
+  const handleHoverStart = (index: number) => {
+    setHoveredIndex(index);
+    const project = data[index % data.length];
+    setHeaderText({
+      logo: project.client,
+      tagline: project.title,
+    });
+    setIsHovering(true);
   };
 
-  const itemAnimateState = {
-    y: liveTargetTranslateY,
-  };
-
-  const itemTransitionConfig = {
-    y: { ...springTransition },
+  const handleHoverEnd = () => {
+    setHoveredIndex(null);
+    setIsHovering(false);
   };
 
   return (
     <FeaturedProjectsWrapper>
-      <Inner
-        initial={itemInitialState}
-        animate={itemAnimateState}
-        transition={itemTransitionConfig}
-      >
-        {hasData &&
-          [...data, ...data].map((project, index) => (
-            <FeaturedProjectCard
-              key={`${project.title}-${index}`}
-              {...project}
-              index={index}
-              totalCards={data.length * 2}
-              isHovered={hoveredIndex === index}
-              onHoverStart={() => setHoveredIndex(index)}
-              onHoverEnd={() => setHoveredIndex(null)}
-              hoveredIndex={hoveredIndex}
-            />
-          ))}
+      <Inner variants={containerVariants} initial="hidden" animate="visible">
+        <ParallaxWrapper
+          animate={{
+            y: liveTargetTranslateY,
+          }}
+          transition={{
+            y: { ...springTransition },
+          }}
+        >
+          {hasData &&
+            [...data, ...data].map((project, index) => (
+              <motion.div
+                key={`${project.title}-${index}`}
+                variants={itemVariants}
+              >
+                <FeaturedProjectCard
+                  {...project}
+                  index={index}
+                  totalCards={data.length * 2}
+                  isHovered={hoveredIndex === index}
+                  onHoverStart={() => handleHoverStart(index)}
+                  onHoverEnd={handleHoverEnd}
+                  hoveredIndex={hoveredIndex}
+                />
+              </motion.div>
+            ))}
+        </ParallaxWrapper>
       </Inner>
     </FeaturedProjectsWrapper>
   );

@@ -12,6 +12,7 @@ import {
   siteSettingsQueryString,
 } from "../lib/sanityQueries";
 import FeaturedProjects from "../components/blocks/FeaturedProjects";
+import LogoSaver from "../components/blocks/LogoSaver";
 
 const PageWrapper = styled(motion.div)``;
 
@@ -39,6 +40,7 @@ const Page = (props: Props) => {
         description={data?.seoDescription || ""}
       />
       <FeaturedProjects data={data?.featuredProjects} />
+      <LogoSaver />
     </PageWrapper>
   );
 };

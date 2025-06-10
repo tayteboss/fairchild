@@ -4,6 +4,7 @@ import Footer from "../common/Footer";
 import { ReactNode } from "react";
 import { ReactLenis, useLenis } from "@studio-freight/react-lenis";
 import { SiteSettingsType } from "../../shared/types/types";
+import { HeaderProvider } from "./HeaderContext";
 
 const siteSettings: SiteSettingsType = require("../../json/siteSettings.json");
 
@@ -19,13 +20,12 @@ const Layout = (props: Props) => {
   useLenis();
 
   return (
-    <>
+    <HeaderProvider>
       <Header tagline={siteSettings.tagline} />
       <ReactLenis root>
         <Main>{children}</Main>
       </ReactLenis>
-      <Footer />
-    </>
+    </HeaderProvider>
   );
 };
 
