@@ -65,7 +65,9 @@ export type ProjectType = {
     title: string;
     link: string;
   }[];
-  thumbnailColor: string;
+  thumbnailColor: {
+    hex: string;
+  };
   video: { asset: { playbackId: string } };
   fallbackImage: { asset: { url: string } };
   colorTempFilter: {

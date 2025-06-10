@@ -62,7 +62,7 @@ const Header = (props: Props) => {
       <LayoutWrapper>
         <LayoutGrid>
           <LogoWrapper>
-            <Link href="">Fairchild</Link>
+            <Link href="/">Fairchild</Link>
           </LogoWrapper>
           <TaglineWrapper>
             <Text>{tagline || ""}</Text>

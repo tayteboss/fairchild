@@ -11,6 +11,7 @@ import {
   homePageQueryString,
   siteSettingsQueryString,
 } from "../lib/sanityQueries";
+import FeaturedProjects from "../components/blocks/FeaturedProjects";
 
 const PageWrapper = styled(motion.div)``;
 
@@ -37,7 +38,7 @@ const Page = (props: Props) => {
         title={data?.seoTitle || ""}
         description={data?.seoDescription || ""}
       />
-      Home
+      <FeaturedProjects data={data?.featuredProjects} />
     </PageWrapper>
   );
 };

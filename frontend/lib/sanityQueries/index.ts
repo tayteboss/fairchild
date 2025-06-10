@@ -44,7 +44,24 @@ export const homePageQueryString = `
 	*[_type == 'homePage'][0] {
 		referenceTitle,
 		seoTitle,
-		seoDescription
+		seoDescription,
+		featuredProjects[]-> {
+			title,
+			client,
+			thumbnailColor {
+				hex
+			},
+			fallbackImage {
+				asset-> {
+					url
+				}
+			},
+			video {
+				asset-> {
+					playbackId
+				}
+			}
+		}
 	}
 `;
 
