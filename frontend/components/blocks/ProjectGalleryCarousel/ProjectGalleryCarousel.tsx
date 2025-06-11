@@ -1,11 +1,9 @@
 import styled from "styled-components";
 import { ProjectType } from "../../../shared/types/types";
-import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { useEffect } from "react";
 import CarouselCard from "../../elements/CarouselCard/CarouselCard";
 import { useHeader } from "../../layout/HeaderContext";
-import { useMouseMovement } from "../../../hooks/useMouseMovement";
-import { useRouter } from "next/router";
 
 const CarouselWrapper = styled.div`
   position: fixed;
@@ -13,10 +11,19 @@ const CarouselWrapper = styled.div`
   left: 0;
   width: 100%;
   height: 100vh;
-  background: var(--color-black);
   z-index: 50;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+`;
+
+const Backdrop = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--colour-bg);
+  opacity: 0.8;
 `;
 
 const CarouselContainer = styled.div`
@@ -100,8 +107,9 @@ const ProjectGalleryCarousel = (props: Props) => {
 
   return (
     <CarouselWrapper data-lenis-prevent>
-      <CarouselContainer lenis-data-prevent="true">
+      <CarouselContainer>
         <Inner>
+          <Backdrop />
           {project.gallery?.map((galleryItem, index) => {
             // Reorder the gallery items to show the selected one first
             const displayIndex =
@@ -111,13 +119,11 @@ const ProjectGalleryCarousel = (props: Props) => {
             return (
               <CarouselCardWrapper
                 key={`carousel-${displayIndex}`}
-                layoutId={`gallery-${project.title}-${displayIndex}`}
-                layout
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
                 transition={{
-                  layout: {
-                    duration: 1.5,
-                    ease: [0.16, 1, 0.3, 1],
-                  },
+                  duration: 0.5,
+                  ease: [0.16, 1, 0.3, 1],
                 }}
               >
                 <CarouselCard project={project} gallery={displayItem} />

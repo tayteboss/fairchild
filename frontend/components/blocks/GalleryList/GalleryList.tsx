@@ -1,7 +1,6 @@
 import styled from "styled-components";
 import { ProjectType } from "../../../shared/types/types";
 import LayoutWrapper from "../../layout/LayoutWrapper";
-import LayoutGrid from "../../layout/LayoutGrid";
 import GalleryCard from "../../elements/GalleryCard";
 import { useMouseMovement } from "../../../hooks/useMouseMovement";
 import { useHeader } from "../../layout/HeaderContext";
@@ -10,10 +9,8 @@ import { useState } from "react";
 import ProjectGalleryCarousel from "../../blocks/ProjectGalleryCarousel/ProjectGalleryCarousel";
 
 const GalleryListWrapper = styled.div`
-  /* .layout-grid {
-    grid-row-gap: 0;
-    grid-column-gap: 0;
-  } */
+  position: relative;
+  z-index: 1;
 `;
 
 const Inner = styled.div`
@@ -27,30 +24,6 @@ const GalleryCardWrapper = styled(motion.div)`
   align-items: center;
   justify-content: center;
 `;
-
-const containerVariants = {
-  hidden: {
-    opacity: 0,
-    transition: {
-      duration: 1.5,
-      ease: [0.16, 1, 0.3, 1],
-    },
-  },
-  visible: {
-    opacity: 1,
-    transition: {
-      duration: 1.5,
-      ease: [0.16, 1, 0.3, 1],
-    },
-  },
-  exit: {
-    opacity: 0,
-    transition: {
-      duration: 1.5,
-      ease: [0.16, 1, 0.3, 1],
-    },
-  },
-};
 
 type Props = {
   data: ProjectType[];
@@ -85,7 +58,7 @@ const GalleryList = (props: Props) => {
     // After fade, move to carousel
     setTimeout(() => {
       setAnimationPhase("carousel");
-    }, 800);
+    }, 500);
   };
 
   const handleCloseCarousel = () => {
@@ -99,32 +72,14 @@ const GalleryList = (props: Props) => {
 
   return (
     <>
-      <GalleryListWrapper className="performance">
+      <GalleryListWrapper>
         <LayoutWrapper>
           {/* <LayoutGrid> */}
           <Inner>
             {hasData &&
               data.map((project, i) =>
                 project.gallery?.map((galleryItem, j) => (
-                  <GalleryCardWrapper
-                    key={`${i}-${j}`}
-                    layoutId={`gallery-${project.title}-${j}`}
-                    variants={containerVariants}
-                    initial="visible"
-                    animate={
-                      selectedProjectIndex === null ||
-                      selectedProjectIndex === i
-                        ? "visible"
-                        : "exit"
-                    }
-                    layout
-                    transition={{
-                      layout: {
-                        duration: 1.5,
-                        ease: [0.16, 1, 0.3, 1],
-                      },
-                    }}
-                  >
+                  <GalleryCardWrapper key={`${i}-${j}`}>
                     <GalleryCard
                       project={project}
                       gallery={galleryItem}

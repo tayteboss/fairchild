@@ -91,6 +91,13 @@ export type ProjectType = {
     saturationFilter: number;
   }[];
   slug: SlugType;
+  images?: {
+    colorTempFilter?: {
+      minTemp: number;
+      maxTemp: number;
+    };
+  }[];
+  medianColorTemp?: number;
 };
 
 export type GalleryPageType = {

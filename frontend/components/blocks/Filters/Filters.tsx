@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useClickOutside } from "../../../hooks/useClickOutside";
 import MultiRangeSlider from "./MultiRangeSlider";
+import { useMouseMovement } from "../../../hooks/useMouseMovement";
 
 const FiltersWrapper = styled(motion.div)`
   position: fixed;
@@ -29,17 +30,20 @@ const FiltersWrapper = styled(motion.div)`
   }
 `;
 
-const FiltersTrigger = styled.button`
+const FiltersTrigger = styled.button<{ $isActive: boolean }>`
   position: fixed;
   top: 50%;
   right: 50%;
-  z-index: 100;
+  z-index: 25;
   transform: translate(50%, -50%);
   height: ${pxToRem(12)};
   display: flex;
   align-items: center;
   justify-content: center;
   padding-top: ${pxToRem(3)};
+  opacity: ${({ $isActive }) => ($isActive ? 1 : 0)};
+
+  transition: all var(--transition-speed-default) var(--transition-ease);
 `;
 
 const Inner = styled.div`
@@ -117,13 +121,20 @@ const Filters = (props: Props) => {
   } = props;
 
   const ref = useRef<HTMLDivElement>(null!);
+
   useClickOutside(ref, () => {
     setIsOpen(false);
   });
 
+  const { hasMoved } = useMouseMovement({
+    initialDelay: 2000,
+    movementThreshold: 5,
+    throttleMs: 100,
+  });
+
   return (
     <>
-      <FiltersTrigger onClick={() => setIsOpen(!isOpen)}>
+      <FiltersTrigger onClick={() => setIsOpen(!isOpen)} $isActive={hasMoved}>
         Filters ({filtersAreOn ? "On" : "Off"})
       </FiltersTrigger>
       <AnimatePresence>

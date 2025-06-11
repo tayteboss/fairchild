@@ -41,6 +41,7 @@ export const GlobalStyles = createGlobalStyle`
 	html {
 		background: var(--colour-bg);
 		font-size: 16px;
+		cursor: crosshair;
 
 		transition: background var(--transition-speed-default) var(--transition-ease), color var(--transition-speed-default) var(--transition-ease);
 

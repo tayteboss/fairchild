@@ -12,7 +12,6 @@ import {
   projectsQueryString,
 } from "../lib/sanityQueries";
 import GalleryList from "../components/blocks/GalleryList";
-import LogoSaver from "../components/blocks/LogoSaver";
 import Filters from "../components/blocks/Filters";
 import { useEffect, useState } from "react";
 
@@ -135,7 +134,62 @@ const Page = (props: Props) => {
 
 export async function getStaticProps() {
   const data = await client.fetch(galleryPageQueryString);
-  const projects = await client.fetch(projectsQueryString);
+  let projects = await client.fetch(projectsQueryString);
+
+  // Sort projects by median color temperature
+  projects = projects
+    .map((project: ProjectType) => {
+      // Initialize with default value
+      project.medianColorTemp = 4700; // Default to middle of range
+
+      if (project.images && project.images.length > 0) {
+        // Calculate median color temp for each image
+        const imageColorTemps = project.images
+          .map(
+            (image: {
+              colorTempFilter?: { minTemp: number; maxTemp: number };
+            }) => {
+              if (
+                image.colorTempFilter?.minTemp &&
+                image.colorTempFilter?.maxTemp
+              ) {
+                // Validate that the temperatures are within our expected range
+                const minTemp = Math.max(
+                  2400,
+                  Math.min(7000, image.colorTempFilter.minTemp)
+                );
+                const maxTemp = Math.max(
+                  2400,
+                  Math.min(7000, image.colorTempFilter.maxTemp)
+                );
+                return (minTemp + maxTemp) / 2;
+              }
+              return null;
+            }
+          )
+          .filter((temp: number | null): temp is number => temp !== null);
+
+        // Calculate overall median for the project
+        if (imageColorTemps.length > 0) {
+          const sortedTemps = imageColorTemps.sort(
+            (a: number, b: number) => a - b
+          );
+          const mid = Math.floor(sortedTemps.length / 2);
+          project.medianColorTemp =
+            sortedTemps.length % 2 === 0
+              ? (sortedTemps[mid - 1] + sortedTemps[mid]) / 2
+              : sortedTemps[mid];
+        }
+      }
+
+      return project;
+    })
+    .sort((a: ProjectType, b: ProjectType) => {
+      // Ensure we have valid numbers for comparison
+      const tempA = a.medianColorTemp ?? 4700;
+      const tempB = b.medianColorTemp ?? 4700;
+      return tempA - tempB;
+    });
 
   const yearRange = projects.reduce(
     (acc: { min: number; max: number }, project: ProjectType) => {

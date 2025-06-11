@@ -60,6 +60,10 @@ const Text = styled.div`
   color: var(--colour-white);
   position: absolute;
   width: 100%;
+
+  &:hover {
+    text-decoration: underline;
+  }
 `;
 
 const LinkText = styled.div<{ $isActive?: boolean }>`

@@ -35,6 +35,7 @@ const Inner = styled(motion.div)`
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
 `;
 
 const ImageOuter = styled.div`
@@ -57,6 +58,7 @@ const ColorOverlay = styled(motion.div)<{
   $animationPhase: "idle" | "fade" | "center" | "carousel";
   $color: string;
   $hasMouseMoved: boolean;
+  $filtersIsOpen: boolean;
 }>`
   position: absolute;
   top: 0;
@@ -67,6 +69,12 @@ const ColorOverlay = styled(motion.div)<{
   z-index: 2;
   pointer-events: none;
   opacity: ${(props) => {
+    if (props.$filtersIsOpen) return 1;
+    if (
+      props.$animationPhase === "carousel" ||
+      props.$animationPhase === "fade"
+    )
+      return 1;
     if (!props.$hasMouseMoved) return 1;
     return 0;
   }};
@@ -122,25 +130,22 @@ const GalleryCard = ({
   });
 
   return (
-    <CardWrapper onClick={onClick}>
+    <CardWrapper>
       <Outer>
         <InnerWrapper>
           <Inner
             ref={elementRef}
-            layout
             animate={{
               width:
-                isSelected && animationPhase === "carousel"
-                  ? "100%"
+                animationPhase === "carousel"
+                  ? `25%`
                   : filtersIsOpen
                     ? "25%"
                     : `${scale * 100}%`,
             }}
             transition={{
-              layout: {
-                duration: 1.5,
-                ease: [0.16, 1, 0.3, 1],
-              },
+              duration: 1.5,
+              ease: [0.16, 1, 0.3, 1],
             }}
             onHoverStart={() => {
               setIsHovering(true);
@@ -156,6 +161,7 @@ const GalleryCard = ({
                 tagline: "",
               });
             }}
+            onClick={onClick}
           >
             <ImageOuter>
               <ImageInner>
@@ -165,7 +171,8 @@ const GalleryCard = ({
                   fill
                   style={{
                     objectFit: "cover",
-                    transform: hasMouseMoved ? "scale(1.1)" : "scale(1)",
+                    transform:
+                      hasMouseMoved && !isSelected ? "scale(1.1)" : "scale(1)",
                     transition: "transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
                   }}
                   sizes="25vw"
@@ -177,6 +184,7 @@ const GalleryCard = ({
                   $isSelected={isSelected}
                   $animationPhase={animationPhase}
                   $hasMouseMoved={hasMouseMoved}
+                  $filtersIsOpen={filtersIsOpen}
                 />
               </ImageInner>
             </ImageOuter>

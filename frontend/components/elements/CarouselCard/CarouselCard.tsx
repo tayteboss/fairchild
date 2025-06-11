@@ -51,6 +51,19 @@ const ImageInner = styled.div`
   width: 100%;
 `;
 
+const ColorOverlay = styled(motion.div)<{ $color: string }>`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: ${(props) => props.$color};
+  z-index: 2;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+`;
+
 type Props = {
   project: ProjectType;
   gallery: {
@@ -73,12 +86,11 @@ type Props = {
 const CarouselCard = ({ project, gallery }: Props) => {
   return (
     <CardWrapper
-      layoutId={`gallery-${project.title}-${gallery.image.asset.url}`}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
       transition={{
-        layout: {
-          duration: 1.5,
-          ease: [0.16, 1, 0.3, 1],
-        },
+        duration: 1.5,
+        ease: [0.16, 1, 0.3, 1],
       }}
     >
       <Outer>
@@ -100,10 +112,12 @@ const CarouselCard = ({ project, gallery }: Props) => {
                   fill
                   style={{
                     objectFit: "cover",
+                    transform: "scale(1)",
                   }}
                   sizes="90vw"
                   loading="lazy"
                 />
+                {/* <ColorOverlay $color={gallery.thumbnailColor.hex} /> */}
               </ImageInner>
             </ImageOuter>
           </Inner>

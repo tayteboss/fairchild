@@ -2,9 +2,11 @@ import styled from "styled-components";
 import pxToRem from "../../../utils/pxToRem";
 import { useRef, useState, useCallback, useEffect } from "react";
 
-const SliderContainer = styled.div`
+const SliderContainer = styled.div<{ $isDragging?: boolean }>`
   position: relative;
   width: 100%;
+  cursor: ${({ $isDragging }) =>
+    $isDragging ? "grabbing" : "default"} !important;
 `;
 
 const SliderTrack = styled.div`
@@ -36,7 +38,7 @@ const SliderLeftValue = styled(SliderValue)``;
 
 const SliderRightValue = styled(SliderValue)``;
 
-const Thumb = styled.input`
+const Thumb = styled.input<{ $isDragging?: boolean }>`
   pointer-events: none;
   position: absolute;
   height: 0;
@@ -48,9 +50,12 @@ const Thumb = styled.input`
 
   &::-webkit-slider-thumb {
     -webkit-appearance: none;
-    cursor: pointer;
+    cursor: ${({ $isDragging }) =>
+      $isDragging ? "grabbing" : "grab"} !important;
     height: 16px;
-    width: 1px;
+    width: 13px;
+    border-right: 6px solid var(--colour-bg);
+    border-left: 6px solid var(--colour-bg);
     pointer-events: all;
     position: relative;
     background: var(--colour-fg);
@@ -58,20 +63,23 @@ const Thumb = styled.input`
 
   &::-moz-range-thumb {
     -webkit-appearance: none;
-    cursor: pointer;
+    cursor: ${({ $isDragging }) =>
+      $isDragging ? "grabbing" : "grab"} !important;
     height: 16px;
-    width: 1px;
+    width: 13px;
+    border-right: 6px solid var(--colour-bg);
+    border-left: 6px solid var(--colour-bg);
     pointer-events: all;
     position: relative;
     background: var(--colour-fg);
   }
 `;
 
-const ThumbLeft = styled(Thumb)`
+const ThumbLeft = styled(Thumb)<{ $isDragging?: boolean }>`
   z-index: 3;
 `;
 
-const ThumbRight = styled(Thumb)`
+const ThumbRight = styled(Thumb)<{ $isDragging?: boolean }>`
   z-index: 4;
 `;
 
@@ -90,7 +98,7 @@ const Values = styled.div`
   gap: ${pxToRem(10)};
 `;
 
-interface MultiRangeSliderProps {
+type MultiRangeSliderProps = {
   min: number;
   max: number;
   onChange: (value: { min: number; max: number }) => void;
@@ -98,7 +106,7 @@ interface MultiRangeSliderProps {
   symbol?: string;
   setIsDragging?: (isDragging: boolean) => void;
   value: { min: number; max: number };
-}
+};
 
 const MultiRangeSlider = ({
   min,
@@ -169,7 +177,7 @@ const MultiRangeSlider = ({
   };
 
   return (
-    <SliderContainer>
+    <SliderContainer $isDragging={isDraggingRef.current}>
       <LabelWrapper>
         <SliderLabel>{label}</SliderLabel>
         <Values>
@@ -185,6 +193,7 @@ const MultiRangeSlider = ({
         min={min}
         max={max}
         value={minVal}
+        $isDragging={isDraggingRef.current}
         onMouseDown={handleMouseDown}
         onChange={(event) => {
           const value = Math.min(Number(event.target.value), maxVal - 1);
@@ -198,6 +207,7 @@ const MultiRangeSlider = ({
         min={min}
         max={max}
         value={maxVal}
+        $isDragging={isDraggingRef.current}
         onMouseDown={handleMouseDown}
         onChange={(event) => {
           const value = Math.max(Number(event.target.value), minVal + 1);
