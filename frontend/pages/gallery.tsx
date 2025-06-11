@@ -2,26 +2,29 @@ import styled from "styled-components";
 import { NextSeo } from "next-seo";
 import {
   GalleryPageType,
-  SiteSettingsType,
+  ProjectType,
   TransitionsType,
 } from "../shared/types/types";
 import { motion } from "framer-motion";
 import client from "../client";
 import {
   galleryPageQueryString,
-  siteSettingsQueryString,
+  projectsQueryString,
 } from "../lib/sanityQueries";
+import GalleryList from "../components/blocks/GalleryList";
+import LogoSaver from "../components/blocks/LogoSaver";
+import Filters from "../components/blocks/Filters";
 
 const PageWrapper = styled(motion.div)``;
 
 type Props = {
   data: GalleryPageType;
-  siteSettings: SiteSettingsType;
+  projects: ProjectType[];
   pageTransitionVariants: TransitionsType;
 };
 
 const Page = (props: Props) => {
-  const { data, siteSettings, pageTransitionVariants } = props;
+  const { data, projects, pageTransitionVariants } = props;
 
   return (
     <PageWrapper
@@ -34,19 +37,20 @@ const Page = (props: Props) => {
         title={data?.seoTitle || ""}
         description={data?.seoDescription || ""}
       />
-      Gallery
+      <GalleryList data={projects} />
+      <Filters />
     </PageWrapper>
   );
 };
 
 export async function getStaticProps() {
-  const siteSettings = await client.fetch(siteSettingsQueryString);
   const data = await client.fetch(galleryPageQueryString);
+  const projects = await client.fetch(projectsQueryString);
 
   return {
     props: {
       data,
-      siteSettings,
+      projects,
     },
   };
 }

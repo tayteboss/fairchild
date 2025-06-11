@@ -80,8 +80,12 @@ export const projectsQueryString = `
 	*[_type == 'project'] {
 		title,
 		client,
-		type,
-		styles,
+		type[]-> {
+			name
+		},
+		styles[]-> {
+			name
+		},
 		year,
 		credits[] {
 			role,
@@ -97,7 +101,11 @@ export const projectsQueryString = `
 		},
 		saturationFilter,
 		gallery[] {
-			image,
+			image {
+				asset-> {
+					url
+				}
+			},
 			thumbnailColor,
 			colorTempFilter {
 				minTemp,

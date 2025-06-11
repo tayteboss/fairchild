@@ -140,6 +140,15 @@ export default {
               title: 'Image',
               name: 'image',
               type: 'image',
+              options: {
+                hotspot: true,
+              },
+              preview: {
+                select: {
+                  imageUrl: 'asset.url',
+                  title: 'caption',
+                },
+              },
             },
             {
               title: 'Thumbnail Color',
@@ -176,6 +185,21 @@ export default {
               description: 'Saturation percentage between 0-100%',
             },
           ],
+          preview: {
+            select: {
+              media: 'image',
+              minTemp: 'colorTempFilter.minTemp',
+              maxTemp: 'colorTempFilter.maxTemp',
+              saturation: 'saturationFilter',
+            },
+            prepare(selection: {media: any; minTemp: number; maxTemp: number; saturation: number}) {
+              const {media, minTemp, maxTemp, saturation} = selection
+              return {
+                title: `${minTemp} - ${maxTemp}K, ${saturation}%`,
+                media: media,
+              }
+            },
+          },
         },
       ],
     },

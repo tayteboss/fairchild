@@ -81,7 +81,9 @@ export type ProjectType = {
   saturationFilter: number;
   gallery: {
     image: { asset: { url: string } };
-    thumbnailColor: string;
+    thumbnailColor: {
+      hex: string;
+    };
     colorTempFilter: {
       minTemp: number;
       maxTemp: number;

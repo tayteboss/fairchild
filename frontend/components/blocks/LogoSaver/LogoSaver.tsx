@@ -2,7 +2,8 @@ import styled from "styled-components";
 import WordmarkSvg from "../../svgs/WordmarkSvg";
 import LayoutWrapper from "../../layout/LayoutWrapper";
 import { useEffect, useState } from "react";
-import { useMousePosition } from "../../../hooks/useMousePosition";
+import { useRouter } from "next/router";
+import { useMouseMovement } from "../../../hooks/useMouseMovement";
 
 const LogoSaverWrapper = styled.div`
   position: fixed;
@@ -14,6 +15,7 @@ const LogoSaverWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 1000;
 
   svg {
     width: 100%;
@@ -31,32 +33,53 @@ const Inner = styled.div`
 
 const LogoSaver = () => {
   const [isVisible, setIsVisible] = useState(true);
-  const { y } = useMousePosition();
-  const [hasMoved, setHasMoved] = useState(false);
-  const [initialDelayComplete, setInitialDelayComplete] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(true);
+  const router = useRouter();
 
+  // Reset state on route change
   useEffect(() => {
-    // Start the initial 2-second timer
-    const initialTimer = setTimeout(() => {
-      setInitialDelayComplete(true);
-    }, 2000);
+    const handleRouteChange = () => {
+      setIsVisible(true);
+      setIsAnimating(true);
+    };
 
-    // Start the flashing interval
+    // Start animation on mount
+    handleRouteChange();
+
+    router.events.on("routeChangeStart", handleRouteChange);
+
+    return () => {
+      router.events.off("routeChangeStart", handleRouteChange);
+    };
+  }, [router]);
+
+  // Handle the flashing animation
+  useEffect(() => {
+    if (!isAnimating) return;
+
     const interval = setInterval(() => {
       setIsVisible((prev) => !prev);
     }, 250);
 
     return () => {
-      clearTimeout(initialTimer);
       clearInterval(interval);
     };
-  }, []);
+  }, [isAnimating]);
 
+  // Use mouse movement hook with key to force reset on route changes
+  const { hasMoved } = useMouseMovement({
+    initialDelay: 2000,
+    movementThreshold: 5,
+    throttleMs: 100,
+    key: router.asPath, // Add key to force hook reset on route change
+  });
+
+  // Stop animation when mouse moves
   useEffect(() => {
-    if (y !== null && initialDelayComplete) {
-      setHasMoved(true);
+    if (hasMoved) {
+      setIsAnimating(false);
     }
-  }, [y, initialDelayComplete]);
+  }, [hasMoved]);
 
   if (hasMoved) return null;
 

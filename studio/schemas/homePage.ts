@@ -26,6 +26,7 @@ export default {
       name: 'featuredProjects',
       type: 'array',
       of: [{type: 'reference', to: [{type: 'project'}]}],
+      validation: (Rule) => Rule.max(10),
     },
   ],
 }

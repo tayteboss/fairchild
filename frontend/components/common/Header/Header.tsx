@@ -26,7 +26,9 @@ const HeaderWrapper = styled(motion.header)`
 const LogoWrapper = styled(motion.div)`
   grid-column: span 1;
   position: relative;
-  height: 1.5em;
+  height: ${pxToRem(12)};
+  display: flex;
+  align-items: center;
 
   a {
     pointer-events: all;
@@ -36,7 +38,9 @@ const LogoWrapper = styled(motion.div)`
 const TaglineWrapper = styled(motion.div)`
   grid-column: span 5;
   position: relative;
-  height: 1.5em;
+  height: ${pxToRem(12)};
+  display: flex;
+  align-items: center;
 `;
 
 const NavigationWrapper = styled(motion.div)`
@@ -136,17 +140,17 @@ const Header = (props: Props) => {
   }, [isHomePage, setHeaderText, setIsHovering, tagline]);
 
   const getInitialY = () => {
-    if (isInformationPage) {
+    if (!isHomePage) {
       return centerPosition;
     }
-    if (previousPage === "/information" && isHomePage) {
+    if (previousPage && !isHomePage) {
       return centerPosition;
     }
     return initialY;
   };
 
   const getAnimateY = () => {
-    if (isInformationPage) {
+    if (!isHomePage) {
       return centerPosition;
     }
     if (isHomePage) {

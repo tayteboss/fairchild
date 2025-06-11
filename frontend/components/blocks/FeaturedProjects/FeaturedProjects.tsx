@@ -136,7 +136,7 @@ const FeaturedProjects = (props: Props) => {
           }}
         >
           {hasData &&
-            [...data, ...data, ...data, ...data, ...data, ...data].map(
+            [...data, ...data, ...data, ...data, ...data].map(
               (project, index) => (
                 <motion.div
                   key={`${project.title}-${index}`}

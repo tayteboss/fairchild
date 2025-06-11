@@ -95,14 +95,16 @@ const FeaturedProjectCard = (props: Props) => {
     hoveredIndex,
   } = props;
 
-  const { y } = useMousePosition();
-  const hasVideo = video?.asset?.playbackId;
-  const hasFallbackImage = fallbackImage?.asset?.url;
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [hasVideoLoaded, setHasVideoLoaded] = useState(false);
   const [initialDelayComplete, setInitialDelayComplete] = useState(false);
   const [hasMoved, setHasMoved] = useState(false);
   const [initialY, setInitialY] = useState<number | null>(null);
+
+  const { y } = useMousePosition();
+
+  const hasVideo = video?.asset?.playbackId;
+  const hasFallbackImage = fallbackImage?.asset?.url;
 
   // Use refs for all video state to persist between re-renders
   const playerRef = useRef<any>(null);
