@@ -54,10 +54,11 @@ const containerVariants = {
 
 type Props = {
   data: ProjectType[];
+  filtersIsOpen: boolean;
 };
 
 const GalleryList = (props: Props) => {
-  const { data } = props;
+  const { data, filtersIsOpen } = props;
   const { setHeaderText, setIsHovering } = useHeader();
   const { hasMoved } = useMouseMovement({
     initialDelay: 2000,
@@ -133,6 +134,7 @@ const GalleryList = (props: Props) => {
                       onClick={() => handleGalleryClick(i, j)}
                       isSelected={selectedProjectIndex === i}
                       animationPhase={animationPhase}
+                      filtersIsOpen={filtersIsOpen}
                     />
                   </GalleryCardWrapper>
                 ))

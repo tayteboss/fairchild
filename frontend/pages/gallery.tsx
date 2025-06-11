@@ -14,17 +14,95 @@ import {
 import GalleryList from "../components/blocks/GalleryList";
 import LogoSaver from "../components/blocks/LogoSaver";
 import Filters from "../components/blocks/Filters";
+import { useEffect, useState } from "react";
 
 const PageWrapper = styled(motion.div)``;
 
 type Props = {
   data: GalleryPageType;
   projects: ProjectType[];
+  yearRange: { min: number; max: number };
   pageTransitionVariants: TransitionsType;
 };
 
+const DEFAULT_COLOR_TEMP = { min: 2300, max: 7000 };
+const DEFAULT_SATURATION = { min: 0, max: 100 };
+
 const Page = (props: Props) => {
-  const { data, projects, pageTransitionVariants } = props;
+  const { data, projects, yearRange, pageTransitionVariants } = props;
+
+  const [filteredProjects, setFilteredProjects] = useState(projects);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const [filtersIsOpen, setFiltersIsOpen] = useState(false);
+  const [colorTemp, setColorTemp] = useState(DEFAULT_COLOR_TEMP);
+  const [saturation, setSaturation] = useState(DEFAULT_SATURATION);
+  const [year, setYear] = useState({ min: yearRange.min, max: yearRange.max });
+  const [filtersAreOn, setFiltersAreOn] = useState(false);
+
+  // Toggle filters panel
+  const handleToggleFilters = () => {
+    setFiltersIsOpen(!filtersIsOpen);
+  };
+
+  useEffect(() => {
+    if (isDragging) return;
+
+    // Check if filters are at default state
+    const isDefaultState =
+      colorTemp.min === DEFAULT_COLOR_TEMP.min &&
+      colorTemp.max === DEFAULT_COLOR_TEMP.max &&
+      saturation.min === DEFAULT_SATURATION.min &&
+      saturation.max === DEFAULT_SATURATION.max &&
+      year.min === yearRange.min &&
+      year.max === yearRange.max;
+
+    if (isDefaultState) {
+      setFilteredProjects(projects);
+      setFiltersAreOn(false);
+      return;
+    }
+
+    setFiltersAreOn(true);
+
+    const filtered = projects.filter((project) => {
+      // Check color temperature if it exists
+      const hasColorTemp =
+        project.colorTempFilter?.minTemp && project.colorTempFilter?.maxTemp;
+      if (hasColorTemp) {
+        const projectColorTempMiddle =
+          (project.colorTempFilter.minTemp + project.colorTempFilter.maxTemp) /
+          2;
+        const isColorTempInRange =
+          projectColorTempMiddle >= colorTemp.min &&
+          projectColorTempMiddle <= colorTemp.max;
+        if (!isColorTempInRange) return false;
+      }
+
+      // Check saturation if it exists
+      const hasSaturation = typeof project.saturationFilter === "number";
+      if (hasSaturation) {
+        const isSaturationInRange =
+          project.saturationFilter >= saturation.min &&
+          project.saturationFilter <= saturation.max;
+        if (!isSaturationInRange) return false;
+      }
+
+      // Check year if it exists
+      const hasYear = project.year && !isNaN(parseInt(project.year));
+      if (hasYear) {
+        const projectYear = parseInt(project.year);
+        const isYearInRange =
+          projectYear >= year.min && projectYear <= year.max;
+        if (!isYearInRange) return false;
+      }
+
+      // If we get here, either the filter is at default state or the project passes all applicable filters
+      return true;
+    });
+
+    setFilteredProjects(filtered);
+  }, [colorTemp, saturation, year, projects, isDragging, yearRange]);
 
   return (
     <PageWrapper
@@ -32,14 +110,25 @@ const Page = (props: Props) => {
       initial="hidden"
       animate="visible"
       exit="hidden"
-      // className="performance"
     >
       <NextSeo
         title={data?.seoTitle || ""}
         description={data?.seoDescription || ""}
       />
-      <GalleryList data={projects} />
-      <Filters />
+      <GalleryList data={filteredProjects} filtersIsOpen={filtersIsOpen} />
+      <Filters
+        isOpen={filtersIsOpen}
+        setIsOpen={handleToggleFilters}
+        colorTemp={colorTemp}
+        setColorTemp={setColorTemp}
+        saturation={saturation}
+        setSaturation={setSaturation}
+        year={year}
+        setYear={setYear}
+        yearRange={yearRange}
+        setIsDragging={setIsDragging}
+        filtersAreOn={filtersAreOn}
+      />
     </PageWrapper>
   );
 };
@@ -48,10 +137,21 @@ export async function getStaticProps() {
   const data = await client.fetch(galleryPageQueryString);
   const projects = await client.fetch(projectsQueryString);
 
+  const yearRange = projects.reduce(
+    (acc: { min: number; max: number }, project: ProjectType) => {
+      const year = parseInt(project.year);
+      if (!acc.min || year < acc.min) acc.min = year;
+      if (!acc.max || year > acc.max) acc.max = year;
+      return acc;
+    },
+    { min: 0, max: 0 }
+  );
+
   return {
     props: {
       data,
       projects,
+      yearRange,
     },
   };
 }

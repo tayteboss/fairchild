@@ -101,6 +101,7 @@ type Props = {
   onClick: () => void;
   isSelected: boolean;
   animationPhase: "idle" | "fade" | "center" | "carousel";
+  filtersIsOpen: boolean;
 };
 
 const GalleryCard = ({
@@ -112,6 +113,7 @@ const GalleryCard = ({
   onClick,
   isSelected,
   animationPhase,
+  filtersIsOpen,
 }: Props) => {
   const { elementRef, scale } = useProximityScale({
     maxScale: 1,
@@ -130,7 +132,9 @@ const GalleryCard = ({
               width:
                 isSelected && animationPhase === "carousel"
                   ? "100%"
-                  : `${scale * 100}%`,
+                  : filtersIsOpen
+                    ? "25%"
+                    : `${scale * 100}%`,
             }}
             transition={{
               layout: {
