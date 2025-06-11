@@ -190,7 +190,7 @@ const Header = (props: Props) => {
             <Text>{isHovering ? headerText.tagline : tagline || ""}</Text>
           </TaglineWrapper>
           <NavigationWrapper>
-            {isHovering ? (
+            {isHovering && headerText.type && headerText.year ? (
               <Text>
                 {headerText.type?.[0]?.name} — {headerText.year}
               </Text>

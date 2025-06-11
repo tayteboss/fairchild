@@ -17,12 +17,14 @@ export const useMouseMovement = ({
   const [hasMoved, setHasMoved] = useState(false);
   const [initialDelayComplete, setInitialDelayComplete] = useState(false);
   const [lastY, setLastY] = useState<number | null>(null);
+  const [lastScrollY, setLastScrollY] = useState<number | null>(null);
 
   // Reset state when key changes
   useEffect(() => {
     setHasMoved(false);
     setInitialDelayComplete(false);
     setLastY(null);
+    setLastScrollY(null);
   }, [key]);
 
   // Handle the initial delay
@@ -34,33 +36,54 @@ export const useMouseMovement = ({
     return () => clearTimeout(timer);
   }, [initialDelay, key]);
 
-  // Handle mouse movement
+  // Handle mouse movement and scroll
   useEffect(() => {
     if (!initialDelayComplete) return;
 
-    const handleMouseMove = throttle((event: MouseEvent) => {
+    const handleMovement = throttle((y: number, isScroll: boolean) => {
       if (hasMoved) return;
 
       // Set initial Y position if not set
-      if (lastY === null) {
-        setLastY(event.clientY);
-        return;
-      }
-
-      // Check if cursor has moved beyond threshold
-      if (Math.abs(event.clientY - lastY) > movementThreshold) {
-        setHasMoved(true);
+      if (isScroll) {
+        if (lastScrollY === null) {
+          setLastScrollY(y);
+          return;
+        }
+        // Check if scroll has moved beyond threshold
+        if (Math.abs(y - lastScrollY) > movementThreshold) {
+          setHasMoved(true);
+        }
+      } else {
+        if (lastY === null) {
+          setLastY(y);
+          return;
+        }
+        // Check if cursor has moved beyond threshold
+        if (Math.abs(y - lastY) > movementThreshold) {
+          setHasMoved(true);
+        }
       }
     }, throttleMs);
 
+    const handleMouseMove = (event: MouseEvent) => {
+      handleMovement(event.clientY, false);
+    };
+
+    const handleScroll = () => {
+      handleMovement(window.scrollY, true);
+    };
+
     window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("scroll", handleScroll);
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("scroll", handleScroll);
     };
   }, [
     initialDelayComplete,
     lastY,
+    lastScrollY,
     hasMoved,
     movementThreshold,
     throttleMs,

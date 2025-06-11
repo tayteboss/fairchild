@@ -12,9 +12,11 @@ export const useProximityScale = ({
   minScale = 0.5,
   proximityRadius = 300,
 }: UseProximityScaleProps = {}) => {
-  const elementRef = useRef<HTMLDivElement>(null);
-  const { x: mouseX, y: mouseY } = useMousePosition();
   const [scale, setScale] = useState(minScale);
+
+  const { x: mouseX, y: mouseY } = useMousePosition();
+
+  const elementRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!elementRef.current || mouseX === null || mouseY === null) return;
