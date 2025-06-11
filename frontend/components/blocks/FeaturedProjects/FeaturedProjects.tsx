@@ -46,7 +46,7 @@ const springTransition = {
   mass: 1,
 };
 
-const PARALLAX_STRENGTH = 1000;
+const PARALLAX_STRENGTH = 500;
 
 const containerVariants = {
   hidden: {
@@ -136,22 +136,24 @@ const FeaturedProjects = (props: Props) => {
           }}
         >
           {hasData &&
-            [...data, ...data].map((project, index) => (
-              <motion.div
-                key={`${project.title}-${index}`}
-                variants={itemVariants}
-              >
-                <FeaturedProjectCard
-                  {...project}
-                  index={index}
-                  totalCards={data.length * 2}
-                  isHovered={hoveredIndex === index}
-                  onHoverStart={() => handleHoverStart(index)}
-                  onHoverEnd={handleHoverEnd}
-                  hoveredIndex={hoveredIndex}
-                />
-              </motion.div>
-            ))}
+            [...data, ...data, ...data, ...data, ...data, ...data].map(
+              (project, index) => (
+                <motion.div
+                  key={`${project.title}-${index}`}
+                  variants={itemVariants}
+                >
+                  <FeaturedProjectCard
+                    {...project}
+                    index={index}
+                    totalCards={data.length * 2}
+                    isHovered={hoveredIndex === index}
+                    onHoverStart={() => handleHoverStart(index)}
+                    onHoverEnd={handleHoverEnd}
+                    hoveredIndex={hoveredIndex}
+                  />
+                </motion.div>
+              )
+            )}
         </ParallaxWrapper>
       </Inner>
     </FeaturedProjectsWrapper>

@@ -20,6 +20,7 @@ const HeaderWrapper = styled(motion.header)`
   z-index: 100;
   will-change: transform;
   pointer-events: none;
+  mix-blend-mode: difference;
 `;
 
 const LogoWrapper = styled(motion.div)`
@@ -46,20 +47,20 @@ const NavigationWrapper = styled(motion.div)`
 
   span {
     white-space: pre;
-    color: var(--colour-fg);
+    color: var(--colour-white);
     cursor: default;
   }
 `;
 
 const Text = styled.div`
-  color: var(--colour-fg);
+  color: var(--colour-white);
   position: absolute;
   width: 100%;
 `;
 
 const LinkText = styled.div<{ $isActive?: boolean }>`
   text-decoration: ${({ $isActive }) => ($isActive ? "underline" : "none")};
-  color: var(--colour-fg);
+  color: var(--colour-white);
   pointer-events: all;
 
   &:hover {
@@ -71,19 +72,14 @@ type Props = {
   tagline: SiteSettingsType["tagline"];
 };
 
-const springTransition = {
-  type: "spring",
-  stiffness: 300,
-  damping: 20,
-  mass: 0.5,
-};
-
 const Header = (props: Props) => {
   const { tagline } = props;
 
   const [initialY, setInitialY] = useState(0);
   const [hasMoved, setHasMoved] = useState(false);
   const [shouldShow, setShouldShow] = useState(false);
+  const [previousPage, setPreviousPage] = useState<string | null>(null);
+  const [centerPosition, setCenterPosition] = useState(0);
 
   const { headerText, isHovering, setHeaderText, setIsHovering } = useHeader();
   const { y } = useMousePosition();
@@ -92,12 +88,27 @@ const Header = (props: Props) => {
   const activeLink = useActiveLink();
 
   const isHomePage = router.pathname === "/";
+  const isInformationPage = router.pathname === "/information";
+
+  // Set center position on mount and window resize
+  useEffect(() => {
+    const updateCenterPosition = () => {
+      setCenterPosition(window.innerHeight / 2 - 12);
+    };
+
+    updateCenterPosition();
+    window.addEventListener("resize", updateCenterPosition);
+
+    return () => {
+      window.removeEventListener("resize", updateCenterPosition);
+    };
+  }, []);
 
   useEffect(() => {
     if (isHomePage) {
-      setInitialY(window.innerHeight / 2 - 12);
+      setInitialY(centerPosition);
     }
-  }, [isHomePage]);
+  }, [isHomePage, centerPosition]);
 
   useEffect(() => {
     if (y !== null && !hasMoved) {
@@ -107,6 +118,11 @@ const Header = (props: Props) => {
       }, 200);
     }
   }, [y, hasMoved]);
+
+  // Track page changes
+  useEffect(() => {
+    setPreviousPage(router.pathname);
+  }, [router.pathname]);
 
   // Reset header text when navigating away from home page
   useEffect(() => {
@@ -119,25 +135,45 @@ const Header = (props: Props) => {
     }
   }, [isHomePage, setHeaderText, setIsHovering, tagline]);
 
-  const itemInitialState = {
-    y: initialY,
+  const getInitialY = () => {
+    if (isInformationPage) {
+      return centerPosition;
+    }
+    if (previousPage === "/information" && isHomePage) {
+      return centerPosition;
+    }
+    return initialY;
   };
 
-  const itemAnimateState = {
-    y: isHomePage ? (y ? y - 12 : initialY) : 0,
-  };
-
-  const itemTransitionConfig = {
-    y: { ...springTransition },
+  const getAnimateY = () => {
+    if (isInformationPage) {
+      return centerPosition;
+    }
+    if (isHomePage) {
+      return y ? y - 12 : initialY;
+    }
+    return 0;
   };
 
   return (
     <HeaderWrapper
       className="header"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: shouldShow ? 1 : 0, ...itemAnimateState }}
+      initial={{ opacity: 0, y: getInitialY() }}
+      animate={{
+        opacity: shouldShow ? 1 : 0,
+        y: getAnimateY(),
+      }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+      transition={{
+        duration: 0.3,
+        ease: [0.16, 1, 0.3, 1],
+        y: {
+          type: "spring",
+          stiffness: 300,
+          damping: 20,
+          mass: 0.5,
+        },
+      }}
     >
       <LayoutWrapper>
         <LayoutGrid>
