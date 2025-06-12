@@ -25,7 +25,7 @@ const HeaderWrapper = styled(motion.header)`
 `;
 
 const LogoWrapper = styled(motion.div)`
-  grid-column: span 1;
+  grid-column: 1 / 2;
   position: relative;
   height: ${pxToRem(12)};
   display: flex;
@@ -37,15 +37,26 @@ const LogoWrapper = styled(motion.div)`
 `;
 
 const TaglineWrapper = styled(motion.div)`
-  grid-column: span 5;
-  position: relative;
-  height: ${pxToRem(12)};
+  grid-column: 2 / 5;
   display: flex;
   align-items: center;
 `;
 
+const ProjectTypeWrapper = styled(motion.div)`
+  grid-column: 5 / 7;
+`;
+
+const ProjectStylesWrapper = styled(motion.div)`
+  grid-column: 7 / 11;
+`;
+
+const ProjectYearWrapper = styled(motion.div)`
+  grid-column: 12 / -1;
+  text-align: right;
+`;
+
 const NavigationWrapper = styled(motion.div)`
-  grid-column: span 6;
+  grid-column: 10 / -1;
   text-align: right;
   display: flex;
   justify-content: flex-end;
@@ -59,7 +70,6 @@ const NavigationWrapper = styled(motion.div)`
 
 const Text = styled.div`
   color: var(--colour-white);
-  position: absolute;
   width: 100%;
 
   &:hover {
@@ -92,6 +102,9 @@ const Header = (props: Props) => {
     headerText,
     isHovering,
     isProjectView,
+    projectType,
+    projectStyles,
+    projectCredits,
     setHeaderText,
     setIsHovering,
   } = useHeader();
@@ -195,12 +208,22 @@ const Header = (props: Props) => {
             <Text>{isHovering ? headerText.tagline : tagline || ""}</Text>
           </TaglineWrapper>
           {isProjectView ? (
-            <Text>ProjectView</Text>
+            <>
+              {/* <ProjectTypeWrapper>
+                <Text>Type here</Text>
+              </ProjectTypeWrapper>
+              <ProjectStylesWrapper>
+                <Text>Styles here</Text>
+              </ProjectStylesWrapper> */}
+              <ProjectYearWrapper>
+                <Text>{headerText.year || ""}</Text>
+              </ProjectYearWrapper>
+            </>
           ) : (
             <NavigationWrapper>
               {isHovering && headerText.type && headerText.year ? (
                 <Text>
-                  {headerText.type?.[0]?.name} — {headerText.year}
+                  {headerText.type?.[0]?.name || ""} — {headerText.year || ""}
                 </Text>
               ) : (
                 <>

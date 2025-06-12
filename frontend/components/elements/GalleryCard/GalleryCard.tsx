@@ -135,6 +135,7 @@ const GalleryCard = ({
         <InnerWrapper>
           <Inner
             ref={elementRef}
+            initial={{ width: "25%" }}
             animate={{
               width:
                 animationPhase === "carousel"
@@ -177,7 +178,7 @@ const GalleryCard = ({
                   }}
                   sizes="25vw"
                   loading="lazy"
-                  quality={50}
+                  quality={90}
                 />
                 <ColorOverlay
                   $color={gallery.thumbnailColor.hex}

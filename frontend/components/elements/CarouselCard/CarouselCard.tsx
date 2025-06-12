@@ -2,12 +2,16 @@ import styled from "styled-components";
 import { ProjectType } from "../../../shared/types/types";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { useInView } from "react-intersection-observer";
+import { useHeader } from "../../layout/HeaderContext";
+import { useEffect } from "react";
 
-const CardWrapper = styled(motion.div)`
+const CardWrapper = styled.div`
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: crosshair;
 `;
 
 const Outer = styled.div`
@@ -86,18 +90,36 @@ type Props = {
   };
   onLoad?: () => void;
   isOverlayActive: boolean;
+  hasScrolled: boolean;
 };
 
-const CarouselCard = ({ project, gallery, onLoad, isOverlayActive }: Props) => {
+const CarouselCard = ({
+  project,
+  gallery,
+  onLoad,
+  isOverlayActive,
+  hasScrolled,
+}: Props) => {
+  const { setHeaderText } = useHeader();
+
+  const { ref, inView } = useInView({
+    triggerOnce: false,
+    threshold: 1,
+    rootMargin: "-50px",
+  });
+
+  useEffect(() => {
+    if (inView && hasScrolled) {
+      setHeaderText({
+        logo: project.client || "",
+        tagline: project.title || "",
+        year: project.year || "",
+      });
+    }
+  }, [inView, project, setHeaderText, hasScrolled]);
+
   return (
-    <CardWrapper
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{
-        duration: 1.5,
-        ease: [0.16, 1, 0.3, 1],
-      }}
-    >
+    <CardWrapper ref={ref}>
       <Outer>
         <InnerWrapper>
           <Inner>
@@ -110,7 +132,7 @@ const CarouselCard = ({ project, gallery, onLoad, isOverlayActive }: Props) => {
                   style={{
                     objectFit: "cover",
                   }}
-                  sizes="70vw"
+                  sizes="60vw"
                   loading="lazy"
                   onLoad={onLoad}
                 />

@@ -106,6 +106,7 @@ type MultiRangeSliderProps = {
   symbol?: string;
   setIsDragging?: (isDragging: boolean) => void;
   value: { min: number; max: number };
+  step?: number;
 };
 
 const MultiRangeSlider = ({
@@ -116,6 +117,7 @@ const MultiRangeSlider = ({
   symbol,
   setIsDragging,
   value,
+  step = 1,
 }: MultiRangeSliderProps) => {
   const [minVal, setMinVal] = useState(value.min);
   const [maxVal, setMaxVal] = useState(value.max);
@@ -195,6 +197,7 @@ const MultiRangeSlider = ({
         value={minVal}
         $isDragging={isDraggingRef.current}
         onMouseDown={handleMouseDown}
+        step={step}
         onChange={(event) => {
           const value = Math.min(Number(event.target.value), maxVal - 1);
           setMinVal(value);
@@ -209,6 +212,7 @@ const MultiRangeSlider = ({
         value={maxVal}
         $isDragging={isDraggingRef.current}
         onMouseDown={handleMouseDown}
+        step={step}
         onChange={(event) => {
           const value = Math.max(Number(event.target.value), minVal + 1);
           setMaxVal(value);

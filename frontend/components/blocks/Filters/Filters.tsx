@@ -155,6 +155,7 @@ const Filters = (props: Props) => {
                   symbol="K"
                   setIsDragging={setIsDragging}
                   value={colorTemp}
+                  step={100}
                 />
                 <MultiRangeSlider
                   min={0}
@@ -164,6 +165,7 @@ const Filters = (props: Props) => {
                   symbol="%"
                   setIsDragging={setIsDragging}
                   value={saturation}
+                  step={5}
                 />
                 <MultiRangeSlider
                   min={yearRange.min || 0}

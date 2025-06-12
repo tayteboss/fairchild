@@ -2,16 +2,19 @@ import styled from "styled-components";
 import { ProjectType } from "../../../shared/types/types";
 import {
   motion,
-  useTransform,
   MotionValue,
   useMotionValue,
   AnimatePresence,
 } from "framer-motion";
 import { useEffect, useRef, useState, useCallback } from "react";
-import CarouselCard from "../../elements/CarouselCard/CarouselCard";
 import { useHeader } from "../../layout/HeaderContext";
 import Lenis from "@studio-freight/lenis";
-import { useInView } from "react-intersection-observer";
+import AnimatedCarouselCard, {
+  CardLayout,
+} from "../../elements/AnimatedCarouselCard/AnimatedCarouselCard";
+
+const MAX_WIDTH = 60;
+const MIN_WIDTH = 30;
 
 const CarouselWrapper = styled(motion.div)`
   position: fixed;
@@ -21,6 +24,7 @@ const CarouselWrapper = styled(motion.div)`
   height: 100vh;
   z-index: 50;
   overflow: hidden;
+  cursor: pointer;
 `;
 
 const Backdrop = styled.div`
@@ -44,35 +48,8 @@ const CarouselContainer = styled.div`
 const Inner = styled.div`
   display: flex;
   flex-direction: column;
-  width: 50vw;
+  width: 60vw;
   margin: 0 auto;
-`;
-
-const CarouselCardWrapper = styled(motion.div)`
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  margin: 0 auto;
-`;
-
-const CloseButton = styled.button`
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background: none;
-  border: none;
-  color: var(--color-white);
-  font-size: 16px;
-  cursor: pointer;
-  z-index: 101;
-  padding: 10px;
-  transition: opacity 0.3s ease;
-
-  &:hover {
-    opacity: 0.7;
-  }
 `;
 
 const wrapperVariants = {
@@ -102,95 +79,6 @@ type Props = {
   isOpen: boolean;
 };
 
-const MAX_WIDTH = 50;
-const MIN_WIDTH = 25;
-const SCALE_THRESHOLD = 0.5;
-
-type CardLayout = { top: number; height: number };
-
-type AnimatedCarouselCardProps = {
-  project: ProjectType | null;
-  galleryItem: any;
-  scrollY: MotionValue<number>;
-  viewportHeight: number;
-  layout: CardLayout | undefined;
-  onImageLoad: () => void;
-  isOverlayActive: boolean;
-};
-
-const AnimatedCarouselCard = ({
-  project,
-  galleryItem,
-  scrollY,
-  viewportHeight,
-  layout,
-  onImageLoad,
-  isOverlayActive,
-}: AnimatedCarouselCardProps) => {
-  const width = useMotionValue(MIN_WIDTH);
-
-  const { ref, inView } = useInView({
-    triggerOnce: true,
-    threshold: 0.5,
-  });
-
-  useEffect(() => {
-    const updateWidth = (scroll: number) => {
-      if (!layout || viewportHeight === 0) {
-        width.set(MIN_WIDTH);
-        return;
-      }
-
-      const cardCenter = layout.top + layout.height / 2;
-      const viewportCenterInScrollable = viewportHeight / 2 + scroll;
-
-      const distanceFromCenter = Math.abs(
-        cardCenter - viewportCenterInScrollable
-      );
-      const normalizedDistance = Math.min(
-        distanceFromCenter / (viewportHeight * SCALE_THRESHOLD),
-        1
-      );
-      const newWidth = MAX_WIDTH - normalizedDistance * (MAX_WIDTH - MIN_WIDTH);
-      width.set(newWidth);
-    };
-
-    const unsubscribe = scrollY.onChange(updateWidth);
-    updateWidth(scrollY.get());
-
-    return () => unsubscribe();
-  }, [layout, scrollY, viewportHeight, width]);
-
-  const widthVw = useTransform(width, (w) => `${w}vw`);
-
-  return (
-    <CarouselCardWrapper
-      className="carousel-card"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{
-        duration: 0.5,
-        ease: [0.16, 1, 0.3, 1],
-      }}
-      style={{
-        width: widthVw,
-      }}
-      ref={ref}
-    >
-      <CarouselCard
-        project={{
-          ...(project as ProjectType),
-          title: galleryItem.projectTitle,
-          client: galleryItem.projectClient,
-        }}
-        gallery={galleryItem}
-        onLoad={onImageLoad}
-        isOverlayActive={isOverlayActive}
-      />
-    </CarouselCardWrapper>
-  );
-};
-
 const ProjectGalleryCarousel = (props: Props) => {
   const {
     project,
@@ -200,17 +88,21 @@ const ProjectGalleryCarousel = (props: Props) => {
     allProjects,
     isOpen,
   } = props;
+  const [cardLayouts, setCardLayouts] = useState<CardLayout[]>([]);
+  const [viewportHeight, setViewportHeight] = useState(0);
+  const [isOverlayActive, setIsOverlayActive] = useState(true);
+  const [allImagesLoaded, setAllImagesLoaded] = useState(false);
+  const [hasScrolled, setHasScrolled] = useState(false);
+
   const { setHeaderText, setIsHovering, setIsProjectView } = useHeader();
+
+  const loadedImageCounter = useRef(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
   const lenisRef = useRef<Lenis | null>(null);
   const didInitialScroll = useRef(false);
-  const [cardLayouts, setCardLayouts] = useState<CardLayout[]>([]);
-  const [viewportHeight, setViewportHeight] = useState(0);
+
   const scrollY = useMotionValue(0);
-  const [isOverlayActive, setIsOverlayActive] = useState(true);
-  const loadedImageCounter = useRef(0);
-  const [allImagesLoaded, setAllImagesLoaded] = useState(false);
 
   const allGalleryItems = allProjects.reduce((acc, project) => {
     if (project.gallery) {
@@ -243,16 +135,42 @@ const ProjectGalleryCarousel = (props: Props) => {
   }, [allProjects, project, initialGalleryIndex]);
 
   const recalculateLayout = useCallback(() => {
-    if (containerRef.current) {
+    if (
+      containerRef.current &&
+      innerRef.current &&
+      allGalleryItems.length > 0
+    ) {
       const cards =
         containerRef.current.querySelectorAll<HTMLElement>(".carousel-card");
-      const layouts = Array.from(cards).map((el) => ({
-        top: el.offsetTop,
-        height: el.clientHeight,
-      }));
-      setCardLayouts(layouts);
+      if (cards.length === 0) return;
+
+      const paddingTop = containerRef.current.clientHeight / 2;
+      const selectedIndex = findSelectedImageIndex();
+      const vw = window.innerWidth / 100;
+      const style = window.getComputedStyle(cards[0]);
+      const marginTop = parseFloat(style.marginTop);
+      const marginBottom = parseFloat(style.marginBottom);
+
+      let accumulatedTop = paddingTop;
+      const newLayouts: CardLayout[] = Array.from(cards).map((_, index) => {
+        const isActive = index === selectedIndex;
+        const cardWidthVw =
+          selectedIndex !== null
+            ? isActive
+              ? MAX_WIDTH
+              : MIN_WIDTH
+            : MIN_WIDTH;
+        const cardWidthPx = cardWidthVw * vw;
+        const cardHeightPx = (cardWidthPx * 9) / 16;
+
+        const top = accumulatedTop;
+        accumulatedTop += cardHeightPx + marginTop + marginBottom;
+        return { top, height: cardHeightPx };
+      });
+
+      setCardLayouts(newLayouts);
     }
-  }, []);
+  }, [findSelectedImageIndex, allGalleryItems.length]);
 
   const handleImageLoad = useCallback(() => {
     loadedImageCounter.current += 1;
@@ -267,6 +185,7 @@ const ProjectGalleryCarousel = (props: Props) => {
     setHeaderText({
       logo: "Fairchild",
       tagline: "",
+      year: "",
     });
     setIsHovering(false);
     onClose();
@@ -304,21 +223,25 @@ const ProjectGalleryCarousel = (props: Props) => {
 
         if (selectedIndex !== null) {
           didInitialScroll.current = true;
-          const cards = container.querySelectorAll(".carousel-card");
-          if (cards[selectedIndex]) {
-            const targetCard = cards[selectedIndex] as HTMLElement;
+          const targetLayout = cardLayouts[selectedIndex];
+
+          if (targetLayout) {
             const offset =
-              targetCard.offsetTop -
+              targetLayout.top -
               container.clientHeight / 2 +
-              targetCard.clientHeight / 2;
+              targetLayout.height / 2;
             const scrollDuration = 2;
             lenisRef.current.scrollTo(offset, {
               duration: scrollDuration,
               easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
             });
+            const timeoutId = setTimeout(() => {
+              setHasScrolled(true);
+            }, 2000);
+            return () => clearTimeout(timeoutId);
           }
         }
-      }, 0);
+      }, 100);
     }
   }, [cardLayouts, findSelectedImageIndex]);
 
@@ -331,6 +254,7 @@ const ProjectGalleryCarousel = (props: Props) => {
       setHeaderText({
         logo: project.client || "",
         tagline: project.title || "",
+        year: project.year || "",
       });
       setIsHovering(true);
 
@@ -393,6 +317,7 @@ const ProjectGalleryCarousel = (props: Props) => {
           initial="hidden"
           animate="visible"
           exit="hidden"
+          onClick={handleClose}
         >
           <Backdrop />
           <CarouselContainer ref={containerRef}>
@@ -413,11 +338,14 @@ const ProjectGalleryCarousel = (props: Props) => {
                   layout={cardLayouts[index]}
                   onImageLoad={handleImageLoad}
                   isOverlayActive={isOverlayActive}
+                  hasScrolled={hasScrolled}
+                  isSelected={index === findSelectedImageIndex()}
+                  maxWidth={MAX_WIDTH}
+                  minWidth={MIN_WIDTH}
                 />
               ))}
             </Inner>
           </CarouselContainer>
-          <CloseButton onClick={handleClose}>Close</CloseButton>
         </CarouselWrapper>
       )}
     </AnimatePresence>
