@@ -3,13 +3,17 @@ import styled from "styled-components";
 const IndicatorWrapper = styled.div``;
 
 type Props = {
-  isAscending: boolean;
+  type: "asc" | "dsc" | "inactive";
 };
 
 const Indicator = (props: Props) => {
-  const { isAscending } = props;
+  const { type } = props;
 
-  return <IndicatorWrapper>[{isAscending ? "↑" : "↓"}]</IndicatorWrapper>;
+  return (
+    <IndicatorWrapper>
+      [{type === "asc" ? "↑" : type === "dsc" ? "↓" : "·"}]
+    </IndicatorWrapper>
+  );
 };
 
 export default Indicator;

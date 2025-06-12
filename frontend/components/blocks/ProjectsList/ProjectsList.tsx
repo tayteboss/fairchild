@@ -17,17 +17,22 @@ const ProjectsWrapper = styled.div`
 
 type Props = {
   projects: ProjectType[];
+  handleSort: (key: string) => void;
+  sortConfig: {
+    key: string;
+    direction: string;
+  };
 };
 
 const ProjectsList = (props: Props) => {
-  const { projects } = props;
+  const { projects, handleSort, sortConfig } = props;
 
   const hasProjects = projects && projects.length > 0;
 
   return (
     <ProjectsListWrapper>
       <LayoutWrapper>
-        <ProjectHeader />
+        <ProjectHeader handleSort={handleSort} sortConfig={sortConfig} />
         <ProjectsWrapper>
           {hasProjects ? (
             projects.map((project, index) => (

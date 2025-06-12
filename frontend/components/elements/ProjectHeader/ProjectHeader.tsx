@@ -35,9 +35,8 @@ const Type = styled.button`
   ${sharedStyles}
 `;
 
-const Styles = styled.button`
+const Styles = styled.p`
   grid-column: span 4;
-  ${sharedStyles}
 `;
 
 const Year = styled.button`
@@ -45,24 +44,41 @@ const Year = styled.button`
   ${sharedStyles}
 `;
 
-const ProjectHeader = () => {
+type Props = {
+  handleSort: (key: string) => void;
+  sortConfig: {
+    key: string;
+    direction: string;
+  };
+};
+
+const ProjectHeader = (props: Props) => {
+  const { handleSort, sortConfig } = props;
+
+  const getIndicatorType = (key: string) => {
+    if (sortConfig.key !== key) {
+      return "inactive";
+    }
+    return sortConfig.direction === "asc" ? "asc" : "dsc";
+  };
+
   return (
     <ProjectHeaderWrapper>
       <LayoutGrid>
-        <Client>
-          <span>Client</span> <Indicator isAscending={true} />
+        <Client onClick={() => handleSort("client")}>
+          <span>Client</span> <Indicator type={getIndicatorType("client")} />
         </Client>
-        <Project>
-          <span>Project</span> <Indicator isAscending={false} />
+        <Project onClick={() => handleSort("project")}>
+          <span>Project</span> <Indicator type={getIndicatorType("project")} />
         </Project>
-        <Type>
-          <span>Type</span> <Indicator isAscending={true} />
+        <Type onClick={() => handleSort("type")}>
+          <span>Type</span> <Indicator type={getIndicatorType("type")} />
         </Type>
         <Styles>
-          <span>Styles</span> <Indicator isAscending={true} />
+          <span>Styles</span>
         </Styles>
-        <Year>
-          <span>Year</span> <Indicator isAscending={true} />
+        <Year onClick={() => handleSort("year")}>
+          <span>Year</span> <Indicator type={getIndicatorType("year")} />
         </Year>
       </LayoutGrid>
     </ProjectHeaderWrapper>

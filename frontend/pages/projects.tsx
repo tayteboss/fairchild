@@ -41,10 +41,24 @@ const Page = (props: Props) => {
   const [filtersAreOn, setFiltersAreOn] = useState(false);
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
+  const [sortConfig, setSortConfig] = useState({
+    key: "client",
+    direction: "asc",
+  });
 
   // Toggle filters panel
   const handleToggleFilters = () => {
     setFiltersIsOpen(!filtersIsOpen);
+  };
+
+  const handleSort = (key: string) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    } else if (key === "year" && sortConfig.key !== "year") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
   };
 
   useEffect(() => {
@@ -62,6 +76,42 @@ const Page = (props: Props) => {
       );
     }
 
+    if (sortConfig.key) {
+      tempProjects.sort((a, b) => {
+        let aValue: any;
+        let bValue: any;
+
+        switch (sortConfig.key) {
+          case "client":
+            aValue = a.client?.toLowerCase();
+            bValue = b.client?.toLowerCase();
+            break;
+          case "project":
+            aValue = a.title?.toLowerCase();
+            bValue = b.title?.toLowerCase();
+            break;
+          case "type":
+            aValue = a.type[0]?.name.toLowerCase() || "";
+            bValue = b.type[0]?.name.toLowerCase() || "";
+            break;
+          case "year":
+            aValue = a.year;
+            bValue = b.year;
+            break;
+          default:
+            return 0;
+        }
+
+        if (aValue < bValue) {
+          return sortConfig.direction === "asc" ? -1 : 1;
+        }
+        if (aValue > bValue) {
+          return sortConfig.direction === "asc" ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+
     setFilteredProjects(tempProjects);
 
     if (selectedTypes.length > 0 || selectedStyles.length > 0) {
@@ -69,7 +119,7 @@ const Page = (props: Props) => {
     } else {
       setFiltersAreOn(false);
     }
-  }, [selectedTypes, selectedStyles, projects]);
+  }, [selectedTypes, selectedStyles, projects, sortConfig]);
 
   return (
     <PageWrapper
@@ -82,7 +132,11 @@ const Page = (props: Props) => {
         title={data?.seoTitle || ""}
         description={data?.seoDescription || ""}
       />
-      <ProjectsList projects={filteredProjects} />
+      <ProjectsList
+        projects={filteredProjects}
+        handleSort={handleSort}
+        sortConfig={sortConfig}
+      />
       <ProjectFilters
         isOpen={filtersIsOpen}
         setIsOpen={handleToggleFilters}
@@ -100,9 +154,15 @@ const Page = (props: Props) => {
 
 export async function getStaticProps() {
   const data = await client.fetch(projectsPageQueryString);
-  const projects = await client.fetch(projectsQueryString);
+  let projects = await client.fetch(projectsQueryString);
   const projectTypes = await client.fetch(projectTypesQueryString);
   const projectStyles = await client.fetch(projectStylesQueryString);
+
+  projects = projects.sort((a: ProjectType, b: ProjectType) => {
+    const clientA = a.client.toLowerCase();
+    const clientB = b.client.toLowerCase();
+    return clientA.localeCompare(clientB);
+  });
 
   return {
     props: {
