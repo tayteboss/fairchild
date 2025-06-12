@@ -5,7 +5,7 @@ import pxToRem from "../../../utils/pxToRem";
 import FullScreenSvg from "../../svgs/FullScreenSvg";
 
 const ProjectListCardWrapper = styled.div`
-  opacity: 0.2;
+  opacity: 0.4;
   cursor: pointer;
   padding: ${pxToRem(4)} 0;
 
@@ -79,13 +79,30 @@ const FullScreen = styled.button`
 
 type Props = {
   project: ProjectType;
+  setActiveProject: (project: {
+    project: ProjectType | null;
+    action: "hover" | "fullscreen" | "inactive";
+  }) => void;
+  isFullScreen: boolean;
 };
 
 const ProjectListCard = (props: Props) => {
-  const { project } = props;
+  const { project, isFullScreen, setActiveProject } = props;
 
   return (
-    <ProjectListCardWrapper>
+    <ProjectListCardWrapper
+      onMouseOver={() =>
+        setActiveProject({ project: project, action: "hover" })
+      }
+      onMouseLeave={() => {
+        if (!isFullScreen) {
+          setActiveProject({ project: null, action: "inactive" });
+        }
+      }}
+      onClick={() =>
+        setActiveProject({ project: project, action: "fullscreen" })
+      }
+    >
       <LayoutGrid>
         <Client>{project.client || "N/A"}</Client>
         <Project>{project.title || "N/A"}</Project>

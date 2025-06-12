@@ -6,6 +6,7 @@ import { InformationPageType } from "../../../shared/types/types";
 const LinksBlockWrapper = styled.div`
   display: flex;
   gap: ${pxToRem(16)};
+  mix-blend-mode: difference;
 `;
 
 const Block = styled.div`

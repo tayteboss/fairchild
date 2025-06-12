@@ -51,7 +51,7 @@ const ThemeSwitchBlock = () => {
   const handleThemeSwitch = (index: number) => {
     setActiveIndex(index);
     document.documentElement.style.setProperty("--colour-bg", colors[index].bg);
-    document.documentElement.style.setProperty("--colour-fg", colors[index].fg);
+    // document.documentElement.style.setProperty("--colour-fg", colors[index].fg);
   };
 
   return (

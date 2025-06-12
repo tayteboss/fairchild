@@ -43,6 +43,7 @@ const FiltersTrigger = styled.button<{ $isActive: boolean }>`
   padding-top: ${pxToRem(3)};
   opacity: ${({ $isActive }) => ($isActive ? 1 : 0)};
   white-space: pre;
+  mix-blend-mode: difference;
 
   transition: all var(--transition-speed-default) var(--transition-ease);
 

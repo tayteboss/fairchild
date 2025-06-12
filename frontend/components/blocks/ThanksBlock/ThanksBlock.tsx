@@ -8,6 +8,7 @@ const ThanksBlockWrapper = styled.div`
   justify-content: center;
   align-items: center;
   gap: ${pxToRem(16)};
+  mix-blend-mode: difference;
 `;
 
 const Inner = styled.div``;

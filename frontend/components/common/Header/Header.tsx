@@ -33,6 +33,7 @@ const LogoWrapper = styled(motion.div)`
 
   a {
     pointer-events: all;
+    color: var(--colour-white);
   }
 `;
 
@@ -40,14 +41,6 @@ const TaglineWrapper = styled(motion.div)`
   grid-column: 2 / 5;
   display: flex;
   align-items: center;
-`;
-
-const ProjectTypeWrapper = styled(motion.div)`
-  grid-column: 5 / 7;
-`;
-
-const ProjectStylesWrapper = styled(motion.div)`
-  grid-column: 7 / 11;
 `;
 
 const ProjectYearWrapper = styled(motion.div)`
@@ -147,7 +140,7 @@ const Header = (props: Props) => {
   }, [isHomePage, setHeaderText, setIsHovering, tagline]);
 
   const getAnimateY = () => {
-    if (isProjectsPage || isProjectView) {
+    if (isProjectsPage) {
       return 0;
     }
 
@@ -190,12 +183,6 @@ const Header = (props: Props) => {
           </TaglineWrapper>
           {isProjectView ? (
             <>
-              {/* <ProjectTypeWrapper>
-                <Text>Type here</Text>
-              </ProjectTypeWrapper>
-              <ProjectStylesWrapper>
-                <Text>Styles here</Text>
-              </ProjectStylesWrapper> */}
               <ProjectYearWrapper>
                 <Text>{headerText.year || ""}</Text>
               </ProjectYearWrapper>

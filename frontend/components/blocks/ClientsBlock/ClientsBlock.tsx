@@ -4,6 +4,7 @@ import pxToRem from "../../../utils/pxToRem";
 
 const ClientsBlockWrapper = styled.div`
   width: 100%;
+  mix-blend-mode: difference;
 `;
 
 const Title = styled.h3`

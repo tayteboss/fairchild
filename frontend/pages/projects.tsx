@@ -16,6 +16,7 @@ import {
 import ProjectsList from "../components/blocks/ProjectsList";
 import ProjectFilters from "../components/blocks/ProjectFilters";
 import { useState, useEffect } from "react";
+import ProjectPlayer from "../components/blocks/ProjectPlayer";
 
 const PageWrapper = styled(motion.div)``;
 
@@ -45,6 +46,14 @@ const Page = (props: Props) => {
     key: "client",
     direction: "asc",
   });
+  const [activeProject, setActiveProject] = useState<{
+    project: ProjectType | null;
+    action: "hover" | "fullscreen" | "inactive";
+  }>({
+    project: null,
+    action: "inactive",
+  });
+  const [isFullScreen, setIsFullScreen] = useState(false);
 
   // Toggle filters panel
   const handleToggleFilters = () => {
@@ -136,6 +145,13 @@ const Page = (props: Props) => {
         projects={filteredProjects}
         handleSort={handleSort}
         sortConfig={sortConfig}
+        setActiveProject={setActiveProject}
+        isFullScreen={isFullScreen}
+      />
+      <ProjectPlayer
+        activeProject={activeProject}
+        isFullScreen={isFullScreen}
+        setIsFullScreen={setIsFullScreen}
       />
       <ProjectFilters
         isOpen={filtersIsOpen}

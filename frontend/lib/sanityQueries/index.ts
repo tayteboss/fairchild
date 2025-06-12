@@ -93,8 +93,22 @@ export const projectsQueryString = `
 			link
 		},
 		thumbnailColor,
-		video,
-		fallbackImage,
+		video {
+			asset-> {
+				playbackId,
+				data {
+					duration
+				}
+			}
+		},
+		fallbackImage {
+			asset-> {
+				url,
+				metadata {
+					lqip
+				}
+			}
+		},
 		colorTempFilter {
 			minTemp,
 			maxTemp

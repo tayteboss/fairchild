@@ -5,6 +5,7 @@ import Link from "next/link";
 const CreditsBlockWrapper = styled.div`
   display: flex;
   gap: ${pxToRem(16)};
+  mix-blend-mode: difference;
 `;
 
 const Block = styled.div`

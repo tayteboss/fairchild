@@ -72,8 +72,13 @@ export type ProjectType = {
   thumbnailColor: {
     hex: string;
   };
-  video: { asset: { playbackId: string } };
-  fallbackImage: { asset: { url: string } };
+  video: {
+    asset: {
+      playbackId: string;
+      data: { duration: number };
+    };
+  };
+  fallbackImage: { asset: { url: string; metadata: { lqip: string } } };
   colorTempFilter: {
     minTemp: number;
     maxTemp: number;

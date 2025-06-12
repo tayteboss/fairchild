@@ -12,6 +12,7 @@ const ClientLogosBlockWrapper = styled.div`
   gap: ${pxToRem(64)};
   align-items: center;
   max-width: ${pxToRem(600)};
+  mix-blend-mode: difference;
 
   @media ${(props) => props.theme.mediaBreakpoints.tabletPortrait} {
     flex-direction: column;

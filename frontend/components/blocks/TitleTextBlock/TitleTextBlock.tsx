@@ -7,6 +7,7 @@ import { PortableText, PortableTextBlock } from "@portabletext/react";
 const TitleTextBlockWrapper = styled.div`
   max-width: ${pxToRem(620)};
   margin: 0 auto;
+  mix-blend-mode: difference;
 
   @media ${(props) => props.theme.mediaBreakpoints.tabletPortrait} {
     max-width: unset;
