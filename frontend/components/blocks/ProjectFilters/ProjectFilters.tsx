@@ -1,10 +1,10 @@
 import styled from "styled-components";
 import pxToRem from "../../../utils/pxToRem";
-import { useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useClickOutside } from "../../../hooks/useClickOutside";
-import MultiRangeSlider from "./MultiRangeSlider";
 import { useMouseMovement } from "../../../hooks/useMouseMovement";
+import { useRef } from "react";
+import { useClickOutside } from "../../../hooks/useClickOutside";
+import ProjectFilter from "../../elements/ProjectFilter";
 
 const FiltersWrapper = styled(motion.div)`
   position: fixed;
@@ -26,7 +26,7 @@ const FiltersWrapper = styled(motion.div)`
     width: 100%;
     height: 100%;
     background-color: var(--colour-bg);
-    opacity: 0.8;
+    opacity: 0.9;
   }
 `;
 
@@ -42,8 +42,15 @@ const FiltersTrigger = styled.button<{ $isActive: boolean }>`
   justify-content: center;
   padding-top: ${pxToRem(3)};
   opacity: ${({ $isActive }) => ($isActive ? 1 : 0)};
+  white-space: pre;
 
   transition: all var(--transition-speed-default) var(--transition-ease);
+
+  &:hover {
+    span {
+      text-decoration: underline;
+    }
+  }
 `;
 
 const Inner = styled.div`
@@ -94,30 +101,26 @@ const wrapperVariants = {
 type Props = {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
-  colorTemp: { min: number; max: number };
-  setColorTemp: (colorTemp: { min: number; max: number }) => void;
-  saturation: { min: number; max: number };
-  setSaturation: (saturation: { min: number; max: number }) => void;
-  year: { min: number; max: number };
-  setYear: (year: { min: number; max: number }) => void;
-  yearRange: { min: number; max: number };
-  setIsDragging: (isDragging: boolean) => void;
   filtersAreOn: boolean;
+  projectTypes: { name: string }[];
+  projectStyles: { name: string }[];
+  selectedTypes: string[];
+  setSelectedTypes: (types: string[]) => void;
+  selectedStyles: string[];
+  setSelectedStyles: (styles: string[]) => void;
 };
 
-const Filters = (props: Props) => {
+const ProjectFilters = (props: Props) => {
   const {
     isOpen,
     setIsOpen,
-    colorTemp,
-    setColorTemp,
-    saturation,
-    setSaturation,
-    year,
-    setYear,
-    yearRange,
-    setIsDragging,
     filtersAreOn,
+    projectTypes,
+    projectStyles,
+    selectedTypes,
+    setSelectedTypes,
+    selectedStyles,
+    setSelectedStyles,
   } = props;
 
   const ref = useRef<HTMLDivElement>(null!);
@@ -135,7 +138,7 @@ const Filters = (props: Props) => {
   return (
     <>
       <FiltersTrigger onClick={() => setIsOpen(!isOpen)} $isActive={hasMoved}>
-        Filters ({filtersAreOn ? "On" : "Off"})
+        <span>Filters</span> ({filtersAreOn ? "On" : "Off"})
       </FiltersTrigger>
       <AnimatePresence>
         {isOpen && (
@@ -147,33 +150,17 @@ const Filters = (props: Props) => {
           >
             <Inner ref={ref}>
               <Container>
-                <MultiRangeSlider
-                  min={2300}
-                  max={7000}
-                  onChange={setColorTemp}
-                  label="Color Temperature"
-                  symbol="K"
-                  setIsDragging={setIsDragging}
-                  value={colorTemp}
-                  step={100}
+                <ProjectFilter
+                  title="Types"
+                  options={projectTypes}
+                  selectedOptions={selectedTypes}
+                  setSelectedOptions={setSelectedTypes}
                 />
-                <MultiRangeSlider
-                  min={0}
-                  max={100}
-                  onChange={setSaturation}
-                  label="Saturation"
-                  symbol="%"
-                  setIsDragging={setIsDragging}
-                  value={saturation}
-                  step={5}
-                />
-                <MultiRangeSlider
-                  min={yearRange.min || 0}
-                  max={yearRange.max || 0}
-                  onChange={setYear}
-                  label="Year"
-                  setIsDragging={setIsDragging}
-                  value={year}
+                <ProjectFilter
+                  title="Styles"
+                  options={projectStyles}
+                  selectedOptions={selectedStyles}
+                  setSelectedOptions={setSelectedStyles}
                 />
               </Container>
               <CloseTrigger onClick={() => setIsOpen(false)}>
@@ -187,4 +174,4 @@ const Filters = (props: Props) => {
   );
 };
 
-export default Filters;
+export default ProjectFilters;

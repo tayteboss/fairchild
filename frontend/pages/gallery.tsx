@@ -12,7 +12,7 @@ import {
   projectsQueryString,
 } from "../lib/sanityQueries";
 import GalleryList from "../components/blocks/GalleryList";
-import Filters from "../components/blocks/Filters";
+import GalleryFilters from "../components/blocks/GalleryFilters";
 import { useEffect, useState } from "react";
 import ProjectGalleryCarousel from "../components/blocks/ProjectGalleryCarousel/ProjectGalleryCarousel";
 
@@ -33,12 +33,11 @@ const Page = (props: Props) => {
 
   const [filteredProjects, setFilteredProjects] = useState(projects);
   const [isDragging, setIsDragging] = useState(false);
-
   const [filtersIsOpen, setFiltersIsOpen] = useState(false);
+  const [filtersAreOn, setFiltersAreOn] = useState(false);
   const [colorTemp, setColorTemp] = useState(DEFAULT_COLOR_TEMP);
   const [saturation, setSaturation] = useState(DEFAULT_SATURATION);
   const [year, setYear] = useState({ min: yearRange.min, max: yearRange.max });
-  const [filtersAreOn, setFiltersAreOn] = useState(false);
   const [selectedProjectIndex, setSelectedProjectIndex] = useState<
     number | null
   >(null);
@@ -156,7 +155,7 @@ const Page = (props: Props) => {
         selectedProjectIndex={selectedProjectIndex}
         animationPhase={animationPhase}
       />
-      <Filters
+      <GalleryFilters
         isOpen={filtersIsOpen}
         setIsOpen={handleToggleFilters}
         colorTemp={colorTemp}

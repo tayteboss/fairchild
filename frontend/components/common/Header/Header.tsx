@@ -94,8 +94,6 @@ type Props = {
 const Header = (props: Props) => {
   const { tagline } = props;
 
-  const [initialY, setInitialY] = useState(0);
-  const [previousPage, setPreviousPage] = useState<string | null>(null);
   const [centerPosition, setCenterPosition] = useState(0);
 
   const {
@@ -120,6 +118,8 @@ const Header = (props: Props) => {
 
   const isHomePage = router.pathname === "/";
   const isInformationPage = router.pathname === "/information";
+  const isGalleryPage = router.pathname === "/gallery";
+  const isProjectsPage = router.pathname === "/projects";
 
   // Set center position on mount and window resize
   useEffect(() => {
@@ -135,17 +135,6 @@ const Header = (props: Props) => {
     };
   }, []);
 
-  useEffect(() => {
-    if (isHomePage) {
-      setInitialY(centerPosition);
-    }
-  }, [isHomePage, centerPosition]);
-
-  // Track page changes
-  useEffect(() => {
-    setPreviousPage(router.pathname);
-  }, [router.pathname]);
-
   // Reset header text when navigating away from home page
   useEffect(() => {
     if (!isHomePage) {
@@ -157,30 +146,22 @@ const Header = (props: Props) => {
     }
   }, [isHomePage, setHeaderText, setIsHovering, tagline]);
 
-  const getInitialY = () => {
-    if (!isHomePage) {
-      return centerPosition;
-    }
-    if (previousPage && !isHomePage) {
-      return centerPosition;
-    }
-    return initialY;
-  };
-
   const getAnimateY = () => {
-    if (!isHomePage) {
-      return centerPosition;
+    if (isProjectsPage || isProjectView) {
+      return 0;
     }
+
     if (isHomePage) {
-      return y ? y - 12 : initialY;
+      return y ? y - 12 : centerPosition;
     }
-    return 0;
+
+    return centerPosition;
   };
 
   return (
     <HeaderWrapper
       className="header"
-      initial={{ opacity: 0, y: getInitialY() }}
+      initial={{ opacity: 0, y: centerPosition }}
       animate={{
         opacity: hasMoved ? 1 : 0,
         y: getAnimateY(),

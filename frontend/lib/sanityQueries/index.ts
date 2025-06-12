@@ -133,6 +133,18 @@ export const projectsPageQueryString = `
 	}
 `;
 
+export const projectTypesQueryString = `
+	*[_type == 'projectType'] {
+		name
+	}
+`;
+
+export const projectStylesQueryString = `
+	*[_type == 'projectStyles'] {
+		name
+	}
+`;
+
 export const informationPageQueryString = `
 	*[_type == 'informationPage'][0] {
 		...,
