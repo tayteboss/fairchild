@@ -5,8 +5,6 @@ import GalleryCard from "../../elements/GalleryCard";
 import { useMouseMovement } from "../../../hooks/useMouseMovement";
 import { useHeader } from "../../layout/HeaderContext";
 import { motion } from "framer-motion";
-import { useState } from "react";
-import ProjectGalleryCarousel from "../../blocks/ProjectGalleryCarousel/ProjectGalleryCarousel";
 
 const GalleryListWrapper = styled.div`
   position: relative;
@@ -28,84 +26,54 @@ const GalleryCardWrapper = styled(motion.div)`
 type Props = {
   data: ProjectType[];
   filtersIsOpen: boolean;
+  handleGalleryClick: (projectIndex: number, galleryIndex: number) => void;
+  selectedProjectIndex: number | null;
+  animationPhase: "idle" | "fade" | "center" | "carousel";
 };
 
 const GalleryList = (props: Props) => {
-  const { data, filtersIsOpen } = props;
+  const {
+    data,
+    filtersIsOpen,
+    handleGalleryClick,
+    selectedProjectIndex,
+    animationPhase,
+  } = props;
+
   const { setHeaderText, setIsHovering } = useHeader();
   const { hasMoved } = useMouseMovement({
     initialDelay: 2000,
     movementThreshold: 5,
     throttleMs: 100,
   });
-  const [selectedProjectIndex, setSelectedProjectIndex] = useState<
-    number | null
-  >(null);
-  const [selectedGalleryIndex, setSelectedGalleryIndex] = useState<
-    number | null
-  >(null);
-  const [animationPhase, setAnimationPhase] = useState<
-    "idle" | "fade" | "center" | "carousel"
-  >("idle");
 
   const hasData = data && data.length > 0;
 
-  const handleGalleryClick = (projectIndex: number, galleryIndex: number) => {
-    setSelectedGalleryIndex(galleryIndex);
-    setSelectedProjectIndex(projectIndex);
-    setAnimationPhase("fade");
-
-    // After fade, move to carousel
-    setTimeout(() => {
-      setAnimationPhase("carousel");
-    }, 500);
-  };
-
-  const handleCloseCarousel = () => {
-    setSelectedProjectIndex(null);
-    setSelectedGalleryIndex(null);
-    setAnimationPhase("idle");
-  };
-
-  const selectedProject =
-    selectedProjectIndex !== null ? data[selectedProjectIndex] : null;
-
   return (
-    <>
-      <GalleryListWrapper>
-        <LayoutWrapper>
-          {/* <LayoutGrid> */}
-          <Inner>
-            {hasData &&
-              data.map((project, i) =>
-                project.gallery?.map((galleryItem, j) => (
-                  <GalleryCardWrapper key={`${i}-${j}`}>
-                    <GalleryCard
-                      project={project}
-                      gallery={galleryItem}
-                      hasMouseMoved={hasMoved}
-                      setHeaderText={setHeaderText}
-                      setIsHovering={setIsHovering}
-                      onClick={() => handleGalleryClick(i, j)}
-                      isSelected={selectedProjectIndex === i}
-                      animationPhase={animationPhase}
-                      filtersIsOpen={filtersIsOpen}
-                    />
-                  </GalleryCardWrapper>
-                ))
-              )}
-          </Inner>
-          {/* </LayoutGrid> */}
-        </LayoutWrapper>
-      </GalleryListWrapper>
-
-      <ProjectGalleryCarousel
-        project={selectedProject}
-        onClose={handleCloseCarousel}
-        animationPhase={animationPhase}
-        initialGalleryIndex={selectedGalleryIndex}
-      />
-    </>
+    <GalleryListWrapper>
+      <LayoutWrapper>
+        <Inner>
+          {hasData &&
+            data.map((project, i) =>
+              project.gallery?.map((galleryItem, j) => (
+                <GalleryCardWrapper key={`${i}-${j}`}>
+                  <GalleryCard
+                    project={project}
+                    gallery={galleryItem}
+                    hasMouseMoved={hasMoved}
+                    setHeaderText={setHeaderText}
+                    setIsHovering={setIsHovering}
+                    onClick={() => handleGalleryClick(i, j)}
+                    isSelected={selectedProjectIndex === i}
+                    animationPhase={animationPhase}
+                    filtersIsOpen={filtersIsOpen}
+                  />
+                </GalleryCardWrapper>
+              ))
+            )}
+        </Inner>
+      </LayoutWrapper>
+    </GalleryListWrapper>
   );
 };
 

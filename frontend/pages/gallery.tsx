@@ -14,6 +14,7 @@ import {
 import GalleryList from "../components/blocks/GalleryList";
 import Filters from "../components/blocks/Filters";
 import { useEffect, useState } from "react";
+import ProjectGalleryCarousel from "../components/blocks/ProjectGalleryCarousel/ProjectGalleryCarousel";
 
 const PageWrapper = styled(motion.div)``;
 
@@ -38,10 +39,39 @@ const Page = (props: Props) => {
   const [saturation, setSaturation] = useState(DEFAULT_SATURATION);
   const [year, setYear] = useState({ min: yearRange.min, max: yearRange.max });
   const [filtersAreOn, setFiltersAreOn] = useState(false);
+  const [selectedProjectIndex, setSelectedProjectIndex] = useState<
+    number | null
+  >(null);
+  const [selectedGalleryIndex, setSelectedGalleryIndex] = useState<
+    number | null
+  >(null);
+  const [animationPhase, setAnimationPhase] = useState<
+    "idle" | "fade" | "center" | "carousel"
+  >("idle");
+  const [isCarouselOpen, setIsCarouselOpen] = useState(false);
 
   // Toggle filters panel
   const handleToggleFilters = () => {
     setFiltersIsOpen(!filtersIsOpen);
+  };
+
+  const handleGalleryClick = (projectIndex: number, galleryIndex: number) => {
+    setSelectedGalleryIndex(galleryIndex);
+    setSelectedProjectIndex(projectIndex);
+    setAnimationPhase("fade");
+    setIsCarouselOpen(true);
+
+    // After fade, move to carousel
+    setTimeout(() => {
+      setAnimationPhase("carousel");
+    }, 250);
+  };
+
+  const handleCloseCarousel = () => {
+    setIsCarouselOpen(false);
+    setSelectedProjectIndex(null);
+    setSelectedGalleryIndex(null);
+    setAnimationPhase("idle");
   };
 
   useEffect(() => {
@@ -103,6 +133,11 @@ const Page = (props: Props) => {
     setFilteredProjects(filtered);
   }, [colorTemp, saturation, year, projects, isDragging, yearRange]);
 
+  const selectedProject =
+    selectedProjectIndex !== null
+      ? filteredProjects[selectedProjectIndex]
+      : null;
+
   return (
     <PageWrapper
       variants={pageTransitionVariants}
@@ -114,7 +149,13 @@ const Page = (props: Props) => {
         title={data?.seoTitle || ""}
         description={data?.seoDescription || ""}
       />
-      <GalleryList data={filteredProjects} filtersIsOpen={filtersIsOpen} />
+      <GalleryList
+        data={filteredProjects}
+        filtersIsOpen={filtersIsOpen}
+        handleGalleryClick={handleGalleryClick}
+        selectedProjectIndex={selectedProjectIndex}
+        animationPhase={animationPhase}
+      />
       <Filters
         isOpen={filtersIsOpen}
         setIsOpen={handleToggleFilters}
@@ -127,6 +168,14 @@ const Page = (props: Props) => {
         yearRange={yearRange}
         setIsDragging={setIsDragging}
         filtersAreOn={filtersAreOn}
+      />
+      <ProjectGalleryCarousel
+        project={selectedProject}
+        onClose={handleCloseCarousel}
+        animationPhase={animationPhase}
+        initialGalleryIndex={selectedGalleryIndex}
+        allProjects={filteredProjects}
+        isOpen={isCarouselOpen}
       />
     </PageWrapper>
   );

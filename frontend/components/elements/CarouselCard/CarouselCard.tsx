@@ -51,16 +51,19 @@ const ImageInner = styled.div`
   width: 100%;
 `;
 
-const ColorOverlay = styled(motion.div)<{ $color: string }>`
+const ColorOverlay = styled(motion.div)<{
+  $isActive: boolean;
+  $bg: string;
+}>`
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: ${(props) => props.$color};
+  background: ${(props) => props.$bg};
   z-index: 2;
   pointer-events: none;
-  opacity: 1;
+  opacity: ${(props) => (props.$isActive ? 1 : 0)};
   transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 `;
 
@@ -81,9 +84,11 @@ type Props = {
     };
     saturationFilter: number;
   };
+  onLoad?: () => void;
+  isOverlayActive: boolean;
 };
 
-const CarouselCard = ({ project, gallery }: Props) => {
+const CarouselCard = ({ project, gallery, onLoad, isOverlayActive }: Props) => {
   return (
     <CardWrapper
       initial={{ opacity: 0 }}
@@ -95,15 +100,7 @@ const CarouselCard = ({ project, gallery }: Props) => {
     >
       <Outer>
         <InnerWrapper>
-          <Inner
-            animate={{
-              width: "50vw",
-            }}
-            transition={{
-              duration: 1.5,
-              ease: [0.16, 1, 0.3, 1],
-            }}
-          >
+          <Inner>
             <ImageOuter>
               <ImageInner>
                 <Image
@@ -112,14 +109,17 @@ const CarouselCard = ({ project, gallery }: Props) => {
                   fill
                   style={{
                     objectFit: "cover",
-                    transform: "scale(1)",
                   }}
-                  sizes="90vw"
+                  sizes="70vw"
                   loading="lazy"
+                  onLoad={onLoad}
                 />
-                {/* <ColorOverlay $color={gallery.thumbnailColor.hex} /> */}
               </ImageInner>
             </ImageOuter>
+            <ColorOverlay
+              $isActive={isOverlayActive}
+              $bg={gallery.thumbnailColor?.hex || "var(--colour-fg)"}
+            />
           </Inner>
         </InnerWrapper>
       </Outer>

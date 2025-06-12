@@ -10,6 +10,7 @@ import { useMousePosition } from "../../../hooks/useMousePosition";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useHeader } from "../../layout/HeaderContext";
+import { useMouseMovement } from "../../../hooks/useMouseMovement";
 
 const HeaderWrapper = styled(motion.header)`
   padding: ${pxToRem(8)} 0;
@@ -84,16 +85,25 @@ const Header = (props: Props) => {
   const { tagline } = props;
 
   const [initialY, setInitialY] = useState(0);
-  const [hasMoved, setHasMoved] = useState(false);
-  const [shouldShow, setShouldShow] = useState(false);
   const [previousPage, setPreviousPage] = useState<string | null>(null);
   const [centerPosition, setCenterPosition] = useState(0);
 
-  const { headerText, isHovering, setHeaderText, setIsHovering } = useHeader();
+  const {
+    headerText,
+    isHovering,
+    isProjectView,
+    setHeaderText,
+    setIsHovering,
+  } = useHeader();
   const { y } = useMousePosition();
   const router = useRouter();
-
   const activeLink = useActiveLink();
+
+  const { hasMoved } = useMouseMovement({
+    initialDelay: 2000,
+    movementThreshold: 5,
+    throttleMs: 100,
+  });
 
   const isHomePage = router.pathname === "/";
   const isInformationPage = router.pathname === "/information";
@@ -117,15 +127,6 @@ const Header = (props: Props) => {
       setInitialY(centerPosition);
     }
   }, [isHomePage, centerPosition]);
-
-  useEffect(() => {
-    if (y !== null && !hasMoved) {
-      setHasMoved(true);
-      setTimeout(() => {
-        setShouldShow(true);
-      }, 200);
-    }
-  }, [y, hasMoved]);
 
   // Track page changes
   useEffect(() => {
@@ -168,7 +169,7 @@ const Header = (props: Props) => {
       className="header"
       initial={{ opacity: 0, y: getInitialY() }}
       animate={{
-        opacity: shouldShow ? 1 : 0,
+        opacity: hasMoved ? 1 : 0,
         y: getAnimateY(),
       }}
       exit={{ opacity: 0 }}
@@ -193,33 +194,37 @@ const Header = (props: Props) => {
           <TaglineWrapper>
             <Text>{isHovering ? headerText.tagline : tagline || ""}</Text>
           </TaglineWrapper>
-          <NavigationWrapper>
-            {isHovering && headerText.type && headerText.year ? (
-              <Text>
-                {headerText.type?.[0]?.name} — {headerText.year}
-              </Text>
-            ) : (
-              <>
-                <Link href="/gallery">
-                  <LinkText $isActive={activeLink === "/gallery"}>
-                    Gallery
-                  </LinkText>
-                </Link>
-                <span>, </span>
-                <Link href="/projects">
-                  <LinkText $isActive={activeLink === "/projects"}>
-                    Projects
-                  </LinkText>
-                </Link>
-                <span>, </span>
-                <Link href="/information">
-                  <LinkText $isActive={activeLink === "/information"}>
-                    Information
-                  </LinkText>
-                </Link>
-              </>
-            )}
-          </NavigationWrapper>
+          {isProjectView ? (
+            <Text>ProjectView</Text>
+          ) : (
+            <NavigationWrapper>
+              {isHovering && headerText.type && headerText.year ? (
+                <Text>
+                  {headerText.type?.[0]?.name} — {headerText.year}
+                </Text>
+              ) : (
+                <>
+                  <Link href="/gallery">
+                    <LinkText $isActive={activeLink === "/gallery"}>
+                      Gallery
+                    </LinkText>
+                  </Link>
+                  <span>, </span>
+                  <Link href="/projects">
+                    <LinkText $isActive={activeLink === "/projects"}>
+                      Projects
+                    </LinkText>
+                  </Link>
+                  <span>, </span>
+                  <Link href="/information">
+                    <LinkText $isActive={activeLink === "/information"}>
+                      Information
+                    </LinkText>
+                  </Link>
+                </>
+              )}
+            </NavigationWrapper>
+          )}
         </LayoutGrid>
       </LayoutWrapper>
     </HeaderWrapper>

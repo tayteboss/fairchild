@@ -12,6 +12,8 @@ type HeaderContextType = {
   setHeaderText: (text: HeaderTextType) => void;
   isHovering: boolean;
   setIsHovering: (isHovering: boolean) => void;
+  isProjectView: boolean;
+  setIsProjectView: (isProjectView: boolean) => void;
 };
 
 const HeaderContext = createContext<HeaderContextType | undefined>(undefined);
@@ -22,6 +24,7 @@ export const HeaderProvider = ({ children }: { children: ReactNode }) => {
     tagline: "",
   });
   const [isHovering, setIsHovering] = useState(false);
+  const [isProjectView, setIsProjectView] = useState(false);
 
   return (
     <HeaderContext.Provider
@@ -30,6 +33,8 @@ export const HeaderProvider = ({ children }: { children: ReactNode }) => {
         setHeaderText,
         isHovering,
         setIsHovering,
+        isProjectView,
+        setIsProjectView,
       }}
     >
       {children}
