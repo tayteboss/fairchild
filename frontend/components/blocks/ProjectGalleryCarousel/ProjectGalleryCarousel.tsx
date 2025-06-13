@@ -13,7 +13,7 @@ import AnimatedCarouselCard, {
   CardLayout,
 } from "../../elements/AnimatedCarouselCard/AnimatedCarouselCard";
 
-const MAX_WIDTH = 60;
+const MAX_WIDTH = 50;
 const MIN_WIDTH = 30;
 
 const CarouselWrapper = styled(motion.div)`

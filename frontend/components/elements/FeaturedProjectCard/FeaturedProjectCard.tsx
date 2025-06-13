@@ -11,7 +11,7 @@ const INITIAL_WIDTH = "2vw";
 const BASE_WIDTH = "5vw";
 const HOVER_BASE_WIDTH = "5vw";
 const MAX_WIDTH = "50vw";
-const ADJACENT_WIDTH = "25vw";
+const ADJACENT_WIDTH = "30vw";
 const STAGGER_CARDS = 7;
 
 const FeaturedProjectCardWrapper = styled(motion.div)<{ $bgColor: string }>`
