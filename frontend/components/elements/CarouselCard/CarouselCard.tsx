@@ -108,10 +108,7 @@ const CarouselCard = ({
   });
 
   useEffect(() => {
-    console.log("inView", inView);
     if (inView) {
-      console.log("project", project);
-
       setHeaderText({
         logo: project?.client || "",
         tagline: project?.title || "",

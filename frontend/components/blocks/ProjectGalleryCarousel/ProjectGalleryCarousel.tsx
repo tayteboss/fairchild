@@ -130,20 +130,9 @@ const ProjectGalleryCarousel = (props: Props) => {
   const MAX_WIDTH_MOBILE = 100;
   const MIN_WIDTH_MOBILE = 50;
 
-  const allGalleryItems = allProjects.reduce((acc, project) => {
-    if (project.gallery) {
-      return [
-        ...acc,
-        ...project.gallery.map((item) => ({
-          ...item,
-          projectTitle: project.title,
-          projectClient: project.client,
-          projectThumbnailColor: project.thumbnailColor,
-        })),
-      ];
-    }
-    return acc;
-  }, [] as Array<any>);
+  const allGalleryItems = allProjects.flatMap((project) =>
+    project.gallery ? project.gallery.map((item) => ({ ...item, project })) : []
+  );
 
   const findSelectedImageIndex = useCallback(() => {
     if (!project || initialGalleryIndex === null) return null;
@@ -183,9 +172,15 @@ const ProjectGalleryCarousel = (props: Props) => {
         const cardWidthVw =
           selectedIndex !== null
             ? isActive
-              ? MAX_WIDTH
-              : MIN_WIDTH
-            : MIN_WIDTH;
+              ? isMobile
+                ? MAX_WIDTH_MOBILE
+                : MAX_WIDTH
+              : isMobile
+                ? MIN_WIDTH_MOBILE
+                : MIN_WIDTH
+            : isMobile
+              ? MIN_WIDTH_MOBILE
+              : MIN_WIDTH;
         const cardWidthPx = cardWidthVw * vw;
         const cardHeightPx = (cardWidthPx * 9) / 16;
 
@@ -369,7 +364,7 @@ const ProjectGalleryCarousel = (props: Props) => {
               {allGalleryItems.map((galleryItem, index) => (
                 <AnimatedCarouselCard
                   key={`carousel-${index}`}
-                  project={project}
+                  project={galleryItem.project}
                   galleryItem={galleryItem}
                   scrollY={scrollY}
                   viewportHeight={viewportHeight}

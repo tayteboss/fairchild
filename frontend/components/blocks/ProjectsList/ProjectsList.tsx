@@ -45,8 +45,6 @@ const ProjectsList = (props: Props) => {
   const viewport = useViewportWidth();
   const isMobile = viewport === "mobile" || viewport === "tabletPortrait";
 
-  console.log(isMobile);
-
   return (
     <ProjectsListWrapper>
       <LayoutWrapper>
