@@ -7,6 +7,10 @@ const ThemeSwitchBlockWrapper = styled.div`
   justify-content: center;
   align-items: center;
   gap: ${pxToRem(4)};
+
+  @media ${(props) => props.theme.mediaBreakpoints.tabletPortrait} {
+    gap: ${pxToRem(8)};
+  }
 `;
 
 const ColorBlock = styled.div<{
@@ -20,6 +24,11 @@ const ColorBlock = styled.div<{
   border: 0.5px solid
     ${(props) => (props.$isActive ? props.$fgColor : props.$bgColor)};
   cursor: crosshair;
+
+  @media ${(props) => props.theme.mediaBreakpoints.tabletPortrait} {
+    width: ${pxToRem(16)};
+    height: ${pxToRem(16)};
+  }
 `;
 
 const ThemeSwitchBlock = () => {

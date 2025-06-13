@@ -36,7 +36,7 @@ export const useMouseMovement = ({
     return () => clearTimeout(timer);
   }, [initialDelay, key]);
 
-  // Handle mouse movement and scroll
+  // Handle mouse movement, scroll, click and touch
   useEffect(() => {
     if (!initialDelayComplete) return;
 
@@ -73,12 +73,24 @@ export const useMouseMovement = ({
       handleMovement(window.scrollY, true);
     };
 
+    const handleClick = () => {
+      setHasMoved(true);
+    };
+
+    const handleTouch = () => {
+      setHasMoved(true);
+    };
+
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("scroll", handleScroll);
+    window.addEventListener("click", handleClick);
+    window.addEventListener("touchstart", handleTouch);
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("click", handleClick);
+      window.removeEventListener("touchstart", handleTouch);
     };
   }, [
     initialDelayComplete,

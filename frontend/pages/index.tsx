@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import client from "../client";
 import { homePageQueryString } from "../lib/sanityQueries";
 import FeaturedProjects from "../components/blocks/FeaturedProjects";
-import LogoSaver from "../components/blocks/LogoSaver";
+import MobileFeaturedProjects from "../components/blocks/MobileFeaturedProjects";
 
 const PageWrapper = styled(motion.div)``;
 
@@ -29,6 +29,7 @@ const Page = (props: Props) => {
         description={data?.seoDescription || ""}
       />
       <FeaturedProjects data={data?.featuredProjects} />
+      <MobileFeaturedProjects data={data?.featuredProjects} />
     </PageWrapper>
   );
 };

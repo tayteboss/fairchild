@@ -22,6 +22,11 @@ const HeaderWrapper = styled(motion.header)`
   will-change: transform;
   pointer-events: none;
   mix-blend-mode: difference;
+
+  @media ${(props) => props.theme.mediaBreakpoints.tabletPortrait} {
+    top: 50vh;
+    transform: translateY(-50%);
+  }
 `;
 
 const LogoWrapper = styled(motion.div)`
@@ -41,6 +46,10 @@ const TaglineWrapper = styled(motion.div)`
   grid-column: 2 / 5;
   display: flex;
   align-items: center;
+
+  @media ${(props) => props.theme.mediaBreakpoints.tabletPortrait} {
+    display: none;
+  }
 `;
 
 const ProjectYearWrapper = styled(motion.div)`
@@ -54,10 +63,25 @@ const NavigationWrapper = styled(motion.div)`
   display: flex;
   justify-content: flex-end;
 
+  @media ${(props) => props.theme.mediaBreakpoints.tabletPortrait} {
+    display: none;
+  }
+
   span {
     white-space: pre;
     color: var(--colour-white);
     cursor: default;
+  }
+`;
+
+const MenuTrigger = styled.button`
+  display: none;
+
+  @media ${(props) => props.theme.mediaBreakpoints.tabletPortrait} {
+    grid-column: -2 / -1;
+    text-align: right;
+    pointer-events: all;
+    display: block;
   }
 `;
 
@@ -82,12 +106,14 @@ const LinkText = styled.div<{ $isActive?: boolean }>`
 
 type Props = {
   tagline: SiteSettingsType["tagline"];
+  setIsMobileMenuOpen: (isOpen: boolean) => void;
 };
 
 const Header = (props: Props) => {
-  const { tagline } = props;
+  const { tagline, setIsMobileMenuOpen } = props;
 
   const [centerPosition, setCenterPosition] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
 
   const {
     headerText,
@@ -113,6 +139,20 @@ const Header = (props: Props) => {
   const isInformationPage = router.pathname === "/information";
   const isGalleryPage = router.pathname === "/gallery";
   const isProjectsPage = router.pathname === "/projects";
+
+  // Check for mobile viewport
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+
+    return () => {
+      window.removeEventListener("resize", checkMobile);
+    };
+  }, []);
 
   // Set center position on mount and window resize
   useEffect(() => {
@@ -144,7 +184,7 @@ const Header = (props: Props) => {
       return 0;
     }
 
-    if (isHomePage) {
+    if (isHomePage && !isMobile) {
       return y ? y - 12 : centerPosition;
     }
 
@@ -157,7 +197,7 @@ const Header = (props: Props) => {
       initial={{ opacity: 0, y: centerPosition }}
       animate={{
         opacity: hasMoved ? 1 : 0,
-        y: getAnimateY(),
+        y: isMobile ? 0 : getAnimateY(),
       }}
       exit={{ opacity: 0 }}
       transition={{
@@ -188,33 +228,38 @@ const Header = (props: Props) => {
               </ProjectYearWrapper>
             </>
           ) : (
-            <NavigationWrapper>
-              {isHovering && headerText.type && headerText.year ? (
-                <Text>
-                  {headerText.type?.[0]?.name || ""} — {headerText.year || ""}
-                </Text>
-              ) : (
-                <>
-                  <Link href="/gallery">
-                    <LinkText $isActive={activeLink === "Gallery"}>
-                      Gallery
-                    </LinkText>
-                  </Link>
-                  <span>, </span>
-                  <Link href="/projects">
-                    <LinkText $isActive={activeLink === "Projects"}>
-                      Projects
-                    </LinkText>
-                  </Link>
-                  <span>, </span>
-                  <Link href="/information">
-                    <LinkText $isActive={activeLink === "Information"}>
-                      Information
-                    </LinkText>
-                  </Link>
-                </>
-              )}
-            </NavigationWrapper>
+            <>
+              <NavigationWrapper>
+                {isHovering && headerText.type && headerText.year ? (
+                  <Text>
+                    {headerText.type?.[0]?.name || ""} — {headerText.year || ""}
+                  </Text>
+                ) : (
+                  <>
+                    <Link href="/gallery">
+                      <LinkText $isActive={activeLink === "Gallery"}>
+                        Gallery
+                      </LinkText>
+                    </Link>
+                    <span>, </span>
+                    <Link href="/projects">
+                      <LinkText $isActive={activeLink === "Projects"}>
+                        Projects
+                      </LinkText>
+                    </Link>
+                    <span>, </span>
+                    <Link href="/information">
+                      <LinkText $isActive={activeLink === "Information"}>
+                        Information
+                      </LinkText>
+                    </Link>
+                  </>
+                )}
+              </NavigationWrapper>
+              <MenuTrigger onClick={() => setIsMobileMenuOpen(true)}>
+                Menu
+              </MenuTrigger>
+            </>
           )}
         </LayoutGrid>
       </LayoutWrapper>

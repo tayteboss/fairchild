@@ -7,6 +7,11 @@ const PressBlockWrapper = styled.div`
   display: flex;
   gap: ${pxToRem(16)};
   mix-blend-mode: difference;
+
+  @media ${(props) => props.theme.mediaBreakpoints.tabletPortrait} {
+    flex-direction: column;
+    gap: ${pxToRem(48)};
+  }
 `;
 
 const Block = styled.div`

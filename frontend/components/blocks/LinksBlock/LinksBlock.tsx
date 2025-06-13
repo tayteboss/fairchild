@@ -7,6 +7,10 @@ const LinksBlockWrapper = styled.div`
   display: flex;
   gap: ${pxToRem(16)};
   mix-blend-mode: difference;
+
+  @media ${(props) => props.theme.mediaBreakpoints.tabletPortrait} {
+    width: 100%;
+  }
 `;
 
 const Block = styled.div`
@@ -20,7 +24,8 @@ const Block = styled.div`
   flex: 1;
 
   @media ${(props) => props.theme.mediaBreakpoints.tabletPortrait} {
-    width: auto;
+    width: 50%;
+    flex: 1;
   }
 
   a {

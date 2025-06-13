@@ -17,6 +17,10 @@ const FeaturedProjectsWrapper = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+
+  @media ${(props) => props.theme.mediaBreakpoints.tabletPortrait} {
+    display: none;
+  }
 `;
 
 const Inner = styled(motion.div)`
