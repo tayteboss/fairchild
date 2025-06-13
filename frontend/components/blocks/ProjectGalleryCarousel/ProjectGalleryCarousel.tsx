@@ -12,9 +12,8 @@ import Lenis from "@studio-freight/lenis";
 import AnimatedCarouselCard, {
   CardLayout,
 } from "../../elements/AnimatedCarouselCard/AnimatedCarouselCard";
-
-const MAX_WIDTH = 50;
-const MIN_WIDTH = 30;
+import useViewportWidth from "../../../hooks/useViewportWidth";
+import pxToRem from "../../../utils/pxToRem";
 
 const CarouselWrapper = styled(motion.div)`
   position: fixed;
@@ -37,6 +36,17 @@ const Backdrop = styled.div`
   opacity: 0.8;
 `;
 
+const CloseTrigger = styled.div`
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  z-index: 100;
+  padding: ${pxToRem(8)};
+  color: var(--colour-white);
+  mix-blend-mode: difference;
+`;
+
 const CarouselContainer = styled.div`
   position: relative;
   width: 100%;
@@ -50,6 +60,10 @@ const Inner = styled.div`
   flex-direction: column;
   width: 60vw;
   margin: 0 auto;
+
+  @media ${(props) => props.theme.mediaBreakpoints.tabletPortrait} {
+    width: 100%;
+  }
 `;
 
 const wrapperVariants = {
@@ -96,6 +110,9 @@ const ProjectGalleryCarousel = (props: Props) => {
 
   const { setHeaderText, setIsHovering, setIsProjectView } = useHeader();
 
+  const viewport = useViewportWidth();
+  const isMobile = viewport === "mobile" || viewport === "tabletPortrait";
+
   const loadedImageCounter = useRef(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
@@ -103,6 +120,11 @@ const ProjectGalleryCarousel = (props: Props) => {
   const didInitialScroll = useRef(false);
 
   const scrollY = useMotionValue(0);
+
+  const MAX_WIDTH = 50;
+  const MIN_WIDTH = 30;
+  const MAX_WIDTH_MOBILE = 100;
+  const MIN_WIDTH_MOBILE = 50;
 
   const allGalleryItems = allProjects.reduce((acc, project) => {
     if (project.gallery) {
@@ -254,7 +276,7 @@ const ProjectGalleryCarousel = (props: Props) => {
       setHeaderText({
         logo: project.client || "",
         tagline: project.title || "",
-        year: project.year || "",
+        year: isMobile ? "" : project.year || "",
       });
       setIsHovering(true);
 
@@ -314,7 +336,7 @@ const ProjectGalleryCarousel = (props: Props) => {
       setHeaderText({
         logo: project.client || "",
         tagline: project.title || "",
-        year: project.year || "",
+        year: isMobile ? "" : project.year || "",
       });
       setIsHovering(true);
     }
@@ -331,6 +353,7 @@ const ProjectGalleryCarousel = (props: Props) => {
           onClick={handleClose}
         >
           <Backdrop />
+          <CloseTrigger onClick={handleClose}>Close</CloseTrigger>
           <CarouselContainer ref={containerRef}>
             <Inner
               ref={innerRef}
@@ -346,13 +369,12 @@ const ProjectGalleryCarousel = (props: Props) => {
                   galleryItem={galleryItem}
                   scrollY={scrollY}
                   viewportHeight={viewportHeight}
-                  layout={cardLayouts[index]}
                   onImageLoad={handleImageLoad}
                   isOverlayActive={isOverlayActive}
                   hasScrolled={hasScrolled}
                   isSelected={index === findSelectedImageIndex()}
-                  maxWidth={MAX_WIDTH}
-                  minWidth={MIN_WIDTH}
+                  maxWidth={isMobile ? MAX_WIDTH_MOBILE : MAX_WIDTH}
+                  minWidth={isMobile ? MIN_WIDTH_MOBILE : MIN_WIDTH}
                 />
               ))}
             </Inner>

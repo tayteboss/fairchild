@@ -25,7 +25,6 @@ const HeaderWrapper = styled(motion.header)`
 
   @media ${(props) => props.theme.mediaBreakpoints.tabletPortrait} {
     top: 50vh;
-    transform: translateY(-50%);
   }
 `;
 
@@ -88,6 +87,7 @@ const MenuTrigger = styled.button`
 const Text = styled.div`
   color: var(--colour-white);
   width: 100%;
+  white-space: nowrap;
 
   &:hover {
     text-decoration: underline;
@@ -191,13 +191,20 @@ const Header = (props: Props) => {
     return centerPosition;
   };
 
+  const getInitialY = () => {
+    if (isMobile) {
+      return "-50%";
+    }
+    return centerPosition;
+  };
+
   return (
     <HeaderWrapper
       className="header"
-      initial={{ opacity: 0, y: centerPosition }}
+      initial={{ opacity: 0, y: getInitialY() }}
       animate={{
         opacity: hasMoved ? 1 : 0,
-        y: isMobile ? 0 : getAnimateY(),
+        y: isMobile ? "-50%" : getAnimateY(),
       }}
       exit={{ opacity: 0 }}
       transition={{

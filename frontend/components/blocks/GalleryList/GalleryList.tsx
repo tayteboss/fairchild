@@ -5,15 +5,24 @@ import GalleryCard from "../../elements/GalleryCard";
 import { useMouseMovement } from "../../../hooks/useMouseMovement";
 import { useHeader } from "../../layout/HeaderContext";
 import { motion } from "framer-motion";
+import pxToRem from "../../../utils/pxToRem";
 
 const GalleryListWrapper = styled.div`
   position: relative;
   z-index: 1;
+
+  @media ${(props) => props.theme.mediaBreakpoints.tabletPortrait} {
+    padding: ${pxToRem(64)} 0;
+  }
 `;
 
 const Inner = styled.div`
   display: flex;
   flex-wrap: wrap;
+
+  @media ${(props) => props.theme.mediaBreakpoints.tabletPortrait} {
+    row-gap: ${pxToRem(64)};
+  }
 `;
 
 const GalleryCardWrapper = styled(motion.div)`
@@ -21,6 +30,10 @@ const GalleryCardWrapper = styled(motion.div)`
   display: flex;
   align-items: center;
   justify-content: center;
+
+  @media ${(props) => props.theme.mediaBreakpoints.tabletPortrait} {
+    width: 50%;
+  }
 `;
 
 type Props = {

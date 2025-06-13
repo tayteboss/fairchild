@@ -3,12 +3,18 @@ import { ProjectType } from "../../../shared/types/types";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useProximityScale } from "../../../hooks/useProximityScale";
+import useWindowDimensions from "../../../hooks/useWindowDimensions";
+import useViewportWidth from "../../../hooks/useViewportWidth";
 
 const CardWrapper = styled(motion.div)`
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
+
+  @media ${(props) => props.theme.mediaBreakpoints.tabletPortrait} {
+    width: 50%;
+  }
 `;
 
 const Outer = styled.div`
@@ -123,6 +129,10 @@ const GalleryCard = ({
   animationPhase,
   filtersIsOpen,
 }: Props) => {
+  const viewportWidth = useViewportWidth();
+  const isMobile =
+    viewportWidth === "mobile" || viewportWidth === "tabletPortrait";
+
   const { elementRef, scale } = useProximityScale({
     maxScale: 1,
     minScale: 0.25,
@@ -135,10 +145,11 @@ const GalleryCard = ({
         <InnerWrapper>
           <Inner
             ref={elementRef}
-            initial={{ width: "25%" }}
+            initial={{ width: isMobile ? "100%" : "25%" }}
             animate={{
-              width:
-                animationPhase === "carousel"
+              width: isMobile
+                ? "100%"
+                : animationPhase === "carousel"
                   ? `25%`
                   : filtersIsOpen
                     ? "25%"
@@ -149,6 +160,7 @@ const GalleryCard = ({
               ease: [0.16, 1, 0.3, 1],
             }}
             onHoverStart={() => {
+              if (isMobile) return;
               setIsHovering(true);
               setHeaderText({
                 logo: project.client,
@@ -156,6 +168,7 @@ const GalleryCard = ({
               });
             }}
             onHoverEnd={() => {
+              if (isMobile) return;
               setIsHovering(false);
               setHeaderText({
                 logo: "Fairchild",

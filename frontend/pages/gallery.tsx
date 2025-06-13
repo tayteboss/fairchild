@@ -16,6 +16,7 @@ import GalleryFilters from "../components/blocks/GalleryFilters";
 import { useEffect, useState } from "react";
 import ProjectGalleryCarousel from "../components/blocks/ProjectGalleryCarousel/ProjectGalleryCarousel";
 import { useHeader } from "../components/layout/HeaderContext";
+import useViewportWidth from "../hooks/useViewportWidth";
 
 const PageWrapper = styled(motion.div)``;
 
@@ -52,6 +53,9 @@ const Page = (props: Props) => {
 
   const { setHeaderText, setIsHovering } = useHeader();
 
+  const viewport = useViewportWidth();
+  const isMobile = viewport === "mobile" || viewport === "tabletPortrait";
+
   // Toggle filters panel
   const handleToggleFilters = () => {
     setFiltersIsOpen(!filtersIsOpen);
@@ -66,7 +70,7 @@ const Page = (props: Props) => {
     setHeaderText({
       logo: filteredProjects[projectIndex].client || "",
       tagline: filteredProjects[projectIndex].title || "",
-      year: filteredProjects[projectIndex].year || "",
+      year: isMobile ? "" : filteredProjects[projectIndex].year || "",
     });
     setIsHovering(true);
 
@@ -165,6 +169,7 @@ const Page = (props: Props) => {
         selectedProjectIndex={selectedProjectIndex}
         animationPhase={animationPhase}
       />
+      {/* <MobileGalleryList /> */}
       <GalleryFilters
         isOpen={filtersIsOpen}
         setIsOpen={handleToggleFilters}

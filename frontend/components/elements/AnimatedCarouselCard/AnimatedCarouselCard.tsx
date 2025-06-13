@@ -27,7 +27,6 @@ type AnimatedCarouselCardProps = {
   galleryItem: any;
   scrollY: MotionValue<number>;
   viewportHeight: number;
-  layout: CardLayout | undefined;
   onImageLoad: () => void;
   isOverlayActive: boolean;
   hasScrolled: boolean;
@@ -41,7 +40,6 @@ const AnimatedCarouselCard = ({
   galleryItem,
   scrollY,
   viewportHeight,
-  layout,
   onImageLoad,
   isOverlayActive,
   hasScrolled,
