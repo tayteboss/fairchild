@@ -97,7 +97,21 @@ export default {
       title: 'Fallback Image',
       name: 'fallbackImage',
       type: 'image',
-      description: 'Use the first frame of the video as the fallback image',
+      description:
+        'Use the first frame of the video as the fallback image. Ensure the image is optimised',
+    },
+    {
+      title: 'Snippet Video',
+      name: 'snippetVideo',
+      type: 'mux.video',
+      description: '10sec maximum snippet of the hero video to be used on the home page',
+    },
+    {
+      title: 'Snippet Fallback Image',
+      name: 'snippetFallbackImage',
+      type: 'image',
+      description:
+        'Use the first frame of the snippet video as the fallback image. Ensure the image is optimised',
     },
     {
       title: 'Color Temperature Filter',

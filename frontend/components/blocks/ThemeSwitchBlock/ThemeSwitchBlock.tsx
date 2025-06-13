@@ -23,7 +23,7 @@ const ColorBlock = styled.div<{
 `;
 
 const ThemeSwitchBlock = () => {
-  const [activeIndex, setActiveIndex] = useState<number>(-1);
+  const [activeIndex, setActiveIndex] = useState<number>(0);
 
   const colors = [
     {

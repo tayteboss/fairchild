@@ -79,6 +79,13 @@ export type ProjectType = {
     };
   };
   fallbackImage: { asset: { url: string; metadata: { lqip: string } } };
+  snippetVideo: {
+    asset: {
+      playbackId: string;
+      data: { duration: number };
+    };
+  };
+  snippetFallbackImage: { asset: { url: string; metadata: { lqip: string } } };
   colorTempFilter: {
     minTemp: number;
     maxTemp: number;

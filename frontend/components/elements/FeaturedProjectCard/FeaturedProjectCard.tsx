@@ -68,12 +68,12 @@ const PosterImage = styled(motion.div)`
 
 type Props = {
   title: ProjectType["title"];
-  client: ProjectType["client"];
   thumbnailColor: ProjectType["thumbnailColor"];
   fallbackImage: ProjectType["fallbackImage"];
   video: ProjectType["video"];
+  snippetVideo: ProjectType["snippetVideo"];
+  snippetFallbackImage: ProjectType["snippetFallbackImage"];
   index: number;
-  totalCards: number;
   isHovered: boolean;
   onHoverStart: () => void;
   onHoverEnd: () => void;
@@ -83,12 +83,12 @@ type Props = {
 const FeaturedProjectCard = (props: Props) => {
   const {
     title,
-    client,
     thumbnailColor,
     fallbackImage,
     video,
+    snippetVideo,
+    snippetFallbackImage,
     index,
-    totalCards,
     isHovered,
     onHoverStart,
     onHoverEnd,
@@ -103,8 +103,14 @@ const FeaturedProjectCard = (props: Props) => {
 
   const { y } = useMousePosition();
 
-  const hasVideo = video?.asset?.playbackId;
-  const hasFallbackImage = fallbackImage?.asset?.url;
+  // Prioritize snippet video/image over regular video/image
+  const hasVideo = snippetVideo?.asset?.playbackId || video?.asset?.playbackId;
+  const hasFallbackImage =
+    snippetFallbackImage?.asset?.url || fallbackImage?.asset?.url;
+  const videoPlaybackId =
+    snippetVideo?.asset?.playbackId || video?.asset?.playbackId;
+  const fallbackImageUrl =
+    snippetFallbackImage?.asset?.url || fallbackImage?.asset?.url;
 
   // Use refs for all video state to persist between re-renders
   const playerRef = useRef<any>(null);
@@ -215,7 +221,7 @@ const FeaturedProjectCard = (props: Props) => {
             <MuxPlayer
               ref={playerRef}
               streamType="on-demand"
-              playbackId={video.asset.playbackId}
+              playbackId={videoPlaybackId}
               autoPlay="muted"
               loop={true}
               preload="auto"
@@ -232,7 +238,7 @@ const FeaturedProjectCard = (props: Props) => {
                 transition={{ duration: 0.3 }}
               >
                 <Image
-                  src={fallbackImage.asset.url}
+                  src={fallbackImageUrl}
                   alt={title}
                   priority={true}
                   fill
@@ -249,7 +255,7 @@ const FeaturedProjectCard = (props: Props) => {
         )}
         {!hasVideo && isHovered && hasFallbackImage && (
           <Image
-            src={fallbackImage.asset.url}
+            src={fallbackImageUrl}
             alt={title}
             priority={true}
             fill

@@ -64,6 +64,19 @@ export const homePageQueryString = `
 				asset-> {
 					playbackId
 				}
+			},
+			snippetVideo {
+				asset-> {
+					playbackId
+				}
+			},
+			snippetFallbackImage {
+				asset-> {
+					url,
+					metadata {
+						lqip
+					}
+				}
 			}
 		}
 	}
@@ -102,6 +115,22 @@ export const projectsQueryString = `
 			}
 		},
 		fallbackImage {
+			asset-> {
+				url,
+				metadata {
+					lqip
+				}
+			}
+		},
+		snippetVideo {
+			asset-> {
+				playbackId,
+				data {
+					duration
+				}
+			}
+		},
+		snippetFallbackImage {
 			asset-> {
 				url,
 				metadata {

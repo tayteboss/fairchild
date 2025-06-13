@@ -145,7 +145,6 @@ const FeaturedProjects = (props: Props) => {
                   <FeaturedProjectCard
                     {...project}
                     index={index}
-                    totalCards={data.length * 2}
                     isHovered={hoveredIndex === index}
                     onHoverStart={() => handleHoverStart(index)}
                     onHoverEnd={handleHoverEnd}

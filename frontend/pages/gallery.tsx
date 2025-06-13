@@ -15,6 +15,7 @@ import GalleryList from "../components/blocks/GalleryList";
 import GalleryFilters from "../components/blocks/GalleryFilters";
 import { useEffect, useState } from "react";
 import ProjectGalleryCarousel from "../components/blocks/ProjectGalleryCarousel/ProjectGalleryCarousel";
+import { useHeader } from "../components/layout/HeaderContext";
 
 const PageWrapper = styled(motion.div)``;
 
@@ -49,6 +50,8 @@ const Page = (props: Props) => {
   >("idle");
   const [isCarouselOpen, setIsCarouselOpen] = useState(false);
 
+  const { setHeaderText, setIsHovering } = useHeader();
+
   // Toggle filters panel
   const handleToggleFilters = () => {
     setFiltersIsOpen(!filtersIsOpen);
@@ -60,10 +63,17 @@ const Page = (props: Props) => {
     setAnimationPhase("fade");
     setIsCarouselOpen(true);
 
+    setHeaderText({
+      logo: filteredProjects[projectIndex].client || "",
+      tagline: filteredProjects[projectIndex].title || "",
+      year: filteredProjects[projectIndex].year || "",
+    });
+    setIsHovering(true);
+
     // After fade, move to carousel
     setTimeout(() => {
       setAnimationPhase("carousel");
-    }, 250);
+    }, 200);
   };
 
   const handleCloseCarousel = () => {

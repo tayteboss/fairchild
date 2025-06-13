@@ -309,6 +309,17 @@ const ProjectGalleryCarousel = (props: Props) => {
     setIsHovering,
   ]);
 
+  useEffect(() => {
+    if (project && hasScrolled) {
+      setHeaderText({
+        logo: project.client || "",
+        tagline: project.title || "",
+        year: project.year || "",
+      });
+      setIsHovering(true);
+    }
+  }, [hasScrolled]);
+
   return (
     <AnimatePresence>
       {isOpen && (
