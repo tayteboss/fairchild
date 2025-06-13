@@ -1,9 +1,13 @@
 import styled from "styled-components";
 import WordmarkSvg from "../../svgs/WordmarkSvg";
 import LayoutWrapper from "../../layout/LayoutWrapper";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/router";
 import { useMouseMovement } from "../../../hooks/useMouseMovement";
+import GraphicOneSvg from "../../svgs/GraphicOneSvg";
+import GraphicTwoSvg from "../../svgs/GraphicTwoSvg";
+
+const graphicSvgs = [GraphicOneSvg, GraphicTwoSvg, WordmarkSvg];
 
 const LogoSaverWrapper = styled.div`
   position: fixed;
@@ -35,16 +39,24 @@ const LogoSaver = () => {
   const [isVisible, setIsVisible] = useState(true);
   const [isAnimating, setIsAnimating] = useState(true);
   const router = useRouter();
+  const [CurrentSvg, setCurrentSvg] = useState<React.ElementType>(
+    () => WordmarkSvg
+  );
+  const lastIndexRef = useRef<number | null>(null);
 
   // Reset state on route change
   useEffect(() => {
     const handleRouteChange = () => {
       setIsVisible(true);
       setIsAnimating(true);
-    };
 
-    // Start animation on mount
-    handleRouteChange();
+      let newIndex;
+      do {
+        newIndex = Math.floor(Math.random() * graphicSvgs.length);
+      } while (graphicSvgs.length > 1 && newIndex === lastIndexRef.current);
+      lastIndexRef.current = newIndex;
+      setCurrentSvg(() => graphicSvgs[newIndex]);
+    };
 
     router.events.on("routeChangeStart", handleRouteChange);
 
@@ -86,7 +98,7 @@ const LogoSaver = () => {
   return (
     <LogoSaverWrapper>
       <LayoutWrapper>
-        <Inner>{isVisible && <WordmarkSvg />}</Inner>
+        <Inner>{isVisible && <CurrentSvg />}</Inner>
       </LayoutWrapper>
     </LogoSaverWrapper>
   );

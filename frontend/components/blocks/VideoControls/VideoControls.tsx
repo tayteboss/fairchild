@@ -27,19 +27,13 @@ const Inner = styled(motion.div)`
 `;
 
 const CreditsTrigger = styled.button`
-  grid-column: 1 / 2;
+  grid-column: 3 / 4;
   text-align: left;
   color: var(--colour-white);
 `;
 
 const MuteTrigger = styled.button`
-  grid-column: -3 / -2;
-  text-align: right;
-  color: var(--colour-white);
-`;
-
-const CloseTrigger = styled.button`
-  grid-column: -1 / -2;
+  grid-column: -4 / -3;
   text-align: right;
   color: var(--colour-white);
 `;
@@ -194,7 +188,6 @@ const VideoControls = (props: Props) => {
                   <MuteTrigger onClick={() => setIsMuted(!isMuted)}>
                     {isMuted ? "Unmute" : "Mute"}
                   </MuteTrigger>
-                  <CloseTrigger onClick={handleClose}>Close</CloseTrigger>
                 </LayoutGrid>
                 <ControlsPanel
                   currentTime={currentTime}

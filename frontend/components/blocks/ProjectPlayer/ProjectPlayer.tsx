@@ -36,10 +36,8 @@ const Backdrop = styled.div<{ $isActive: boolean }>`
 const Outer = styled.div<{ $isFullScreen: boolean }>`
   width: ${({ $isFullScreen }) => ($isFullScreen ? "100%" : "33.33%")};
   position: absolute;
-  bottom: ${({ $isFullScreen }) => ($isFullScreen ? "50%" : "0")};
+  bottom: 0;
   left: 0;
-  transform: ${({ $isFullScreen }) =>
-    $isFullScreen ? "translateY(50%)" : "none"};
   z-index: 2;
   padding: ${pxToRem(8)};
 
@@ -65,6 +63,15 @@ const Inner = styled.div`
     height: 100%;
     width: 100%;
   }
+`;
+
+const CloseTrigger = styled(motion.button)`
+  position: fixed;
+  top: ${pxToRem(8)};
+  right: ${pxToRem(8)};
+  z-index: 10;
+  color: var(--colour-white);
+  text-decoration: underline;
 `;
 
 const wrapperVariants = {
@@ -179,6 +186,19 @@ const ProjectPlayer = (props: Props) => {
           <Outer $isFullScreen={isFullScreen}>
             <Ratio>
               <Inner>
+                <AnimatePresence>
+                  {isFullScreen && (
+                    <CloseTrigger
+                      onClick={handleClose}
+                      variants={wrapperVariants}
+                      initial="hidden"
+                      animate="visible"
+                      exit="hidden"
+                    >
+                      Close
+                    </CloseTrigger>
+                  )}
+                </AnimatePresence>
                 <VideoControls
                   isMuted={isMuted}
                   currentTime={currentTime}

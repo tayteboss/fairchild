@@ -12,7 +12,7 @@ const CreditsModalWrapper = styled(motion.div)`
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: rgba(0, 0, 0, 0.9);
   backdrop-filter: blur(10px);
   z-index: 5;
   display: flex;
@@ -24,14 +24,16 @@ const CreditsModalWrapper = styled(motion.div)`
 `;
 
 const CreditsList = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: ${pxToRem(64)};
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-column-gap: ${pxToRem(8)};
+  grid-row-gap: ${pxToRem(48)};
   width: 50vw;
   padding: ${pxToRem(16)};
   cursor: crosshair;
 
   a {
+    grid-column: span 2;
     cursor: pointer;
 
     &:hover {
@@ -47,6 +49,7 @@ const CreditsItem = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  grid-column: span 2;
 `;
 
 const CreditsItemRole = styled.p`
@@ -104,8 +107,6 @@ const CreditsModal = (props: Props) => {
   useClickOutside(ref, () => {
     setIsOpen(false);
   });
-
-  console.log("project", project);
 
   return (
     <AnimatePresence>
