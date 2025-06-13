@@ -100,11 +100,7 @@ const AnimatedCarouselCard = ({
       }}
     >
       <CarouselCard
-        project={{
-          ...(project as ProjectType),
-          title: galleryItem.projectTitle,
-          client: galleryItem.projectClient,
-        }}
+        project={project}
         gallery={galleryItem}
         onLoad={onImageLoad}
         isOverlayActive={isOverlayActive}

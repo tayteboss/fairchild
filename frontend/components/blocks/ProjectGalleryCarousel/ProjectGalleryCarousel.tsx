@@ -37,14 +37,18 @@ const Backdrop = styled.div`
 `;
 
 const CloseTrigger = styled.div`
-  position: absolute;
-  top: 50%;
-  right: 0;
-  transform: translateY(-50%);
-  z-index: 100;
-  padding: ${pxToRem(8)};
-  color: var(--colour-white);
-  mix-blend-mode: difference;
+  display: none;
+
+  @media ${(props) => props.theme.mediaBreakpoints.tabletPortrait} {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    z-index: 100;
+    padding: ${pxToRem(8)};
+    color: var(--colour-white);
+    mix-blend-mode: difference;
+  }
 `;
 
 const CarouselContainer = styled.div`

@@ -72,7 +72,7 @@ const ColorOverlay = styled(motion.div)<{
 `;
 
 type Props = {
-  project: ProjectType;
+  project: ProjectType | null;
   gallery: {
     image: {
       asset: {
@@ -104,16 +104,18 @@ const CarouselCard = ({
 
   const { ref, inView } = useInView({
     triggerOnce: false,
-    threshold: 1,
-    rootMargin: "-50px",
+    threshold: 0.5,
   });
 
   useEffect(() => {
-    if (inView && hasScrolled) {
+    console.log("inView", inView);
+    if (inView) {
+      console.log("project", project);
+
       setHeaderText({
-        logo: project.client || "",
-        tagline: project.title || "",
-        year: project.year || "",
+        logo: project?.client || "",
+        tagline: project?.title || "",
+        year: project?.year || "",
       });
     }
   }, [inView, project, setHeaderText, hasScrolled]);
@@ -127,7 +129,7 @@ const CarouselCard = ({
               <ImageInner>
                 <Image
                   src={gallery.image.asset.url}
-                  alt={project.title}
+                  alt={project ? project.title : ""}
                   fill
                   style={{
                     objectFit: "cover",
