@@ -69,6 +69,10 @@ const Container = styled.div`
   flex-direction: column;
   gap: ${pxToRem(64)};
   margin-bottom: ${pxToRem(64)};
+
+  @media ${(props) => props.theme.mediaBreakpoints.tabletPortrait} {
+    width: 90vw;
+  }
 `;
 
 const CloseTrigger = styled.button`

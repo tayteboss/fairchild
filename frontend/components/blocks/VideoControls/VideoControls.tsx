@@ -5,7 +5,6 @@ import throttle from "lodash.throttle";
 import useViewportWidth from "../../../hooks/useViewportWidth";
 import ControlsPanel from "../ControlsPanel";
 import useWindowDimensions from "../../../hooks/useWindowDimensions";
-import LayoutWrapper from "../../layout/LayoutWrapper";
 import LayoutGrid from "../../layout/LayoutGrid";
 import pxToRem from "../../../utils/pxToRem";
 
@@ -18,6 +17,10 @@ const VideoControlsWrapper = styled(motion.div)`
   z-index: 4;
   color: var(--colour-white);
   mix-blend-mode: difference;
+
+  @media ${(props) => props.theme.mediaBreakpoints.tabletPortrait} {
+    display: none;
+  }
 `;
 
 const Inner = styled(motion.div)`

@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
 import { useHeader } from "../../layout/HeaderContext";
 import { useMouseMovement } from "../../../hooks/useMouseMovement";
 
-const HeaderWrapper = styled(motion.header)`
+const HeaderWrapper = styled(motion.header)<{ $isProjectsPage?: boolean }>`
   padding: ${pxToRem(8)} 0;
   position: fixed;
   top: 0;
@@ -24,7 +24,7 @@ const HeaderWrapper = styled(motion.header)`
   mix-blend-mode: difference;
 
   @media ${(props) => props.theme.mediaBreakpoints.tabletPortrait} {
-    top: 50vh;
+    top: ${({ $isProjectsPage }) => ($isProjectsPage ? "0" : "50vh")};
   }
 `;
 
@@ -193,6 +193,9 @@ const Header = (props: Props) => {
 
   const getInitialY = () => {
     if (isMobile) {
+      if (isProjectsPage) {
+        return 0;
+      }
       return "-50%";
     }
     return centerPosition;
@@ -200,11 +203,12 @@ const Header = (props: Props) => {
 
   return (
     <HeaderWrapper
+      $isProjectsPage={isProjectsPage}
       className="header"
       initial={{ opacity: 0, y: getInitialY() }}
       animate={{
         opacity: hasMoved ? 1 : 0,
-        y: isMobile ? "-50%" : getAnimateY(),
+        y: isMobile ? (isProjectsPage ? 0 : "-50%") : getAnimateY(),
       }}
       exit={{ opacity: 0 }}
       transition={{

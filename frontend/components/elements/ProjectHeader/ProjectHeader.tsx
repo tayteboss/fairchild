@@ -18,30 +18,55 @@ const sharedStyles = css`
 
 const ProjectHeaderWrapper = styled.div`
   margin-bottom: ${pxToRem(8)};
+
+  @media ${(props) => props.theme.mediaBreakpoints.tabletPortrait} {
+    margin-bottom: ${pxToRem(24)};
+  }
 `;
 
 const Client = styled.button`
   grid-column: span 1;
   ${sharedStyles}
+
+  @media ${(props) => props.theme.mediaBreakpoints.tabletPortrait} {
+    grid-column: span 3;
+  }
 `;
 
 const Project = styled.button`
   grid-column: span 3;
   ${sharedStyles}
+
+  @media ${(props) => props.theme.mediaBreakpoints.tabletPortrait} {
+    grid-column: span 3;
+    justify-content: flex-end;
+  }
 `;
 
 const Type = styled.button`
   grid-column: span 2;
   ${sharedStyles}
+
+  @media ${(props) => props.theme.mediaBreakpoints.tabletPortrait} {
+    display: none;
+  }
 `;
 
 const Styles = styled.p`
   grid-column: span 4;
+
+  @media ${(props) => props.theme.mediaBreakpoints.tabletPortrait} {
+    display: none;
+  }
 `;
 
 const Year = styled.button`
   grid-column: span 2;
   ${sharedStyles}
+
+  @media ${(props) => props.theme.mediaBreakpoints.tabletPortrait} {
+    display: none;
+  }
 `;
 
 type Props = {

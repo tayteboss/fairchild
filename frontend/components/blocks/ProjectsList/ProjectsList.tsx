@@ -4,6 +4,9 @@ import ProjectHeader from "../../elements/ProjectHeader";
 import pxToRem from "../../../utils/pxToRem";
 import LayoutWrapper from "../../layout/LayoutWrapper";
 import ProjectListCard from "../../elements/ProjectListCard";
+import useViewportWidth from "../../../hooks/useViewportWidth";
+import { useState } from "react";
+import MobileProjectPlayer from "../MobileProjectPlayer";
 
 const ProjectsListWrapper = styled.section`
   padding: ${pxToRem(130)} 0 calc(50lvh + 12px);
@@ -13,6 +16,10 @@ const ProjectsListWrapper = styled.section`
 const ProjectsWrapper = styled.div`
   display: flex;
   flex-direction: column;
+
+  @media ${(props) => props.theme.mediaBreakpoints.tabletPortrait} {
+    gap: ${pxToRem(24)};
+  }
 `;
 
 type Props = {
@@ -35,19 +42,21 @@ const ProjectsList = (props: Props) => {
 
   const hasProjects = projects && projects.length > 0;
 
+  const viewport = useViewportWidth();
+  const isMobile = viewport === "mobile" || viewport === "tabletPortrait";
+
+  console.log(isMobile);
+
   return (
     <ProjectsListWrapper>
       <LayoutWrapper>
         <ProjectHeader handleSort={handleSort} sortConfig={sortConfig} />
         <ProjectsWrapper>
           {hasProjects ? (
-            [
-              ...projects,
-              ...projects,
-              ...projects,
-              ...projects,
-              ...projects,
-            ].map((project, index) => (
+            (isMobile
+              ? projects
+              : [...projects, ...projects, ...projects, ...projects]
+            ).map((project, index) => (
               <ProjectListCard
                 key={index}
                 project={project}

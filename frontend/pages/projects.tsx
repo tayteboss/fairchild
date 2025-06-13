@@ -152,6 +152,7 @@ const Page = (props: Props) => {
         activeProject={activeProject}
         isFullScreen={isFullScreen}
         setIsFullScreen={setIsFullScreen}
+        setActiveProject={setActiveProject}
       />
       <ProjectFilters
         isOpen={filtersIsOpen}

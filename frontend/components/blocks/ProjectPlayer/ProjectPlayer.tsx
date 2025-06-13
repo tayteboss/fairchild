@@ -41,6 +41,17 @@ const Outer = styled.div<{ $isFullScreen: boolean }>`
   z-index: 2;
   padding: ${pxToRem(8)};
 
+  @media ${(props) => props.theme.mediaBreakpoints.tabletPortrait} {
+    bottom: 50%;
+    left: 50%;
+    transform: translate(-50%, 50%);
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   transition: all var(--transition-speed-slow) var(--transition-ease);
 `;
 
@@ -98,14 +109,19 @@ type Props = {
   };
   isFullScreen: boolean;
   setIsFullScreen: (isFullScreen: boolean) => void;
+  setActiveProject: (project: {
+    project: ProjectType | null;
+    action: "hover" | "fullscreen" | "inactive";
+  }) => void;
 };
 
 const ProjectPlayer = (props: Props) => {
-  const { activeProject, isFullScreen, setIsFullScreen } = props;
+  const { activeProject, isFullScreen, setIsFullScreen, setActiveProject } =
+    props;
 
   const [isActive, setIsActive] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
-  const [isPlaying, setIsPlaying] = useState(true);
+  const [isPlaying] = useState(true);
   const [currentTime, setCurrentTime] = useState(0);
   const [videoLength, setVideoLength] = useState(
     activeProject?.project?.video?.asset?.data?.duration || 0
@@ -123,6 +139,7 @@ const ProjectPlayer = (props: Props) => {
 
   const handleClose = () => {
     setIsFullScreen(false);
+    setActiveProject({ project: null, action: "inactive" });
   };
 
   useEffect(() => {

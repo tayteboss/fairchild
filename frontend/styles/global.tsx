@@ -116,6 +116,10 @@ export const GlobalStyles = createGlobalStyle`
 		--controls: none;
 		--media-object-fit: cover;
 		--media-object-position: center;
+		object-fit: cover;
+		object-position: center;
+		height: 100%;
+		width: 100%;
 	}
 
 	.view-element-fade-in
