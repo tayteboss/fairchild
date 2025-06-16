@@ -2,9 +2,8 @@ import styled from "styled-components";
 import { ProjectType } from "../../../shared/types/types";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, memo } from "react";
 import MuxPlayer from "@mux/mux-player-react";
-import { useMousePosition } from "../../../hooks/useMousePosition";
 
 // Base and max width variables for easy adjustment
 const INITIAL_WIDTH = "2vw";
@@ -80,7 +79,7 @@ type Props = {
   hoveredIndex: number | null;
 };
 
-const FeaturedProjectCard = (props: Props) => {
+const FeaturedProjectCard = memo((props: Props) => {
   const {
     title,
     thumbnailColor,
@@ -98,10 +97,6 @@ const FeaturedProjectCard = (props: Props) => {
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [hasVideoLoaded, setHasVideoLoaded] = useState(false);
   const [initialDelayComplete, setInitialDelayComplete] = useState(false);
-  const [hasMoved, setHasMoved] = useState(false);
-  const [initialY, setInitialY] = useState<number | null>(null);
-
-  const { y } = useMousePosition();
 
   // Prioritize snippet video/image over regular video/image
   const hasVideo = snippetVideo?.asset?.playbackId || video?.asset?.playbackId;
@@ -116,13 +111,6 @@ const FeaturedProjectCard = (props: Props) => {
   const playerRef = useRef<any>(null);
 
   useEffect(() => {
-    // Set initial cursor position
-    if (y !== null && initialY === null) {
-      setInitialY(y);
-    }
-  }, [y, initialY]);
-
-  useEffect(() => {
     // Start the initial 2-second timer
     const initialTimer = setTimeout(() => {
       setInitialDelayComplete(true);
@@ -130,16 +118,6 @@ const FeaturedProjectCard = (props: Props) => {
 
     return () => clearTimeout(initialTimer);
   }, []);
-
-  useEffect(() => {
-    // After 2 seconds, check for cursor movement
-    if (initialDelayComplete && initialY !== null && y !== null && !hasMoved) {
-      if (Math.abs(y - initialY) > 5) {
-        // Small threshold to detect movement
-        setHasMoved(true);
-      }
-    }
-  }, [initialDelayComplete, initialY, y, hasMoved]);
 
   useEffect(() => {
     if (!playerRef.current) return;
@@ -224,7 +202,7 @@ const FeaturedProjectCard = (props: Props) => {
               playbackId={videoPlaybackId}
               autoPlay="muted"
               loop={true}
-              preload="auto"
+              preload="metadata"
               muted
               playsInline={true}
               minResolution="720p"
@@ -240,14 +218,13 @@ const FeaturedProjectCard = (props: Props) => {
                 <Image
                   src={fallbackImageUrl}
                   alt={title}
-                  priority={true}
+                  priority={false}
                   fill
                   style={{
                     objectFit: "cover",
                     transform: "translateZ(0)",
                   }}
                   sizes="50vw"
-                  loading="eager"
                 />
               </PosterImage>
             )}
@@ -257,19 +234,20 @@ const FeaturedProjectCard = (props: Props) => {
           <Image
             src={fallbackImageUrl}
             alt={title}
-            priority={true}
+            priority={false}
             fill
             style={{
               objectFit: "cover",
               transform: "translateZ(0)",
             }}
             sizes="50vw"
-            loading="eager"
           />
         )}
       </Inner>
     </FeaturedProjectCardWrapper>
   );
-};
+});
+
+FeaturedProjectCard.displayName = "FeaturedProjectCard";
 
 export default FeaturedProjectCard;

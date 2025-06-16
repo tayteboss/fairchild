@@ -163,8 +163,8 @@ const GalleryCard = ({
               if (isMobile) return;
               setIsHovering(true);
               setHeaderText({
-                logo: project.client,
-                tagline: project.title,
+                logo: isMobile ? "" : project.client,
+                tagline: isMobile ? "" : project.title,
               });
             }}
             onHoverEnd={() => {

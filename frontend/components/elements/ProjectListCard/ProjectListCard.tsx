@@ -4,8 +4,8 @@ import { ProjectType } from "../../../shared/types/types";
 import pxToRem from "../../../utils/pxToRem";
 import FullScreenSvg from "../../svgs/FullScreenSvg";
 import MuxPlayer from "@mux/mux-player-react";
-import { useEffect, useRef } from "react";
 import { useInView } from "react-intersection-observer";
+import { AnimatePresence, motion } from "framer-motion";
 
 const DesktopProjectListCardWrapper = styled.div`
   opacity: 0.4;
@@ -103,7 +103,7 @@ const Inner = styled.div`
   padding-top: 56.25%;
 `;
 
-const MediaWrapper = styled.div`
+const MediaWrapper = styled(motion.div)`
   position: absolute;
   inset: 0;
   height: 100%;
@@ -124,6 +124,23 @@ const ContentWrapper = styled.div`
   align-items: center;
 `;
 
+const wrapperVariants = {
+  hidden: {
+    opacity: 0,
+    transition: {
+      duration: 0.3,
+      ease: "easeInOut",
+    },
+  },
+  visible: {
+    opacity: 1,
+    transition: {
+      duration: 0.3,
+      ease: "easeInOut",
+    },
+  },
+};
+
 type Props = {
   project: ProjectType;
   setActiveProject: (project: {
@@ -136,25 +153,10 @@ type Props = {
 const ProjectListCard = (props: Props) => {
   const { project, isFullScreen, setActiveProject } = props;
 
-  const muxPlayerRef = useRef<any>(null);
   const { ref, inView } = useInView({
-    triggerOnce: false,
+    triggerOnce: true,
     threshold: 0.25,
   });
-
-  useEffect(() => {
-    if (!muxPlayerRef.current) return;
-
-    if (isFullScreen) {
-      muxPlayerRef.current.pause();
-    } else {
-      if (inView) {
-        muxPlayerRef.current.play();
-      } else {
-        muxPlayerRef.current.pause();
-      }
-    }
-  }, [isFullScreen, inView, muxPlayerRef]);
 
   return (
     <>
@@ -188,27 +190,38 @@ const ProjectListCard = (props: Props) => {
         onClick={() =>
           setActiveProject({ project: project, action: "fullscreen" })
         }
-        ref={ref}
       >
-        <Inner>
-          <MediaWrapper>
-            {project?.video?.asset?.playbackId && (
-              <MuxPlayer
-                ref={muxPlayerRef}
-                streamType="on-demand"
-                playbackId={project.video.asset.playbackId}
-                autoPlay="muted"
-                loop={true}
-                thumbnailTime={1}
-                preload="auto"
-                muted
-                playsInline={true}
-                poster={project.fallbackImage.asset.url}
-              />
+        <Inner ref={ref}>
+          <AnimatePresence>
+            {inView && (
+              <MediaWrapper
+                variants={wrapperVariants}
+                initial="hidden"
+                animate="visible"
+                exit="hidden"
+              >
+                {project?.video?.asset?.playbackId && (
+                  <MuxPlayer
+                    streamType="on-demand"
+                    playbackId={project.video.asset.playbackId}
+                    autoPlay="muted"
+                    loop={true}
+                    thumbnailTime={1}
+                    preload="auto"
+                    muted
+                    playsInline={true}
+                    poster={project.fallbackImage.asset.url}
+                  />
+                )}
+              </MediaWrapper>
             )}
-          </MediaWrapper>
+          </AnimatePresence>
         </Inner>
-        <ContentWrapper>
+        <ContentWrapper
+          className={`view-element-fade-in ${
+            inView ? "view-element-fade-in--in-view" : ""
+          }`}
+        >
           <Client>{project.client || "N/A"}</Client>
           <Project>{project.title || "N/A"}</Project>
         </ContentWrapper>

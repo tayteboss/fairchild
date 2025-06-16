@@ -1,9 +1,8 @@
 import styled from "styled-components";
 import { ProjectType } from "../../../shared/types/types";
 import FeaturedProjectCard from "../../elements/FeaturedProjectCard";
-import { motion } from "framer-motion";
-import { useMousePosition } from "../../../hooks/useMousePosition";
-import { useEffect, useState, useMemo } from "react";
+import { motion, useMotionValue, useTransform, useSpring } from "framer-motion";
+import { useEffect, useState, useCallback } from "react";
 import { useHeader } from "../../layout/HeaderContext";
 
 const FeaturedProjectsWrapper = styled.div`
@@ -88,55 +87,69 @@ const FeaturedProjects = (props: Props) => {
   const [windowHeight, setWindowHeight] = useState(0);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
-  const { y } = useMousePosition();
+  const motionY = useMotionValue(0);
 
   const hasData = data && data.length > 0;
 
   useEffect(() => {
-    setWindowHeight(window.innerHeight);
+    const handleMouseMove = (e: MouseEvent) => {
+      motionY.set(e.clientY);
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+    };
+  }, [motionY]);
+
+  useEffect(() => {
+    const initialHeight = window.innerHeight;
+    setWindowHeight(initialHeight);
+    motionY.set(initialHeight / 2);
+
     const handleResize = () => {
       setWindowHeight(window.innerHeight);
     };
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  }, [motionY]);
 
-  const liveNormalizedY = useMemo(
-    () => (y !== null && windowHeight > 0 ? y / windowHeight - 0.5 : 0),
-    [y, windowHeight]
+  const liveNormalizedY = useTransform(motionY, (latestY) => {
+    return windowHeight > 0 ? latestY / windowHeight - 0.5 : 0;
+  });
+
+  const liveTargetTranslateY = useTransform(
+    liveNormalizedY,
+    (latestNormalizedY) => -latestNormalizedY * PARALLAX_STRENGTH
   );
 
-  const liveTargetTranslateY = useMemo(
-    () => -liveNormalizedY * PARALLAX_STRENGTH,
-    [liveNormalizedY]
+  const smoothedY = useSpring(liveTargetTranslateY, springTransition);
+
+  const handleHoverStart = useCallback(
+    (index: number) => {
+      setHoveredIndex(index);
+      const project = data[index % data.length];
+      setHeaderText({
+        logo: project.client,
+        tagline: project.title,
+        type: project.type,
+        year: project.year,
+      });
+      setIsHovering(true);
+    },
+    [data, setHeaderText, setIsHovering]
   );
 
-  const handleHoverStart = (index: number) => {
-    setHoveredIndex(index);
-    const project = data[index % data.length];
-    setHeaderText({
-      logo: project.client,
-      tagline: project.title,
-      type: project.type,
-      year: project.year,
-    });
-    setIsHovering(true);
-  };
-
-  const handleHoverEnd = () => {
+  const handleHoverEnd = useCallback(() => {
     setHoveredIndex(null);
     setIsHovering(false);
-  };
+  }, [setIsHovering]);
 
   return (
     <FeaturedProjectsWrapper>
       <Inner variants={containerVariants} initial="hidden" animate="visible">
         <ParallaxWrapper
-          animate={{
-            y: liveTargetTranslateY,
-          }}
-          transition={{
-            y: { ...springTransition },
+          style={{
+            y: smoothedY,
           }}
         >
           {hasData &&

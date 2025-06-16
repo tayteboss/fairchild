@@ -73,6 +73,7 @@ const ColorOverlay = styled(motion.div)<{
 
 type Props = {
   project: ProjectType | null;
+  isMobile: boolean;
   gallery: {
     image: {
       asset: {
@@ -111,8 +112,8 @@ const CarouselCard = ({
   useEffect(() => {
     if (inView) {
       setHeaderText({
-        logo: project?.client || "",
-        tagline: project?.title || "",
+        logo: isMobile ? "" : project?.client || "",
+        tagline: isMobile ? "" : project?.title || "",
         year: isMobile ? "" : project?.year || "",
       });
     }

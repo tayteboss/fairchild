@@ -68,8 +68,8 @@ const Page = (props: Props) => {
     setIsCarouselOpen(true);
 
     setHeaderText({
-      logo: filteredProjects[projectIndex].client || "",
-      tagline: filteredProjects[projectIndex].title || "",
+      logo: isMobile ? "" : filteredProjects[projectIndex].client || "",
+      tagline: isMobile ? "" : filteredProjects[projectIndex].title || "",
       year: isMobile ? "" : filteredProjects[projectIndex].year || "",
     });
     setIsHovering(true);

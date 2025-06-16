@@ -24,7 +24,7 @@ const HeaderWrapper = styled(motion.header)<{ $isProjectsPage?: boolean }>`
   mix-blend-mode: difference;
 
   @media ${(props) => props.theme.mediaBreakpoints.tabletPortrait} {
-    top: ${({ $isProjectsPage }) => ($isProjectsPage ? "0" : "50vh")};
+    top: ${({ $isProjectsPage }) => ($isProjectsPage ? "0" : "50dvh")};
   }
 `;
 
@@ -226,7 +226,7 @@ const Header = (props: Props) => {
         <LayoutGrid>
           <LogoWrapper>
             <Text>
-              <Link href="/">{isHovering ? headerText.logo : "Fairchild"}</Link>
+              {isHovering ? headerText.logo : <Link href="/">Fairchild</Link>}
             </Text>
           </LogoWrapper>
           <TaglineWrapper>

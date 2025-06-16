@@ -6,6 +6,8 @@ import client from "../client";
 import { homePageQueryString } from "../lib/sanityQueries";
 import FeaturedProjects from "../components/blocks/FeaturedProjects";
 import MobileFeaturedProjects from "../components/blocks/MobileFeaturedProjects";
+import { useEffect } from "react";
+import { useHeader } from "../components/layout/HeaderContext";
 
 const PageWrapper = styled(motion.div)``;
 
@@ -16,6 +18,16 @@ type Props = {
 
 const Page = (props: Props) => {
   const { data, pageTransitionVariants } = props;
+
+  const { setHeaderText, setIsHovering } = useHeader();
+
+  useEffect(() => {
+    setHeaderText({
+      logo: "Fairchild",
+      tagline: "",
+    });
+    setIsHovering(false);
+  }, []);
 
   return (
     <PageWrapper

@@ -56,7 +56,7 @@ const ProjectsList = (props: Props) => {
               : [...projects, ...projects, ...projects, ...projects]
             ).map((project, index) => (
               <ProjectListCard
-                key={index}
+                key={isMobile ? `mobile-${index}` : `desktop-${index}`}
                 project={project}
                 setActiveProject={setActiveProject}
                 isFullScreen={isFullScreen}

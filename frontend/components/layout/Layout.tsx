@@ -1,6 +1,5 @@
 import styled from "styled-components";
 import Header from "../common/Header";
-import Footer from "../common/Footer";
 import { ReactNode, useState } from "react";
 import { ReactLenis, useLenis } from "@studio-freight/react-lenis";
 import { SiteSettingsType } from "../../shared/types/types";

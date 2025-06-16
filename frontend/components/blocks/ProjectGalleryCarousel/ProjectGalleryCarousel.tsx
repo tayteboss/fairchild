@@ -276,8 +276,8 @@ const ProjectGalleryCarousel = (props: Props) => {
       if (!container || !innerEl) return;
 
       setHeaderText({
-        logo: project.client || "",
-        tagline: project.title || "",
+        logo: isMobile ? "" : project.client || "",
+        tagline: isMobile ? "" : project.title || "",
         year: isMobile ? "" : project.year || "",
       });
       setIsHovering(true);
