@@ -77,14 +77,14 @@ const MobileMenu = (props: Props) => {
           exit="hidden"
         >
           <Inner ref={ref} onClick={() => setIsOpen(false)}>
-            <Link href="/gallery">
-              <LinkText $isActive={activeLink === "Gallery"}>Gallery</LinkText>
-            </Link>
-            <span> / </span>
             <Link href="/projects">
               <LinkText $isActive={activeLink === "Projects"}>
                 Projects
               </LinkText>
+            </Link>
+            <span> / </span>
+            <Link href="/gallery">
+              <LinkText $isActive={activeLink === "Gallery"}>Gallery</LinkText>
             </Link>
             <span> / </span>
             <Link href="/information">

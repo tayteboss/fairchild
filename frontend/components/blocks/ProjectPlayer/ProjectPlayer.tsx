@@ -2,10 +2,11 @@ import styled from "styled-components";
 import { ProjectType } from "../../../shared/types/types";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import MuxPlayer from "@mux/mux-player-react";
+import MuxPlayer from "@mux/mux-player-react/lazy";
 import pxToRem from "../../../utils/pxToRem";
 import VideoControls from "../VideoControls";
 import CreditsModal from "../CreditsModal";
+import MobileProjectDetails from "../MobileProjectDetails";
 
 const ProjectPlayerWrapper = styled(motion.section)<{ $isFullScreen: boolean }>`
   position: fixed;
@@ -200,6 +201,10 @@ const ProjectPlayer = (props: Props) => {
             setIsOpen={setIsCreditsOpen}
             project={activeProject?.project}
           />
+          <MobileProjectDetails
+            project={activeProject?.project}
+            isActive={isFullScreen}
+          />
           <Outer $isFullScreen={isFullScreen}>
             <Ratio>
               <Inner>
@@ -237,6 +242,7 @@ const ProjectPlayer = (props: Props) => {
                     preload="auto"
                     muted={isMuted}
                     playsInline={true}
+                    loading="viewport"
                     poster={
                       activeProject?.project?.fallbackImage?.asset.metadata.lqip
                     }

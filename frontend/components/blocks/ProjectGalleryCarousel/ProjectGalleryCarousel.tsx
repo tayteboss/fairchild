@@ -40,6 +40,7 @@ const CloseTrigger = styled.div`
   display: none;
 
   @media ${(props) => props.theme.mediaBreakpoints.tabletPortrait} {
+    display: block;
     position: absolute;
     top: 50%;
     right: 0;
@@ -64,6 +65,7 @@ const Inner = styled.div`
   flex-direction: column;
   width: 60vw;
   margin: 0 auto;
+  padding: 50vh 0;
 
   @media ${(props) => props.theme.mediaBreakpoints.tabletPortrait} {
     width: 100%;
@@ -250,7 +252,8 @@ const ProjectGalleryCarousel = (props: Props) => {
             const offset =
               targetLayout.top -
               container.clientHeight / 2 +
-              targetLayout.height / 2;
+              targetLayout.height / 2 +
+              (isMobile ? targetLayout.height / 3 : targetLayout.height / 10);
             const scrollDuration = 2;
             lenisRef.current.scrollTo(offset, {
               duration: scrollDuration,
@@ -326,6 +329,7 @@ const ProjectGalleryCarousel = (props: Props) => {
     animationPhase,
     recalculateLayout,
     scrollY,
+    isMobile,
     setHeaderText,
     setIsHovering,
   ]);
@@ -339,7 +343,7 @@ const ProjectGalleryCarousel = (props: Props) => {
       });
       setIsHovering(true);
     }
-  }, [hasScrolled]);
+  }, [hasScrolled, isMobile]);
 
   return (
     <AnimatePresence>
@@ -354,13 +358,7 @@ const ProjectGalleryCarousel = (props: Props) => {
           <Backdrop />
           <CloseTrigger onClick={handleClose}>Close</CloseTrigger>
           <CarouselContainer ref={containerRef}>
-            <Inner
-              ref={innerRef}
-              style={{
-                paddingTop: `${viewportHeight / 2}px`,
-                paddingBottom: `${viewportHeight / 2}px`,
-              }}
-            >
+            <Inner ref={innerRef}>
               {allGalleryItems.map((galleryItem, index) => (
                 <AnimatedCarouselCard
                   key={`carousel-${index}`}
@@ -374,6 +372,8 @@ const ProjectGalleryCarousel = (props: Props) => {
                   isSelected={index === findSelectedImageIndex()}
                   maxWidth={isMobile ? MAX_WIDTH_MOBILE : MAX_WIDTH}
                   minWidth={isMobile ? MIN_WIDTH_MOBILE : MIN_WIDTH}
+                  index={index}
+                  isMobile={isMobile}
                 />
               ))}
             </Inner>

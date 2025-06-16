@@ -4,6 +4,8 @@ import { ProjectType } from "../../../shared/types/types";
 import pxToRem from "../../../utils/pxToRem";
 import FullScreenSvg from "../../svgs/FullScreenSvg";
 import MuxPlayer from "@mux/mux-player-react";
+import { useEffect, useRef } from "react";
+import { useInView } from "react-intersection-observer";
 
 const DesktopProjectListCardWrapper = styled.div`
   opacity: 0.4;
@@ -134,6 +136,26 @@ type Props = {
 const ProjectListCard = (props: Props) => {
   const { project, isFullScreen, setActiveProject } = props;
 
+  const muxPlayerRef = useRef<any>(null);
+  const { ref, inView } = useInView({
+    triggerOnce: false,
+    threshold: 0.25,
+  });
+
+  useEffect(() => {
+    if (!muxPlayerRef.current) return;
+
+    if (isFullScreen) {
+      muxPlayerRef.current.pause();
+    } else {
+      if (inView) {
+        muxPlayerRef.current.play();
+      } else {
+        muxPlayerRef.current.pause();
+      }
+    }
+  }, [isFullScreen, inView, muxPlayerRef]);
+
   return (
     <>
       <DesktopProjectListCardWrapper
@@ -166,11 +188,13 @@ const ProjectListCard = (props: Props) => {
         onClick={() =>
           setActiveProject({ project: project, action: "fullscreen" })
         }
+        ref={ref}
       >
         <Inner>
           <MediaWrapper>
             {project?.video?.asset?.playbackId && (
               <MuxPlayer
+                ref={muxPlayerRef}
                 streamType="on-demand"
                 playbackId={project.video.asset.playbackId}
                 autoPlay="muted"

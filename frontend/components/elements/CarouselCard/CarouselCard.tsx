@@ -99,6 +99,7 @@ const CarouselCard = ({
   onLoad,
   isOverlayActive,
   hasScrolled,
+  isMobile,
 }: Props) => {
   const { setHeaderText } = useHeader();
 
@@ -112,10 +113,10 @@ const CarouselCard = ({
       setHeaderText({
         logo: project?.client || "",
         tagline: project?.title || "",
-        year: project?.year || "",
+        year: isMobile ? "" : project?.year || "",
       });
     }
-  }, [inView, project, setHeaderText, hasScrolled]);
+  }, [inView, project, setHeaderText, isMobile, hasScrolled]);
 
   return (
     <CardWrapper ref={ref}>

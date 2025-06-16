@@ -33,6 +33,8 @@ type AnimatedCarouselCardProps = {
   isSelected: boolean;
   maxWidth: number;
   minWidth: number;
+  index: number;
+  isMobile: boolean;
 };
 
 const AnimatedCarouselCard = ({
@@ -46,6 +48,8 @@ const AnimatedCarouselCard = ({
   isSelected,
   maxWidth,
   minWidth,
+  index,
+  isMobile,
 }: AnimatedCarouselCardProps) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const width = useMotionValue(isSelected ? maxWidth : minWidth);
@@ -98,6 +102,7 @@ const AnimatedCarouselCard = ({
       style={{
         width: widthVw,
       }}
+      id={`carousel-card-${index}`}
     >
       <CarouselCard
         project={project}
@@ -105,6 +110,7 @@ const AnimatedCarouselCard = ({
         onLoad={onImageLoad}
         isOverlayActive={isOverlayActive}
         hasScrolled={hasScrolled}
+        isMobile={isMobile}
       />
     </CarouselCardWrapper>
   );

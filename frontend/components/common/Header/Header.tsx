@@ -247,15 +247,15 @@ const Header = (props: Props) => {
                   </Text>
                 ) : (
                   <>
-                    <Link href="/gallery">
-                      <LinkText $isActive={activeLink === "Gallery"}>
-                        Gallery
-                      </LinkText>
-                    </Link>
-                    <span>, </span>
                     <Link href="/projects">
                       <LinkText $isActive={activeLink === "Projects"}>
                         Projects
+                      </LinkText>
+                    </Link>
+                    <span>, </span>
+                    <Link href="/gallery">
+                      <LinkText $isActive={activeLink === "Gallery"}>
+                        Gallery
                       </LinkText>
                     </Link>
                     <span>, </span>
