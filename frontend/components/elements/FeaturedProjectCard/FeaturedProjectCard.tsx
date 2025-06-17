@@ -3,7 +3,7 @@ import { ProjectType } from "../../../shared/types/types";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState, memo } from "react";
-import MuxPlayer from "@mux/mux-player-react";
+import MuxPlayer from "@mux/mux-player-react/lazy";
 import useViewportWidth from "../../../hooks/useViewportWidth";
 
 // Base and max width variables for easy adjustment
@@ -211,6 +211,7 @@ const FeaturedProjectCard = memo((props: Props) => {
               autoPlay="muted"
               loop={true}
               preload="metadata"
+              loading="viewport"
               muted
               playsInline={true}
               minResolution="720p"

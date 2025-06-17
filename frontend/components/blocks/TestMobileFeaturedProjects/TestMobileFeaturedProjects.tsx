@@ -98,7 +98,7 @@ const TestMobileFeaturedProjects = (props: Props) => {
     [data, setHeaderText, setIsHovering]
   );
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (initialDelayComplete && wrapperRef.current && lenisRef.current) {
       if (wrapperRef.current.offsetParent === null) {
         return;
