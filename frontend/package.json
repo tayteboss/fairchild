@@ -20,6 +20,7 @@
     "@sanity/client": "^6.21.3",
     "@sanity/image-url": "^1.0.2",
     "@studio-freight/lenis": "^1.0.42",
+    "@studio-freight/react-lenis": "^0.0.47",
     "@styled-jsx/plugin-sass": "^4.1.0",
     "@types/js-cookie": "^3.0.6",
     "@types/lodash.throttle": "^4.1.9",
