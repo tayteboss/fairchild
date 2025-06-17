@@ -4,13 +4,18 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState, memo } from "react";
 import MuxPlayer from "@mux/mux-player-react";
+import useViewportWidth from "../../../hooks/useViewportWidth";
 
 // Base and max width variables for easy adjustment
 const INITIAL_WIDTH = "2vw";
+const INITIAL_MOBILE_WIDTH = "20vw";
 const BASE_WIDTH = "5vw";
+const BASE_MOBILE_WIDTH = "10vw";
 const HOVER_BASE_WIDTH = "5vw";
 const MAX_WIDTH = "50vw";
+const MOBILE_MAX_WIDTH = "80vw";
 const ADJACENT_WIDTH = "30vw";
+const MOBILE_ADJACENT_WIDTH = "60vw";
 const STAGGER_CARDS = 7;
 
 const FeaturedProjectCardWrapper = styled(motion.div)<{ $bgColor: string }>`
@@ -77,6 +82,7 @@ type Props = {
   onHoverStart: () => void;
   onHoverEnd: () => void;
   hoveredIndex: number | null;
+  initialDelayComplete: boolean;
 };
 
 const FeaturedProjectCard = memo((props: Props) => {
@@ -92,11 +98,14 @@ const FeaturedProjectCard = memo((props: Props) => {
     onHoverStart,
     onHoverEnd,
     hoveredIndex,
+    initialDelayComplete,
   } = props;
 
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [hasVideoLoaded, setHasVideoLoaded] = useState(false);
-  const [initialDelayComplete, setInitialDelayComplete] = useState(false);
+
+  const viewport = useViewportWidth();
+  const isMobile = viewport === "mobile" || viewport === "tabletPortrait";
 
   // Prioritize snippet video/image over regular video/image
   const hasVideo = snippetVideo?.asset?.playbackId || video?.asset?.playbackId;
@@ -109,15 +118,6 @@ const FeaturedProjectCard = memo((props: Props) => {
 
   // Use refs for all video state to persist between re-renders
   const playerRef = useRef<any>(null);
-
-  useEffect(() => {
-    // Start the initial 2-second timer
-    const initialTimer = setTimeout(() => {
-      setInitialDelayComplete(true);
-    }, 2000);
-
-    return () => clearTimeout(initialTimer);
-  }, []);
 
   useEffect(() => {
     if (!playerRef.current) return;
@@ -149,8 +149,9 @@ const FeaturedProjectCard = memo((props: Props) => {
 
   // Calculate the stagger effect based on distance from hovered card
   const getStaggeredWidth = () => {
-    if (!initialDelayComplete) return INITIAL_WIDTH;
-    if (hoveredIndex === null) return BASE_WIDTH;
+    if (!initialDelayComplete)
+      return isMobile ? INITIAL_MOBILE_WIDTH : INITIAL_WIDTH;
+    if (hoveredIndex === null) return isMobile ? BASE_MOBILE_WIDTH : BASE_WIDTH;
 
     const distanceFromHovered = Math.abs(index - hoveredIndex);
 
@@ -158,14 +159,21 @@ const FeaturedProjectCard = memo((props: Props) => {
     if (distanceFromHovered > STAGGER_CARDS + 1) return HOVER_BASE_WIDTH;
 
     // Return specific widths for hovered and adjacent cards
-    if (distanceFromHovered === 0) return MAX_WIDTH;
-    if (distanceFromHovered === 1) return ADJACENT_WIDTH;
+    if (distanceFromHovered === 0)
+      return isMobile ? MOBILE_MAX_WIDTH : MAX_WIDTH;
+    if (distanceFromHovered === 1)
+      return isMobile ? MOBILE_ADJACENT_WIDTH : ADJACENT_WIDTH;
 
     // Calculate remaining cards' widths with more pronounced stagger
-    const widthDiff = parseFloat(ADJACENT_WIDTH) - parseFloat(HOVER_BASE_WIDTH);
+    const widthDiff =
+      parseFloat(isMobile ? MOBILE_ADJACENT_WIDTH : ADJACENT_WIDTH) -
+      parseFloat(HOVER_BASE_WIDTH);
     const staggerAmount = widthDiff / STAGGER_CARDS;
 
-    return `${parseFloat(ADJACENT_WIDTH) - staggerAmount * (distanceFromHovered - 1)}vw`;
+    return `${
+      parseFloat(isMobile ? MOBILE_ADJACENT_WIDTH : ADJACENT_WIDTH) -
+      staggerAmount * (distanceFromHovered - 1)
+    }vw`;
   };
 
   return (

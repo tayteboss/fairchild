@@ -86,10 +86,16 @@ const FeaturedProjects = (props: Props) => {
 
   const [windowHeight, setWindowHeight] = useState(0);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [initialDelayComplete, setInitialDelayComplete] = useState(false);
 
   const motionY = useMotionValue(0);
 
   const hasData = data && data.length > 0;
+
+  useEffect(() => {
+    const timer = setTimeout(() => setInitialDelayComplete(true), 2000);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -166,6 +172,7 @@ const FeaturedProjects = (props: Props) => {
                     onHoverStart={() => handleHoverStart(index)}
                     onHoverEnd={handleHoverEnd}
                     hoveredIndex={hoveredIndex}
+                    initialDelayComplete={initialDelayComplete}
                   />
                 </motion.div>
               )
