@@ -75,7 +75,24 @@ const Container = styled.div`
   }
 `;
 
+const FooterWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${pxToRem(16)};
+`;
+
 const CloseTrigger = styled.button`
+  text-align: center;
+  opacity: 0.5;
+
+  transition: all var(--transition-speed-default) var(--transition-ease);
+
+  &:hover {
+    opacity: 1;
+  }
+`;
+
+const ResetTrigger = styled.button`
   text-align: center;
   opacity: 0.5;
 
@@ -168,9 +185,21 @@ const ProjectFilters = (props: Props) => {
                   setSelectedOptions={setSelectedStyles}
                 />
               </Container>
-              <CloseTrigger onClick={() => setIsOpen(false)}>
-                Close
-              </CloseTrigger>
+              <FooterWrapper>
+                <CloseTrigger onClick={() => setIsOpen(false)}>
+                  Close
+                </CloseTrigger>
+                {filtersAreOn && (
+                  <ResetTrigger
+                    onClick={() => {
+                      setSelectedTypes([]);
+                      setSelectedStyles([]);
+                    }}
+                  >
+                    Reset
+                  </ResetTrigger>
+                )}
+              </FooterWrapper>
             </Inner>
           </FiltersWrapper>
         )}

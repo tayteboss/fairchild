@@ -42,6 +42,12 @@ const Inner = styled(motion.div)`
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  transform-style: preserve-3d;
+  perspective: 1px;
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000;
+  transform: translate3d(0, 0, 0) translateZ(0);
 `;
 
 const ImageOuter = styled.div`

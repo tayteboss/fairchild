@@ -75,7 +75,24 @@ const Container = styled.div`
   }
 `;
 
+const FooterWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${pxToRem(16)};
+`;
+
 const CloseTrigger = styled.button`
+  text-align: center;
+  opacity: 0.5;
+
+  transition: all var(--transition-speed-default) var(--transition-ease);
+
+  &:hover {
+    opacity: 1;
+  }
+`;
+
+const ResetTrigger = styled.button`
   text-align: center;
   opacity: 0.5;
 
@@ -188,9 +205,22 @@ const GalleryFilters = (props: Props) => {
                   value={year}
                 />
               </Container>
-              <CloseTrigger onClick={() => setIsOpen(false)}>
-                Close
-              </CloseTrigger>
+              <FooterWrapper>
+                <CloseTrigger onClick={() => setIsOpen(false)}>
+                  Close
+                </CloseTrigger>
+                {filtersAreOn && (
+                  <ResetTrigger
+                    onClick={() => {
+                      setColorTemp({ min: 2300, max: 7000 });
+                      setSaturation({ min: 0, max: 100 });
+                      setYear({ min: yearRange.min, max: yearRange.max });
+                    }}
+                  >
+                    Reset
+                  </ResetTrigger>
+                )}
+              </FooterWrapper>
             </Inner>
           </FiltersWrapper>
         )}
