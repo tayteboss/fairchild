@@ -5,6 +5,7 @@ const GraphicOneSvg = () => {
         <div
           style={{
             backdropFilter: "blur(5px)",
+            WebkitBackdropFilter: "blur(5px)", // For Safari support
             clipPath: "url(#bgblur_0_265_26501_clip_path)",
             height: "100%",
             width: "100%",

@@ -5,6 +5,7 @@ const GraphicTwoSvg = () => {
         <div
           style={{
             backdropFilter: "blur(5px)",
+            WebkitBackdropFilter: "blur(5px)", // For Safari support
             clipPath: "url(#bgblur_0_305_27767_clip_path)",
             height: "100%",
             width: "100%",

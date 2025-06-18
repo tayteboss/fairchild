@@ -8,8 +8,8 @@ import useViewportWidth from "../../../hooks/useViewportWidth";
 
 // Base and max width variables for easy adjustment
 const INITIAL_MOBILE_WIDTH = "50vw";
-const BASE_MOBILE_WIDTH = "50vw";
-const MOBILE_ADJACENT_WIDTH = "100vw";
+const BASE_MOBILE_WIDTH = "60vw";
+const MOBILE_ADJACENT_WIDTH = "90vw";
 const MOBILE_MAX_WIDTH = "100vw";
 
 const INITIAL_WIDTH = "2vw";
@@ -105,8 +105,6 @@ const FeaturedProjectCard = memo((props: Props) => {
     isInitialScrollComplete,
   } = props;
 
-  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
-  const [hasVideoLoaded, setHasVideoLoaded] = useState(false);
   const [useBaseMobileWidth, setUseBaseMobileWidth] = useState(false);
 
   const viewport = useViewportWidth();
@@ -139,27 +137,11 @@ const FeaturedProjectCard = memo((props: Props) => {
 
     const player = playerRef.current;
 
-    const handlePlay = () => {
-      setIsVideoPlaying(true);
-    };
-
-    const handlePause = () => {
-      setIsVideoPlaying(false);
-    };
-
-    player.addEventListener("play", handlePlay);
-    player.addEventListener("pause", handlePause);
-
     if (isHovered) {
       player.play();
     } else {
       player.pause();
     }
-
-    return () => {
-      player.removeEventListener("play", handlePlay);
-      player.removeEventListener("pause", handlePause);
-    };
   }, [isHovered]);
 
   // Calculate the stagger effect based on distance from hovered card
@@ -235,28 +217,8 @@ const FeaturedProjectCard = memo((props: Props) => {
               muted
               playsInline={true}
               minResolution="720p"
-              onCanPlay={() => setHasVideoLoaded(true)}
+              poster={fallbackImageUrl}
             />
-            {hasFallbackImage && !hasVideoLoaded && (
-              <PosterImage
-                animate={{
-                  opacity: isVideoPlaying ? 0 : 1,
-                }}
-                transition={{ duration: 0.3 }}
-              >
-                <Image
-                  src={fallbackImageUrl}
-                  alt={title}
-                  priority={false}
-                  fill
-                  style={{
-                    objectFit: "cover",
-                    transform: "translateZ(0)",
-                  }}
-                  sizes="50vw"
-                />
-              </PosterImage>
-            )}
           </VideoWrapper>
         )}
         {!hasVideo && isHovered && hasFallbackImage && (
