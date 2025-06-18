@@ -7,16 +7,18 @@ import MuxPlayer from "@mux/mux-player-react/lazy";
 import useViewportWidth from "../../../hooks/useViewportWidth";
 
 // Base and max width variables for easy adjustment
-const INITIAL_WIDTH = "2vw";
 const INITIAL_MOBILE_WIDTH = "20vw";
-const BASE_WIDTH = "5vw";
 const BASE_MOBILE_WIDTH = "10vw";
-const HOVER_BASE_WIDTH = "5vw";
-const MAX_WIDTH = "50vw";
 const MOBILE_MAX_WIDTH = "80vw";
-const ADJACENT_WIDTH = "30vw";
 const MOBILE_ADJACENT_WIDTH = "60vw";
-const STAGGER_CARDS = 7;
+
+const INITIAL_WIDTH = "2vw";
+const BASE_WIDTH = "5vw";
+const HOVER_BASE_WIDTH = "5vw";
+const ADJACENT_WIDTH = "25vw";
+const MAX_WIDTH = "50vw";
+
+const STAGGER_CARDS = 10;
 
 const FeaturedProjectCardWrapper = styled(motion.div)<{ $bgColor: string }>`
   width: ${INITIAL_WIDTH};

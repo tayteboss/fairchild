@@ -6,6 +6,7 @@ import { useRouter } from "next/router";
 import { useMouseMovement } from "../../../hooks/useMouseMovement";
 import GraphicOneSvg from "../../svgs/GraphicOneSvg";
 import GraphicTwoSvg from "../../svgs/GraphicTwoSvg";
+import { motion } from "framer-motion";
 
 const graphicSvgs = [GraphicOneSvg, GraphicTwoSvg, WordmarkSvg];
 

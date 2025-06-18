@@ -49,8 +49,6 @@ const springTransition = {
   mass: 1,
 };
 
-const PARALLAX_STRENGTH = 500;
-
 const containerVariants = {
   hidden: {
     opacity: 0,
@@ -88,6 +86,7 @@ const FeaturedProjects = (props: Props) => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [initialDelayComplete, setInitialDelayComplete] = useState(false);
 
+  const PARALLAX_STRENGTH = 1000;
   const motionY = useMotionValue(0);
 
   const hasData = data && data.length > 0;
@@ -159,24 +158,22 @@ const FeaturedProjects = (props: Props) => {
           }}
         >
           {hasData &&
-            [...data, ...data, ...data, ...data, ...data].map(
-              (project, index) => (
-                <motion.div
-                  key={`${project.title}-${index}`}
-                  variants={itemVariants}
-                >
-                  <FeaturedProjectCard
-                    {...project}
-                    index={index}
-                    isHovered={hoveredIndex === index}
-                    onHoverStart={() => handleHoverStart(index)}
-                    onHoverEnd={handleHoverEnd}
-                    hoveredIndex={hoveredIndex}
-                    initialDelayComplete={initialDelayComplete}
-                  />
-                </motion.div>
-              )
-            )}
+            [...data, ...data].map((project, index) => (
+              <motion.div
+                key={`${project.title}-${index}`}
+                variants={itemVariants}
+              >
+                <FeaturedProjectCard
+                  {...project}
+                  index={index}
+                  isHovered={hoveredIndex === index}
+                  onHoverStart={() => handleHoverStart(index)}
+                  onHoverEnd={handleHoverEnd}
+                  hoveredIndex={hoveredIndex}
+                  initialDelayComplete={initialDelayComplete}
+                />
+              </motion.div>
+            ))}
         </ParallaxWrapper>
       </Inner>
     </FeaturedProjectsWrapper>
