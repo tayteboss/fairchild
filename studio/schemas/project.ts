@@ -13,6 +13,16 @@ export default {
       type: 'string',
     },
     {
+      title: 'Slug',
+      name: 'slug',
+      type: 'slug',
+      options: {
+        source: 'title',
+        maxLength: 96,
+      },
+      validation: (Rule: any) => Rule.required(),
+    },
+    {
       title: 'Client',
       name: 'client',
       type: 'string',

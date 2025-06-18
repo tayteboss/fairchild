@@ -41,14 +41,22 @@ const Title = styled.h3`
   text-transform: uppercase;
 `;
 
+const List = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
 type Props = {
   email: InformationPageType["email"];
-  instagramHandle: InformationPageType["instagramHandle"];
-  instagramLink: InformationPageType["instagramLink"];
+  instagramAccounts: InformationPageType["instagramAccounts"];
 };
 
 const LinksBlock = (props: Props) => {
-  const { email, instagramHandle, instagramLink } = props;
+  const { email, instagramAccounts } = props;
+
+  const hasInstagramAccounts =
+    instagramAccounts && instagramAccounts.length > 0;
 
   return (
     <LinksBlockWrapper>
@@ -58,9 +66,14 @@ const LinksBlock = (props: Props) => {
       </Block>
       <Block>
         <Title>Socials</Title>
-        <Link href={instagramLink} target="_blank">
-          {instagramHandle}
-        </Link>
+        <List>
+          {hasInstagramAccounts &&
+            instagramAccounts.map((account, index) => (
+              <Link href={account.link} target="_blank" key={index}>
+                {account.handle}
+              </Link>
+            ))}
+        </List>
       </Block>
     </LinksBlockWrapper>
   );

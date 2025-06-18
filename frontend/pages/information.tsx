@@ -78,8 +78,7 @@ const Page = (props: Props) => {
       <TitleTextBlock text={data?.businessDescription || ""} useHTML={true} />
       <LinksBlock
         email={data?.email || ""}
-        instagramHandle={data?.instagramHandle || ""}
-        instagramLink={data?.instagramLink || ""}
+        instagramAccounts={data?.instagramAccounts || []}
       />
       <TitleTextBlock richText={data?.aboutText || []} useRichText={true} />
       <TitleTextBlock

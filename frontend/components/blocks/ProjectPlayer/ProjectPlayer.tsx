@@ -7,6 +7,7 @@ import pxToRem from "../../../utils/pxToRem";
 import VideoControls from "../VideoControls";
 import CreditsModal from "../CreditsModal";
 import MobileProjectDetails from "../MobileProjectDetails";
+import { useRouter } from "next/navigation";
 
 const ProjectPlayerWrapper = styled(motion.section)<{ $isFullScreen: boolean }>`
   position: fixed;
@@ -114,11 +115,17 @@ type Props = {
     project: ProjectType | null;
     action: "hover" | "fullscreen" | "inactive";
   }) => void;
+  useCloseLink?: boolean;
 };
 
 const ProjectPlayer = (props: Props) => {
-  const { activeProject, isFullScreen, setIsFullScreen, setActiveProject } =
-    props;
+  const {
+    activeProject,
+    isFullScreen,
+    useCloseLink,
+    setIsFullScreen,
+    setActiveProject,
+  } = props;
 
   const [isActive, setIsActive] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
@@ -130,6 +137,7 @@ const ProjectPlayer = (props: Props) => {
   const [isCreditsOpen, setIsCreditsOpen] = useState(false);
 
   const muxPlayerRef = useRef<any>(null);
+  const router = useRouter();
 
   const handleSeek = (time: number) => {
     if (muxPlayerRef?.current) {
@@ -139,8 +147,12 @@ const ProjectPlayer = (props: Props) => {
   };
 
   const handleClose = () => {
-    setIsFullScreen(false);
-    setActiveProject({ project: null, action: "inactive" });
+    if (useCloseLink) {
+      router.push(`/projects`);
+    } else {
+      setIsFullScreen(false);
+      setActiveProject({ project: null, action: "inactive" });
+    }
   };
 
   useEffect(() => {

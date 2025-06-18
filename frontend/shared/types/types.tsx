@@ -131,8 +131,10 @@ export type InformationPageType = {
   ideology: string;
   businessDescription: string;
   email: string;
-  instagramHandle: string;
-  instagramLink: string;
+  instagramAccounts: {
+    handle: string;
+    link: string;
+  }[];
   aboutText: any[];
   services: string[];
   press: {

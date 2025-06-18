@@ -35,14 +35,26 @@ export default {
       type: 'string',
     },
     {
-      title: 'Instagram Handle',
-      name: 'instagramHandle',
-      type: 'string',
-    },
-    {
-      title: 'Instagram Link',
-      name: 'instagramLink',
-      type: 'url',
+      title: 'Instagram Accounts',
+      name: 'instagramAccounts',
+      type: 'array',
+      of: [
+        {
+          type: 'object',
+          fields: [
+            {
+              title: 'Handle',
+              name: 'handle',
+              type: 'string',
+            },
+            {
+              title: 'Link',
+              name: 'link',
+              type: 'url',
+            },
+          ],
+        },
+      ],
     },
     {
       title: 'About Text',

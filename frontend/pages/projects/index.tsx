@@ -4,19 +4,19 @@ import {
   GalleryPageType,
   ProjectType,
   TransitionsType,
-} from "../shared/types/types";
+} from "../../shared/types/types";
 import { motion } from "framer-motion";
-import client from "../client";
+import client from "../../client";
 import {
   projectsPageQueryString,
   projectsQueryString,
   projectStylesQueryString,
   projectTypesQueryString,
-} from "../lib/sanityQueries";
-import ProjectsList from "../components/blocks/ProjectsList";
-import ProjectFilters from "../components/blocks/ProjectFilters";
+} from "../../lib/sanityQueries";
+import ProjectsList from "../../components/blocks/ProjectsList";
+import ProjectFilters from "../../components/blocks/ProjectFilters";
 import { useState, useEffect } from "react";
-import ProjectPlayer from "../components/blocks/ProjectPlayer";
+import ProjectPlayer from "../../components/blocks/ProjectPlayer";
 
 const PageWrapper = styled(motion.div)``;
 
