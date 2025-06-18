@@ -7,10 +7,10 @@ import MuxPlayer from "@mux/mux-player-react/lazy";
 import useViewportWidth from "../../../hooks/useViewportWidth";
 
 // Base and max width variables for easy adjustment
-const INITIAL_MOBILE_WIDTH = "20vw";
-const BASE_MOBILE_WIDTH = "10vw";
-const MOBILE_MAX_WIDTH = "80vw";
-const MOBILE_ADJACENT_WIDTH = "60vw";
+const INITIAL_MOBILE_WIDTH = "50vw";
+const BASE_MOBILE_WIDTH = "50vw";
+const MOBILE_ADJACENT_WIDTH = "100vw";
+const MOBILE_MAX_WIDTH = "100vw";
 
 const INITIAL_WIDTH = "2vw";
 const BASE_WIDTH = "5vw";
@@ -85,6 +85,7 @@ type Props = {
   onHoverEnd: () => void;
   hoveredIndex: number | null;
   initialDelayComplete: boolean;
+  isInitialScrollComplete: boolean;
 };
 
 const FeaturedProjectCard = memo((props: Props) => {
@@ -101,10 +102,12 @@ const FeaturedProjectCard = memo((props: Props) => {
     onHoverEnd,
     hoveredIndex,
     initialDelayComplete,
+    isInitialScrollComplete,
   } = props;
 
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [hasVideoLoaded, setHasVideoLoaded] = useState(false);
+  const [useBaseMobileWidth, setUseBaseMobileWidth] = useState(false);
 
   const viewport = useViewportWidth();
   const isMobile = viewport === "mobile" || viewport === "tabletPortrait";
@@ -120,6 +123,16 @@ const FeaturedProjectCard = memo((props: Props) => {
 
   // Use refs for all video state to persist between re-renders
   const playerRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (isInitialScrollComplete && isMobile) {
+      const timer = setTimeout(() => {
+        setUseBaseMobileWidth(true);
+      }, 1000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isInitialScrollComplete, isMobile]);
 
   useEffect(() => {
     if (!playerRef.current) return;
@@ -178,13 +191,17 @@ const FeaturedProjectCard = memo((props: Props) => {
     }vw`;
   };
 
+  const mobileWidth = useBaseMobileWidth
+    ? BASE_MOBILE_WIDTH
+    : INITIAL_MOBILE_WIDTH;
+
   return (
     <FeaturedProjectCardWrapper
       $bgColor={thumbnailColor?.hex || "#000"}
       onMouseEnter={onHoverStart}
       onMouseLeave={onHoverEnd}
       style={{
-        width: getStaggeredWidth(),
+        width: isMobile ? mobileWidth : getStaggeredWidth(),
         zIndex: isHovered ? 2 : 1,
         transform: "translateZ(0)",
       }}
@@ -193,7 +210,8 @@ const FeaturedProjectCard = memo((props: Props) => {
         <BackgroundColor
           $bgColor={thumbnailColor?.hex || "#000"}
           animate={{
-            opacity: isHovered ? 0 : 1,
+            opacity:
+              isMobile && !isInitialScrollComplete ? 1 : isHovered ? 0 : 1,
           }}
           transition={{ duration: 0.3 }}
         />
