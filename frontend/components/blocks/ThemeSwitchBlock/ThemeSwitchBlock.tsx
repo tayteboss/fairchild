@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import pxToRem from "../../../utils/pxToRem";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 
 const ThemeSwitchBlockWrapper = styled.div`
   display: flex;
@@ -34,26 +35,28 @@ const ColorBlock = styled.div<{
 const ThemeSwitchBlock = () => {
   const [activeIndex, setActiveIndex] = useState<number>(0);
 
+  const router = useRouter();
+
   const colors = [
     {
       bg: "#000000",
-      fg: "#FFFFFF",
+      // fg: "#FFFFFF",
     },
     {
-      bg: "#9CA2A5",
-      fg: "#CA1DD7",
+      bg: "#8AC5DC",
+      // fg: "#CA1DD7",
     },
     {
-      bg: "#F95B26",
-      fg: "#2A27D9",
+      bg: "#5F5236",
+      // fg: "#2A27D9",
     },
     {
-      bg: "#FFE7CD",
-      fg: "#9CA2A5",
+      bg: "#464E3A",
+      // fg: "#9CA2A5",
     },
     {
-      bg: "#D3CC2F",
-      fg: "#C65F16",
+      bg: "#EEFF00",
+      // fg: "#C65F16",
     },
   ];
 
@@ -62,6 +65,10 @@ const ThemeSwitchBlock = () => {
     document.documentElement.style.setProperty("--colour-bg", colors[index].bg);
     // document.documentElement.style.setProperty("--colour-fg", colors[index].fg);
   };
+
+  useEffect(() => {
+    document.documentElement.style.setProperty("--colour-bg", colors[0].bg);
+  }, [router]);
 
   return (
     <ThemeSwitchBlockWrapper>

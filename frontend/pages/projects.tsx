@@ -75,13 +75,15 @@ const Page = (props: Props) => {
 
     if (selectedTypes.length > 0) {
       tempProjects = tempProjects.filter((project) =>
-        project.type.some((t) => selectedTypes.includes(t.name))
+        selectedTypes.every((type) => project.type.some((t) => t.name === type))
       );
     }
 
     if (selectedStyles.length > 0) {
       tempProjects = tempProjects.filter((project) =>
-        project.styles.some((s) => selectedStyles.includes(s.name))
+        selectedStyles.every((style) =>
+          project.styles.some((s) => s.name === style)
+        )
       );
     }
 

@@ -57,36 +57,40 @@ const PressBlock = (props: Props) => {
 
   return (
     <PressBlockWrapper>
-      <Block>
-        <Title>Press</Title>
-        <Links>
-          {hasPress &&
-            press.map((item, i) =>
-              item.link ? (
-                <Link key={i} href={item.link} target="_blank">
-                  {item.title}
-                </Link>
-              ) : (
-                <span key={i}>{item.title}</span>
-              )
-            )}
-        </Links>
-      </Block>
-      <Block>
-        <Title>News</Title>
-        <Links>
-          {hasNews &&
-            news.map((item, i) =>
-              item.link ? (
-                <Link key={i} href={item.link} target="_blank">
-                  {item.title}
-                </Link>
-              ) : (
-                <span key={i}>{item.title}</span>
-              )
-            )}
-        </Links>
-      </Block>
+      {hasPress && (
+        <Block>
+          <Title>Press</Title>
+          <Links>
+            {hasPress &&
+              press.map((item, i) =>
+                item.link ? (
+                  <Link key={i} href={item.link} target="_blank">
+                    {item.title}
+                  </Link>
+                ) : (
+                  <span key={i}>{item.title}</span>
+                )
+              )}
+          </Links>
+        </Block>
+      )}
+      {hasNews && (
+        <Block>
+          <Title>News</Title>
+          <Links>
+            {hasNews &&
+              news.map((item, i) =>
+                item.link ? (
+                  <Link key={i} href={item.link} target="_blank">
+                    {item.title}
+                  </Link>
+                ) : (
+                  <span key={i}>{item.title}</span>
+                )
+              )}
+          </Links>
+        </Block>
+      )}
     </PressBlockWrapper>
   );
 };

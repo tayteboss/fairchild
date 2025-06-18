@@ -164,6 +164,8 @@ const MultiRangeSlider = ({
       if (isDraggingRef.current) {
         isDraggingRef.current = false;
         setIsDragging?.(false);
+        // Explicitly call onChange on mouse up to ensure parent is updated
+        onChange({ min: minValRef.current, max: maxValRef.current });
       }
     };
 
@@ -171,7 +173,7 @@ const MultiRangeSlider = ({
     return () => {
       document.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [setIsDragging]);
+  }, [setIsDragging, onChange]);
 
   const handleMouseDown = () => {
     isDraggingRef.current = true;
@@ -199,7 +201,10 @@ const MultiRangeSlider = ({
         onMouseDown={handleMouseDown}
         step={step}
         onChange={(event) => {
-          const value = Math.min(Number(event.target.value), maxVal - 1);
+          const value = Math.min(
+            Number(event.target.value),
+            maxValRef.current - step
+          );
           setMinVal(value);
           minValRef.current = value;
         }}
@@ -214,7 +219,10 @@ const MultiRangeSlider = ({
         onMouseDown={handleMouseDown}
         step={step}
         onChange={(event) => {
-          const value = Math.max(Number(event.target.value), minVal + 1);
+          const value = Math.max(
+            Number(event.target.value),
+            minValRef.current + step
+          );
           setMaxVal(value);
           maxValRef.current = value;
         }}

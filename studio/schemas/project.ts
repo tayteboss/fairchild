@@ -113,35 +113,34 @@ export default {
       description:
         'Use the first frame of the snippet video as the fallback image. Ensure the image is optimised',
     },
-    {
-      title: 'Color Temperature Filter',
-      name: 'colorTempFilter',
-      type: 'object',
-      fields: [
-        {
-          title: 'Min Temperature',
-          name: 'minTemp',
-          type: 'number',
-          validation: (Rule: Rule) => Rule.min(2300).max(7000),
-          description: 'Minimum color temperature (Kelvin) between 2300-7000',
-        },
-        {
-          title: 'Max Temperature',
-          name: 'maxTemp',
-          type: 'number',
-          validation: (Rule: Rule) => Rule.min(2300).max(7000),
-          description: 'Maximum color temperature (Kelvin) between 2300-7000',
-        },
-      ],
-    },
-    {
-      title: 'Saturation Filter',
-      name: 'saturationFilter',
-      type: 'number',
-      validation: (Rule: Rule) => Rule.min(0).max(100),
-      description: 'Saturation percentage between 0-100%',
-    },
-
+    // {
+    //   title: 'Color Temperature Filter',
+    //   name: 'colorTempFilter',
+    //   type: 'object',
+    //   fields: [
+    //     {
+    //       title: 'Min Temperature',
+    //       name: 'minTemp',
+    //       type: 'number',
+    //       validation: (Rule: Rule) => Rule.min(2300).max(7000),
+    //       description: 'Minimum color temperature (Kelvin) between 2300-7000',
+    //     },
+    //     {
+    //       title: 'Max Temperature',
+    //       name: 'maxTemp',
+    //       type: 'number',
+    //       validation: (Rule: Rule) => Rule.min(2300).max(7000),
+    //       description: 'Maximum color temperature (Kelvin) between 2300-7000',
+    //     },
+    //   ],
+    // },
+    // {
+    //   title: 'Saturation Filter',
+    //   name: 'saturationFilter',
+    //   type: 'number',
+    //   validation: (Rule: Rule) => Rule.min(0).max(100),
+    //   description: 'Saturation percentage between 0-100%',
+    // },
     {
       title: 'Gallery',
       name: 'gallery',

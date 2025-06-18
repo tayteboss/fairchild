@@ -89,7 +89,7 @@ const Page = (props: Props) => {
       />
       <PressBlock press={data?.press || []} news={data?.news || []} />
       <ClientsBlock clients={data?.clients || []} />
-      <ClientLogosBlock />
+      <ClientLogosBlock data={data?.featuredClientLogos || []} />
       <CreditsBlock />
       <ThanksBlock
         title={data?.thankYouTitle || ""}
