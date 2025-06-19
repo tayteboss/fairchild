@@ -7,10 +7,7 @@ import MuxPlayer from "@mux/mux-player-react/lazy";
 import useViewportWidth from "../../../hooks/useViewportWidth";
 
 // Base and max width variables for easy adjustment
-const INITIAL_MOBILE_WIDTH = "50vw";
-const BASE_MOBILE_WIDTH = "60vw";
-const MOBILE_ADJACENT_WIDTH = "90vw";
-const MOBILE_MAX_WIDTH = "100vw";
+const BASE_MOBILE_WIDTH = "100vw";
 
 const INITIAL_WIDTH = "2vw";
 const BASE_WIDTH = "5vw";
@@ -85,7 +82,6 @@ type Props = {
   onHoverEnd: () => void;
   hoveredIndex: number | null;
   initialDelayComplete: boolean;
-  isInitialScrollComplete: boolean;
 };
 
 const FeaturedProjectCard = memo((props: Props) => {
@@ -102,10 +98,7 @@ const FeaturedProjectCard = memo((props: Props) => {
     onHoverEnd,
     hoveredIndex,
     initialDelayComplete,
-    isInitialScrollComplete,
   } = props;
-
-  const [useBaseMobileWidth, setUseBaseMobileWidth] = useState(false);
 
   const viewport = useViewportWidth();
   const isMobile = viewport === "mobile" || viewport === "tabletPortrait";
@@ -123,16 +116,6 @@ const FeaturedProjectCard = memo((props: Props) => {
   const playerRef = useRef<any>(null);
 
   useEffect(() => {
-    if (isInitialScrollComplete && isMobile) {
-      const timer = setTimeout(() => {
-        setUseBaseMobileWidth(true);
-      }, 1000);
-
-      return () => clearTimeout(timer);
-    }
-  }, [isInitialScrollComplete, isMobile]);
-
-  useEffect(() => {
     if (!playerRef.current) return;
 
     const player = playerRef.current;
@@ -146,9 +129,8 @@ const FeaturedProjectCard = memo((props: Props) => {
 
   // Calculate the stagger effect based on distance from hovered card
   const getStaggeredWidth = () => {
-    if (!initialDelayComplete)
-      return isMobile ? INITIAL_MOBILE_WIDTH : INITIAL_WIDTH;
-    if (hoveredIndex === null) return isMobile ? BASE_MOBILE_WIDTH : BASE_WIDTH;
+    if (!initialDelayComplete) return INITIAL_WIDTH;
+    if (hoveredIndex === null) return BASE_WIDTH;
 
     const distanceFromHovered = Math.abs(index - hoveredIndex);
 
@@ -156,26 +138,17 @@ const FeaturedProjectCard = memo((props: Props) => {
     if (distanceFromHovered > STAGGER_CARDS + 1) return HOVER_BASE_WIDTH;
 
     // Return specific widths for hovered and adjacent cards
-    if (distanceFromHovered === 0)
-      return isMobile ? MOBILE_MAX_WIDTH : MAX_WIDTH;
-    if (distanceFromHovered === 1)
-      return isMobile ? MOBILE_ADJACENT_WIDTH : ADJACENT_WIDTH;
+    if (distanceFromHovered === 0) return MAX_WIDTH;
+    if (distanceFromHovered === 1) return ADJACENT_WIDTH;
 
     // Calculate remaining cards' widths with more pronounced stagger
-    const widthDiff =
-      parseFloat(isMobile ? MOBILE_ADJACENT_WIDTH : ADJACENT_WIDTH) -
-      parseFloat(HOVER_BASE_WIDTH);
+    const widthDiff = parseFloat(ADJACENT_WIDTH) - parseFloat(HOVER_BASE_WIDTH);
     const staggerAmount = widthDiff / STAGGER_CARDS;
 
     return `${
-      parseFloat(isMobile ? MOBILE_ADJACENT_WIDTH : ADJACENT_WIDTH) -
-      staggerAmount * (distanceFromHovered - 1)
+      parseFloat(ADJACENT_WIDTH) - staggerAmount * (distanceFromHovered - 1)
     }vw`;
   };
-
-  const mobileWidth = useBaseMobileWidth
-    ? BASE_MOBILE_WIDTH
-    : INITIAL_MOBILE_WIDTH;
 
   return (
     <FeaturedProjectCardWrapper
@@ -183,7 +156,7 @@ const FeaturedProjectCard = memo((props: Props) => {
       onMouseEnter={onHoverStart}
       onMouseLeave={onHoverEnd}
       style={{
-        width: isMobile ? mobileWidth : getStaggeredWidth(),
+        width: isMobile ? BASE_MOBILE_WIDTH : getStaggeredWidth(),
         zIndex: isHovered ? 2 : 1,
         transform: "translateZ(0)",
       }}
@@ -192,8 +165,7 @@ const FeaturedProjectCard = memo((props: Props) => {
         <BackgroundColor
           $bgColor={thumbnailColor?.hex || "#000"}
           animate={{
-            opacity:
-              isMobile && !isInitialScrollComplete ? 1 : isHovered ? 0 : 1,
+            opacity: isHovered ? 0 : 1,
           }}
           transition={{ duration: 0.3 }}
         />

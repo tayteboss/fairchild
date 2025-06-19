@@ -27,6 +27,7 @@ export default {
       type: 'array',
       of: [{type: 'reference', to: [{type: 'project'}]}],
       validation: (Rule) => Rule.max(10),
+      description: 'Works best with an odd number of projects.',
     },
   ],
 }
