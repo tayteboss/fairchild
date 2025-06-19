@@ -35,6 +35,7 @@ type AnimatedCarouselCardProps = {
   minWidth: number;
   index: number;
   isMobile: boolean;
+  selectedProjectRatio: "56.25" | "75" | "100";
 };
 
 const AnimatedCarouselCard = ({
@@ -50,6 +51,7 @@ const AnimatedCarouselCard = ({
   minWidth,
   index,
   isMobile,
+  selectedProjectRatio,
 }: AnimatedCarouselCardProps) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const width = useMotionValue(isSelected ? maxWidth : minWidth);
@@ -111,6 +113,7 @@ const AnimatedCarouselCard = ({
         isOverlayActive={isOverlayActive}
         hasScrolled={hasScrolled}
         isMobile={isMobile}
+        selectedProjectRatio={selectedProjectRatio}
       />
     </CarouselCardWrapper>
   );

@@ -14,9 +14,9 @@ const CardWrapper = styled.div`
   cursor: crosshair;
 `;
 
-const Outer = styled.div`
+const Outer = styled.div<{ $ratio: "56.25" | "75" | "100" }>`
   width: 100%;
-  padding-top: 56.25%;
+  padding-top: ${(props) => props.$ratio}%;
   position: relative;
 `;
 
@@ -40,9 +40,9 @@ const Inner = styled(motion.div)`
   justify-content: center;
 `;
 
-const ImageOuter = styled.div`
+const ImageOuter = styled.div<{ $ratio: "56.25" | "75" | "100" }>`
   width: 100%;
-  padding-top: 56.25%;
+  padding-top: ${(props) => props.$ratio}%;
   position: relative;
   overflow: hidden;
 `;
@@ -92,6 +92,7 @@ type Props = {
   onLoad?: () => void;
   isOverlayActive: boolean;
   hasScrolled: boolean;
+  selectedProjectRatio: "56.25" | "75" | "100";
 };
 
 const CarouselCard = ({
@@ -101,6 +102,7 @@ const CarouselCard = ({
   isOverlayActive,
   hasScrolled,
   isMobile,
+  selectedProjectRatio,
 }: Props) => {
   const { setHeaderText } = useHeader();
 
@@ -121,10 +123,10 @@ const CarouselCard = ({
 
   return (
     <CardWrapper ref={ref}>
-      <Outer>
+      <Outer $ratio={selectedProjectRatio}>
         <InnerWrapper>
           <Inner>
-            <ImageOuter>
+            <ImageOuter $ratio={selectedProjectRatio}>
               <ImageInner>
                 <Image
                   src={gallery.image.asset.url}

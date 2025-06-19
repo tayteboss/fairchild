@@ -97,6 +97,7 @@ type Props = {
   initialGalleryIndex: number | null;
   allProjects: ProjectType[];
   isOpen: boolean;
+  selectedProjectRatio: "56.25" | "75" | "100";
 };
 
 const ProjectGalleryCarousel = (props: Props) => {
@@ -107,6 +108,7 @@ const ProjectGalleryCarousel = (props: Props) => {
     initialGalleryIndex,
     allProjects,
     isOpen,
+    selectedProjectRatio,
   } = props;
   const [cardLayouts, setCardLayouts] = useState<CardLayout[]>([]);
   const [viewportHeight, setViewportHeight] = useState(0);
@@ -138,18 +140,8 @@ const ProjectGalleryCarousel = (props: Props) => {
 
   const findSelectedImageIndex = useCallback(() => {
     if (!project || initialGalleryIndex === null) return null;
-
-    let currentIndex = 0;
-    for (const p of allProjects) {
-      if (p.gallery) {
-        if (p === project) {
-          return currentIndex + initialGalleryIndex;
-        }
-        currentIndex += p.gallery.length;
-      }
-    }
-    return null;
-  }, [allProjects, project, initialGalleryIndex]);
+    return initialGalleryIndex;
+  }, [project, initialGalleryIndex]);
 
   const recalculateLayout = useCallback(() => {
     if (
@@ -184,7 +176,14 @@ const ProjectGalleryCarousel = (props: Props) => {
               ? MIN_WIDTH_MOBILE
               : MIN_WIDTH;
         const cardWidthPx = cardWidthVw * vw;
-        const cardHeightPx = (cardWidthPx * 9) / 16;
+        const cardHeightPx =
+          selectedProjectRatio === "56.25"
+            ? (cardWidthPx * 9) / 16
+            : selectedProjectRatio === "75"
+              ? (cardWidthPx * 3) / 4
+              : selectedProjectRatio === "100"
+                ? cardWidthPx
+                : cardWidthPx;
 
         const top = accumulatedTop;
         accumulatedTop += cardHeightPx + marginTop + marginBottom;
@@ -193,7 +192,7 @@ const ProjectGalleryCarousel = (props: Props) => {
 
       setCardLayouts(newLayouts);
     }
-  }, [findSelectedImageIndex, allGalleryItems.length]);
+  }, [findSelectedImageIndex, allGalleryItems.length, selectedProjectRatio]);
 
   const handleImageLoad = useCallback(() => {
     loadedImageCounter.current += 1;
@@ -249,11 +248,22 @@ const ProjectGalleryCarousel = (props: Props) => {
           const targetLayout = cardLayouts[selectedIndex];
 
           if (targetLayout) {
-            const offset =
+            const baseOffset =
               targetLayout.top -
               container.clientHeight / 2 +
-              targetLayout.height / 2 +
-              (isMobile ? targetLayout.height / 3 : targetLayout.height / 10);
+              targetLayout.height / 2;
+
+            let adjustment = 0;
+            if (isMobile) {
+              adjustment = targetLayout.height / 6;
+            } else {
+              if (selectedProjectRatio === "56.25") {
+                adjustment = targetLayout.height / 10;
+              }
+            }
+
+            const offset = baseOffset + adjustment;
+
             const scrollDuration = 2;
             lenisRef.current.scrollTo(offset, {
               duration: scrollDuration,
@@ -374,6 +384,7 @@ const ProjectGalleryCarousel = (props: Props) => {
                   minWidth={isMobile ? MIN_WIDTH_MOBILE : MIN_WIDTH}
                   index={index}
                   isMobile={isMobile}
+                  selectedProjectRatio={selectedProjectRatio}
                 />
               ))}
             </Inner>

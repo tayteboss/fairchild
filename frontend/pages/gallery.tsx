@@ -50,6 +50,9 @@ const Page = (props: Props) => {
     "idle" | "fade" | "center" | "carousel"
   >("idle");
   const [isCarouselOpen, setIsCarouselOpen] = useState(false);
+  const [selectedProjectRatio, setSelectedProjectRatio] = useState<
+    "56.25" | "75" | "100"
+  >("56.25");
 
   const { setHeaderText, setIsHovering } = useHeader();
 
@@ -64,6 +67,9 @@ const Page = (props: Props) => {
   const handleGalleryClick = (projectIndex: number, galleryIndex: number) => {
     setSelectedGalleryIndex(galleryIndex);
     setSelectedProjectIndex(projectIndex);
+    setSelectedProjectRatio(
+      filteredProjects[projectIndex].galleryRatio || "56.25"
+    );
     setAnimationPhase("fade");
     setIsCarouselOpen(true);
 
@@ -85,6 +91,7 @@ const Page = (props: Props) => {
     setSelectedProjectIndex(null);
     setSelectedGalleryIndex(null);
     setAnimationPhase("idle");
+    setSelectedProjectRatio("56.25");
   };
 
   useEffect(() => {
@@ -188,8 +195,9 @@ const Page = (props: Props) => {
         onClose={handleCloseCarousel}
         animationPhase={animationPhase}
         initialGalleryIndex={selectedGalleryIndex}
-        allProjects={filteredProjects}
+        allProjects={selectedProject ? [selectedProject] : []}
         isOpen={isCarouselOpen}
+        selectedProjectRatio={selectedProjectRatio}
       />
     </PageWrapper>
   );
