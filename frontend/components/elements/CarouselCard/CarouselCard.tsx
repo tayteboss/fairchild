@@ -14,7 +14,7 @@ const CardWrapper = styled.div`
   cursor: crosshair;
 `;
 
-const Outer = styled.div<{ $ratio: "56.25" | "75" | "100" }>`
+const Outer = styled.div<{ $ratio: string }>`
   width: 100%;
   padding-top: ${(props) => props.$ratio}%;
   position: relative;
@@ -40,7 +40,7 @@ const Inner = styled(motion.div)`
   justify-content: center;
 `;
 
-const ImageOuter = styled.div<{ $ratio: "56.25" | "75" | "100" }>`
+const ImageOuter = styled.div<{ $ratio: string }>`
   width: 100%;
   padding-top: ${(props) => props.$ratio}%;
   position: relative;
@@ -92,7 +92,10 @@ type Props = {
   onLoad?: () => void;
   isOverlayActive: boolean;
   hasScrolled: boolean;
-  selectedProjectRatio: "56.25" | "75" | "100";
+  selectedProjectRatio: {
+    label: string;
+    value: string;
+  };
 };
 
 const CarouselCard = ({
@@ -123,10 +126,10 @@ const CarouselCard = ({
 
   return (
     <CardWrapper ref={ref}>
-      <Outer $ratio={selectedProjectRatio}>
+      <Outer $ratio={selectedProjectRatio.value || "56.25"}>
         <InnerWrapper>
           <Inner>
-            <ImageOuter $ratio={selectedProjectRatio}>
+            <ImageOuter $ratio={selectedProjectRatio.value || "56.25"}>
               <ImageInner>
                 <Image
                   src={gallery.image.asset.url}
@@ -135,7 +138,7 @@ const CarouselCard = ({
                   style={{
                     objectFit: "cover",
                   }}
-                  sizes="50vw"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
                   loading="lazy"
                   onLoad={onLoad}
                 />

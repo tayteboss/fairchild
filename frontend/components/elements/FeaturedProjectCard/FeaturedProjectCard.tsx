@@ -203,7 +203,7 @@ const FeaturedProjectCard = memo((props: Props) => {
               objectFit: "cover",
               transform: "translateZ(0)",
             }}
-            sizes="50vw"
+            sizes="(max-width: 1024px) 100vw, 50vw"
           />
         )}
       </Inner>

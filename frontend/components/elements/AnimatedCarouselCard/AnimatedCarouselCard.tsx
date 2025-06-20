@@ -35,7 +35,10 @@ type AnimatedCarouselCardProps = {
   minWidth: number;
   index: number;
   isMobile: boolean;
-  selectedProjectRatio: "56.25" | "75" | "100";
+  selectedProjectRatio: {
+    label: string;
+    value: string;
+  };
 };
 
 const AnimatedCarouselCard = ({

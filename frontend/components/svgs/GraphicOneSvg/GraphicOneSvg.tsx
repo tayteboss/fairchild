@@ -3,6 +3,7 @@ const GraphicOneSvg = () => {
     <svg width="429" height="887" viewBox="0 0 429 887" fill="none">
       <foreignObject x="-9.88281" y="-9.81006" width="448.883" height="906.34">
         <div
+          className="logo-saver"
           style={{
             backdropFilter: "blur(5px)",
             WebkitBackdropFilter: "blur(5px)", // For Safari support

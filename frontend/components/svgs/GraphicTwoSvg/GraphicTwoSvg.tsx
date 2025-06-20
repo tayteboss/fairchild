@@ -3,6 +3,7 @@ const GraphicTwoSvg = () => {
     <svg width="623" height="731" viewBox="0 0 623 731" fill="none">
       <foreignObject x="-10" y="-10" width="643" height="751">
         <div
+          className="logo-saver"
           style={{
             backdropFilter: "blur(5px)",
             WebkitBackdropFilter: "blur(5px)", // For Safari support

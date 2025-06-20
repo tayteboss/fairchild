@@ -97,7 +97,10 @@ type Props = {
   initialGalleryIndex: number | null;
   allProjects: ProjectType[];
   isOpen: boolean;
-  selectedProjectRatio: "56.25" | "75" | "100";
+  selectedProjectRatio: {
+    label: string;
+    value: string;
+  };
 };
 
 const ProjectGalleryCarousel = (props: Props) => {
@@ -176,14 +179,9 @@ const ProjectGalleryCarousel = (props: Props) => {
               ? MIN_WIDTH_MOBILE
               : MIN_WIDTH;
         const cardWidthPx = cardWidthVw * vw;
-        const cardHeightPx =
-          selectedProjectRatio === "56.25"
-            ? (cardWidthPx * 9) / 16
-            : selectedProjectRatio === "75"
-              ? (cardWidthPx * 3) / 4
-              : selectedProjectRatio === "100"
-                ? cardWidthPx
-                : cardWidthPx;
+        const cardHeightPx = selectedProjectRatio?.value
+          ? cardWidthPx * (parseFloat(selectedProjectRatio.value) / 100)
+          : (cardWidthPx * 9) / 16;
 
         const top = accumulatedTop;
         accumulatedTop += cardHeightPx + marginTop + marginBottom;
@@ -257,7 +255,7 @@ const ProjectGalleryCarousel = (props: Props) => {
             if (isMobile) {
               adjustment = targetLayout.height / 6;
             } else {
-              if (selectedProjectRatio === "56.25") {
+              if (selectedProjectRatio.value === "56.25") {
                 adjustment = targetLayout.height / 10;
               }
             }

@@ -143,7 +143,10 @@ export const projectsQueryString = `
 			maxTemp
 		},
 		saturationFilter,
-		galleryRatio,
+		galleryRatio[]-> {
+			label,
+			value
+		},
 		gallery[] {
 			image {
 				asset-> {

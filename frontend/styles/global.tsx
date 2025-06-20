@@ -110,6 +110,14 @@ export const GlobalStyles = createGlobalStyle`
 		font-weight: 400;
 	}
 
+	.logo-saver {
+		@media ${theme.mediaBreakpoints.tabletPortrait} {
+			display: none;
+			backdrop-filter: blur(0px);
+			-webkit-backdrop-filter: blur(0px);
+		}
+	}
+
 	mux-player {
 		--media-object-fit: contain;
 		--media-object-position: center;

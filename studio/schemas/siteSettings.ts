@@ -28,5 +28,11 @@ export default {
       type: 'array',
       of: [{type: 'string'}],
     },
+    {
+      title: 'Gallery Ratios',
+      name: 'galleryRatios',
+      type: 'array',
+      of: [{type: 'reference', to: [{type: 'galleryRatios'}]}],
+    },
   ],
 }

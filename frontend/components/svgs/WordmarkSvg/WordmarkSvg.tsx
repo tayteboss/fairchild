@@ -9,6 +9,7 @@ const WordmarkSvg = () => {
     >
       <foreignObject x="-10" y="-10" width="1489" height="731">
         <div
+          className="logo-saver"
           style={{
             backdropFilter: "blur(5px)",
             WebkitBackdropFilter: "blur(5px)", // For Safari support

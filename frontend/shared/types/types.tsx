@@ -91,7 +91,10 @@ export type ProjectType = {
     maxTemp: number;
   };
   saturationFilter: number;
-  galleryRatio: "56.25" | "75" | "100";
+  galleryRatio: {
+    label: string;
+    value: string;
+  }[];
   gallery: {
     image: { asset: { url: string } };
     thumbnailColor: {

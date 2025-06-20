@@ -154,15 +154,17 @@ export default {
     {
       title: 'Gallery Ratio',
       name: 'galleryRatio',
-      type: 'string',
-      options: {
-        list: [
-          {title: '16:9', value: '56.25'},
-          {title: '4:3', value: '75'},
-          {title: '1:1', value: '100'},
-        ],
-      },
-      description: 'Choose the aspect ratio for gallery images',
+      type: 'array',
+      of: [
+        {
+          type: 'reference',
+          to: [{type: 'galleryRatios'}],
+        },
+      ],
+      validation: (Rule: any) => [
+        Rule.required().error('Gallery Ratio is required'),
+        Rule.min(1).max(1).error('Exactly one gallery ratio must be selected'),
+      ],
     },
     {
       title: 'Gallery',

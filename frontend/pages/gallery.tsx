@@ -50,9 +50,13 @@ const Page = (props: Props) => {
     "idle" | "fade" | "center" | "carousel"
   >("idle");
   const [isCarouselOpen, setIsCarouselOpen] = useState(false);
-  const [selectedProjectRatio, setSelectedProjectRatio] = useState<
-    "56.25" | "75" | "100"
-  >("56.25");
+  const [selectedProjectRatio, setSelectedProjectRatio] = useState<{
+    label: string;
+    value: string;
+  }>({
+    label: "16:9",
+    value: "56.25",
+  });
 
   const { setHeaderText, setIsHovering } = useHeader();
 
@@ -68,7 +72,10 @@ const Page = (props: Props) => {
     setSelectedGalleryIndex(galleryIndex);
     setSelectedProjectIndex(projectIndex);
     setSelectedProjectRatio(
-      filteredProjects[projectIndex].galleryRatio || "56.25"
+      filteredProjects[projectIndex].galleryRatio[0] || {
+        label: "16:9",
+        value: "56.25",
+      }
     );
     setAnimationPhase("fade");
     setIsCarouselOpen(true);
@@ -91,7 +98,10 @@ const Page = (props: Props) => {
     setSelectedProjectIndex(null);
     setSelectedGalleryIndex(null);
     setAnimationPhase("idle");
-    setSelectedProjectRatio("56.25");
+    setSelectedProjectRatio({
+      label: "16:9",
+      value: "56.25",
+    });
   };
 
   useEffect(() => {
