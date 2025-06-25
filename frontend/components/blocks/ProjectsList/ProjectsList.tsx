@@ -51,10 +51,7 @@ const ProjectsList = (props: Props) => {
         <ProjectHeader handleSort={handleSort} sortConfig={sortConfig} />
         <ProjectsWrapper>
           {hasProjects ? (
-            (isMobile
-              ? projects
-              : [...projects, ...projects, ...projects, ...projects]
-            ).map((project, index) => (
+            projects.map((project, index) => (
               <ProjectListCard
                 key={isMobile ? `mobile-${index}` : `desktop-${index}`}
                 project={project}

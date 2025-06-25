@@ -1,12 +1,15 @@
 import {CaseIcon} from '@sanity/icons'
 import {Rule} from '@sanity/types'
+import {orderRankField, orderRankOrdering} from '@sanity/orderable-document-list'
 
 export default {
   title: 'Project',
   name: 'project',
   type: 'document',
   icon: CaseIcon,
+  orderings: [orderRankOrdering],
   fields: [
+    orderRankField({type: 'project'}),
     {
       title: 'Title',
       name: 'title',

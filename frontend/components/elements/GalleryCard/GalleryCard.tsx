@@ -1,10 +1,11 @@
 import styled from "styled-components";
 import { ProjectType } from "../../../shared/types/types";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import { useProximityScale } from "../../../hooks/useProximityScale";
-import useWindowDimensions from "../../../hooks/useWindowDimensions";
 import useViewportWidth from "../../../hooks/useViewportWidth";
+import React from "react";
+import { useInView } from "react-intersection-observer";
 
 const CardWrapper = styled(motion.div)`
   width: 100%;
@@ -23,7 +24,7 @@ const Outer = styled.div`
   position: relative;
 `;
 
-const InnerWrapper = styled.div`
+const InnerWrapper = styled(motion.div)`
   position: absolute;
   top: 50%;
   left: 50%;
@@ -65,10 +66,13 @@ const ImageInner = styled.div`
   width: 100%;
 `;
 
-const ColorOverlay = styled(motion.div)<{
+const ColorOverlay = styled(motion.div).attrs<{ $color: string }>((props) => ({
+  style: {
+    backgroundColor: props.$color,
+  },
+}))<{
   $isSelected: boolean;
   $animationPhase: "idle" | "fade" | "center" | "carousel";
-  $color: string;
   $hasMouseMoved: boolean;
   $filtersIsOpen: boolean;
 }>`
@@ -77,7 +81,6 @@ const ColorOverlay = styled(motion.div)<{
   left: 0;
   width: 100%;
   height: 100%;
-  background: ${(props) => props.$color};
   z-index: 2;
   pointer-events: none;
   opacity: ${(props) => {
@@ -124,6 +127,23 @@ type Props = {
   filtersIsOpen: boolean;
 };
 
+const wrapperVariants = {
+  hidden: {
+    opacity: 0,
+    transition: {
+      duration: 0.2,
+      ease: "easeInOut",
+    },
+  },
+  visible: {
+    opacity: 1,
+    transition: {
+      duration: 0.2,
+      ease: "easeInOut",
+    },
+  },
+};
+
 const GalleryCard = ({
   project,
   gallery,
@@ -142,77 +162,94 @@ const GalleryCard = ({
   const { elementRef, scale } = useProximityScale({
     maxScale: 1,
     minScale: 0.25,
-    proximityRadius: 300,
+    proximityRadius: 200,
+  });
+
+  const { ref: InViewRef, inView } = useInView({
+    triggerOnce: false,
+    threshold: 0.25,
   });
 
   return (
-    <CardWrapper>
+    <CardWrapper ref={InViewRef}>
       <Outer>
-        <InnerWrapper>
-          <Inner
-            ref={elementRef}
-            initial={{ width: isMobile ? "100%" : "25%" }}
-            animate={{
-              width: isMobile
-                ? "100%"
-                : animationPhase === "carousel"
-                  ? `25%`
-                  : filtersIsOpen
-                    ? "25%"
-                    : `${scale * 100}%`,
-            }}
-            transition={{
-              duration: 1.5,
-              ease: [0.16, 1, 0.3, 1],
-            }}
-            onHoverStart={() => {
-              if (isMobile) return;
-              setIsHovering(true);
-              setHeaderText({
-                logo: isMobile ? "" : project.client,
-                tagline: isMobile ? "" : project.title,
-              });
-            }}
-            onHoverEnd={() => {
-              if (isMobile) return;
-              setIsHovering(false);
-              setHeaderText({
-                logo: "Fairchild",
-                tagline: "",
-              });
-            }}
-            onClick={onClick}
-          >
-            <ImageOuter>
-              <ImageInner>
-                <Image
-                  src={gallery.image.asset.url}
-                  alt={project.title}
-                  fill
-                  style={{
-                    objectFit: "cover",
-                    transform:
-                      hasMouseMoved && !isSelected ? "scale(1.1)" : "scale(1)",
-                    transition: "transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
-                  }}
-                  sizes="25vw"
-                  loading="lazy"
-                  quality={90}
-                />
-                <ColorOverlay
-                  $color={gallery.thumbnailColor.hex}
-                  $isSelected={isSelected}
-                  $animationPhase={animationPhase}
-                  $hasMouseMoved={hasMouseMoved}
-                  $filtersIsOpen={filtersIsOpen}
-                />
-              </ImageInner>
-            </ImageOuter>
-          </Inner>
-        </InnerWrapper>
+        <AnimatePresence>
+          {inView && (
+            <InnerWrapper
+              variants={wrapperVariants}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+            >
+              <Inner
+                ref={elementRef}
+                initial={{ width: isMobile ? "100%" : "25%" }}
+                animate={{
+                  width: isMobile
+                    ? "100%"
+                    : animationPhase === "carousel"
+                      ? `25%`
+                      : filtersIsOpen
+                        ? "25%"
+                        : `${scale * 100}%`,
+                }}
+                transition={{
+                  duration: 1.5,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
+                onHoverStart={() => {
+                  if (isMobile) return;
+                  setIsHovering(true);
+                  setHeaderText({
+                    logo: isMobile ? "" : project.client,
+                    tagline: isMobile ? "" : project.title,
+                  });
+                }}
+                onHoverEnd={() => {
+                  if (isMobile) return;
+                  setIsHovering(false);
+                  setHeaderText({
+                    logo: "Fairchild",
+                    tagline: "",
+                  });
+                }}
+                onClick={onClick}
+              >
+                <ImageOuter>
+                  <ImageInner>
+                    <Image
+                      src={gallery.image.asset.url}
+                      alt={project.title}
+                      fill
+                      style={{
+                        objectFit: "cover",
+                        transform:
+                          hasMouseMoved && !isSelected
+                            ? "scale(1.1)"
+                            : "scale(1)",
+                        transition:
+                          "transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
+                      }}
+                      sizes="25vw"
+                      loading="lazy"
+                      quality={60}
+                    />
+                    <ColorOverlay
+                      $color={gallery.thumbnailColor.hex}
+                      $isSelected={isSelected}
+                      $animationPhase={animationPhase}
+                      $hasMouseMoved={hasMouseMoved}
+                      $filtersIsOpen={filtersIsOpen}
+                    />
+                  </ImageInner>
+                </ImageOuter>
+              </Inner>
+            </InnerWrapper>
+          )}
+        </AnimatePresence>
       </Outer>
     </CardWrapper>
   );
 };
 
-export default GalleryCard;
+export default React.memo(GalleryCard);

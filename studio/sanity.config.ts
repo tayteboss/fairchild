@@ -4,8 +4,9 @@ import {visionTool} from '@sanity/vision'
 import {schemaTypes} from './schemas'
 import {muxInput} from 'sanity-plugin-mux-input'
 import {vercelDeployTool} from 'sanity-plugin-vercel-deploy'
-import {EarthGlobeIcon, DocumentIcon, UsersIcon, HomeIcon, CaseIcon} from '@sanity/icons'
+import {EarthGlobeIcon, DocumentIcon, HomeIcon, CaseIcon} from '@sanity/icons'
 import {colorInput} from '@sanity/color-input'
+import {orderableDocumentListDeskItem} from '@sanity/orderable-document-list'
 
 export default defineConfig({
   name: 'default',
@@ -26,11 +27,6 @@ export default defineConfig({
               .child(S.editor().schemaType('siteSettings').documentId('siteSettings')),
             S.divider(),
             S.listItem()
-              .title('Home Page')
-              .icon(HomeIcon)
-              .child(S.editor().schemaType('homePage').documentId('homePage')),
-            S.divider(),
-            S.listItem()
               .title('Projects')
               .icon(CaseIcon)
               .child(
@@ -41,17 +37,31 @@ export default defineConfig({
               ),
             S.divider(),
             S.listItem()
+              .title('Home Page')
+              .icon(HomeIcon)
+              .child(S.editor().schemaType('homePage').documentId('homePage')),
+            S.divider(),
+            S.listItem()
               .title('Gallery Page')
               .icon(DocumentIcon)
               .child(S.editor().schemaType('galleryPage').documentId('galleryPage')),
+            orderableDocumentListDeskItem({
+              title: 'Order Projects (Gallery Page)',
+              type: 'project',
+              S,
+              context,
+            }),
+            S.divider(),
             S.listItem()
               .title('Projects Page')
               .icon(DocumentIcon)
               .child(S.editor().schemaType('projectsPage').documentId('projectsPage')),
+            S.divider(),
             S.listItem()
               .title('Information Page')
               .icon(DocumentIcon)
               .child(S.editor().schemaType('informationPage').documentId('informationPage')),
+            S.divider(),
           ])
       },
     }),

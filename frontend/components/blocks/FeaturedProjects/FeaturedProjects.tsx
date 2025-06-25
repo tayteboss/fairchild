@@ -158,7 +158,7 @@ const FeaturedProjects = (props: Props) => {
           }}
         >
           {hasData &&
-            [...data, ...data].map((project, index) => (
+            data.map((project, index) => (
               <motion.div
                 key={`${project.title}-${index}`}
                 variants={itemVariants}

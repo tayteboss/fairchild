@@ -13,7 +13,7 @@ import {
 } from "../lib/sanityQueries";
 import GalleryList from "../components/blocks/GalleryList";
 import GalleryFilters from "../components/blocks/GalleryFilters";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import ProjectGalleryCarousel from "../components/blocks/ProjectGalleryCarousel/ProjectGalleryCarousel";
 import { useHeader } from "../components/layout/HeaderContext";
 import useViewportWidth from "../hooks/useViewportWidth";
@@ -64,36 +64,39 @@ const Page = (props: Props) => {
   const isMobile = viewport === "mobile" || viewport === "tabletPortrait";
 
   // Toggle filters panel
-  const handleToggleFilters = () => {
+  const handleToggleFilters = useCallback(() => {
     setFiltersIsOpen(!filtersIsOpen);
-  };
+  }, [filtersIsOpen]);
 
-  const handleGalleryClick = (projectIndex: number, galleryIndex: number) => {
-    setSelectedGalleryIndex(galleryIndex);
-    setSelectedProjectIndex(projectIndex);
-    setSelectedProjectRatio(
-      filteredProjects[projectIndex].galleryRatio[0] || {
-        label: "16:9",
-        value: "56.25",
-      }
-    );
-    setAnimationPhase("fade");
-    setIsCarouselOpen(true);
+  const handleGalleryClick = useCallback(
+    (projectIndex: number, galleryIndex: number) => {
+      setSelectedGalleryIndex(galleryIndex);
+      setSelectedProjectIndex(projectIndex);
+      setSelectedProjectRatio(
+        filteredProjects[projectIndex].galleryRatio[0] || {
+          label: "16:9",
+          value: "56.25",
+        }
+      );
+      setAnimationPhase("fade");
+      setIsCarouselOpen(true);
 
-    setHeaderText({
-      logo: isMobile ? "" : filteredProjects[projectIndex].client || "",
-      tagline: isMobile ? "" : filteredProjects[projectIndex].title || "",
-      year: isMobile ? "" : filteredProjects[projectIndex].year || "",
-    });
-    setIsHovering(true);
+      setHeaderText({
+        logo: isMobile ? "" : filteredProjects[projectIndex].client || "",
+        tagline: isMobile ? "" : filteredProjects[projectIndex].title || "",
+        year: isMobile ? "" : filteredProjects[projectIndex].year || "",
+      });
+      setIsHovering(true);
 
-    // After fade, move to carousel
-    setTimeout(() => {
-      setAnimationPhase("carousel");
-    }, 200);
-  };
+      // After fade, move to carousel
+      setTimeout(() => {
+        setAnimationPhase("carousel");
+      }, 200);
+    },
+    [filteredProjects, isMobile, setHeaderText, setIsHovering]
+  );
 
-  const handleCloseCarousel = () => {
+  const handleCloseCarousel = useCallback(() => {
     setIsCarouselOpen(false);
     setSelectedProjectIndex(null);
     setSelectedGalleryIndex(null);
@@ -102,7 +105,7 @@ const Page = (props: Props) => {
       label: "16:9",
       value: "56.25",
     });
-  };
+  }, []);
 
   useEffect(() => {
     if (isDragging) return;
@@ -186,7 +189,6 @@ const Page = (props: Props) => {
         selectedProjectIndex={selectedProjectIndex}
         animationPhase={animationPhase}
       />
-      {/* <MobileGalleryList /> */}
       <GalleryFilters
         isOpen={filtersIsOpen}
         setIsOpen={handleToggleFilters}
@@ -216,61 +218,6 @@ const Page = (props: Props) => {
 export async function getStaticProps() {
   const data = await client.fetch(galleryPageQueryString);
   let projects = await client.fetch(projectsQueryString);
-
-  // Sort projects by median color temperature
-  projects = projects
-    .map((project: ProjectType) => {
-      // Initialize with default value
-      project.medianColorTemp = 4700; // Default to middle of range
-
-      if (project.images && project.images.length > 0) {
-        // Calculate median color temp for each image
-        const imageColorTemps = project.images
-          .map(
-            (image: {
-              colorTempFilter?: { minTemp: number; maxTemp: number };
-            }) => {
-              if (
-                image.colorTempFilter?.minTemp &&
-                image.colorTempFilter?.maxTemp
-              ) {
-                // Validate that the temperatures are within our expected range
-                const minTemp = Math.max(
-                  2400,
-                  Math.min(7000, image.colorTempFilter.minTemp)
-                );
-                const maxTemp = Math.max(
-                  2400,
-                  Math.min(7000, image.colorTempFilter.maxTemp)
-                );
-                return (minTemp + maxTemp) / 2;
-              }
-              return null;
-            }
-          )
-          .filter((temp: number | null): temp is number => temp !== null);
-
-        // Calculate overall median for the project
-        if (imageColorTemps.length > 0) {
-          const sortedTemps = imageColorTemps.sort(
-            (a: number, b: number) => a - b
-          );
-          const mid = Math.floor(sortedTemps.length / 2);
-          project.medianColorTemp =
-            sortedTemps.length % 2 === 0
-              ? (sortedTemps[mid - 1] + sortedTemps[mid]) / 2
-              : sortedTemps[mid];
-        }
-      }
-
-      return project;
-    })
-    .sort((a: ProjectType, b: ProjectType) => {
-      // Ensure we have valid numbers for comparison
-      const tempA = a.medianColorTemp ?? 4700;
-      const tempB = b.medianColorTemp ?? 4700;
-      return tempA - tempB;
-    });
 
   const yearRange = projects.reduce(
     (acc: { min: number; max: number }, project: ProjectType) => {

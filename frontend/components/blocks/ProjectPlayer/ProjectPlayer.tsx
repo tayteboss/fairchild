@@ -243,7 +243,7 @@ const ProjectPlayer = (props: Props) => {
                   handleClose={handleClose}
                   setIsCreditsOpen={setIsCreditsOpen}
                 />
-                {activeProject?.project?.video.asset.playbackId && (
+                {activeProject?.project?.video?.asset?.playbackId && (
                   <MuxPlayer
                     ref={muxPlayerRef}
                     streamType="on-demand"
