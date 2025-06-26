@@ -127,43 +127,66 @@ const Page = (props: Props) => {
 
     setFiltersAreOn(true);
 
-    const filtered = projects.filter((project) => {
-      // Check color temperature if it exists
-      const hasColorTemp =
-        project.colorTempFilter?.minTemp && project.colorTempFilter?.maxTemp;
-      if (hasColorTemp) {
-        const projectColorTempMiddle =
-          (project.colorTempFilter.minTemp + project.colorTempFilter.maxTemp) /
-          2;
-        const isColorTempInRange =
-          projectColorTempMiddle >= colorTemp.min &&
-          projectColorTempMiddle <= colorTemp.max;
-        if (!isColorTempInRange) return false;
-      }
+    const projectsWithFilteredGalleries = projects
+      .map((project) => {
+        // Year filter at the project level
+        const hasYear = project.year && !isNaN(parseInt(project.year));
+        if (hasYear) {
+          const projectYear = parseInt(project.year);
+          const isYearInRange =
+            projectYear >= year.min && projectYear <= year.max;
+          if (!isYearInRange) {
+            return null; // Remove project if it's outside the year range
+          }
+        }
 
-      // Check saturation if it exists
-      const hasSaturation = typeof project.saturationFilter === "number";
-      if (hasSaturation) {
-        const isSaturationInRange =
-          project.saturationFilter >= saturation.min &&
-          project.saturationFilter <= saturation.max;
-        if (!isSaturationInRange) return false;
-      }
+        if (!project.gallery) {
+          return {
+            ...project,
+            gallery: [],
+          };
+        }
 
-      // Check year if it exists
-      const hasYear = project.year && !isNaN(parseInt(project.year));
-      if (hasYear) {
-        const projectYear = parseInt(project.year);
-        const isYearInRange =
-          projectYear >= year.min && projectYear <= year.max;
-        if (!isYearInRange) return false;
-      }
+        const filteredGallery = project.gallery.filter((galleryItem) => {
+          // Color temperature filter for each gallery item
+          const hasColorTemp =
+            galleryItem.colorTempFilter?.minTemp &&
+            galleryItem.colorTempFilter?.maxTemp;
+          if (hasColorTemp) {
+            const galleryColorTempMiddle =
+              (galleryItem.colorTempFilter.minTemp +
+                galleryItem.colorTempFilter.maxTemp) /
+              2;
+            const isColorTempInRange =
+              galleryColorTempMiddle >= colorTemp.min &&
+              galleryColorTempMiddle <= colorTemp.max;
+            if (!isColorTempInRange) return false;
+          }
 
-      // If we get here, either the filter is at default state or the project passes all applicable filters
-      return true;
-    });
+          // Saturation filter for each gallery item
+          const hasSaturation =
+            typeof galleryItem.saturationFilter === "number";
+          if (hasSaturation) {
+            const isSaturationInRange =
+              galleryItem.saturationFilter >= saturation.min &&
+              galleryItem.saturationFilter <= saturation.max;
+            if (!isSaturationInRange) return false;
+          }
 
-    setFilteredProjects(filtered);
+          return true;
+        });
+
+        return {
+          ...project,
+          gallery: filteredGallery,
+        };
+      })
+      .filter(
+        (project): project is ProjectType =>
+          project !== null && project.gallery.length > 0
+      );
+
+    setFilteredProjects(projectsWithFilteredGalleries);
   }, [colorTemp, saturation, year, projects, isDragging, yearRange]);
 
   const selectedProject =

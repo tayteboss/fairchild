@@ -131,14 +131,14 @@ const wrapperVariants = {
   hidden: {
     opacity: 0,
     transition: {
-      duration: 0.2,
+      duration: 0.1,
       ease: "easeInOut",
     },
   },
   visible: {
     opacity: 1,
     transition: {
-      duration: 0.2,
+      duration: 0.1,
       ease: "easeInOut",
     },
   },
@@ -167,7 +167,8 @@ const GalleryCard = ({
 
   const { ref: InViewRef, inView } = useInView({
     triggerOnce: false,
-    threshold: 0.25,
+    rootMargin: "250px 0px 250px 0px",
+    threshold: 0.5,
   });
 
   return (
