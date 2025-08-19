@@ -34,10 +34,12 @@ const LogoWrapper = styled(motion.div)`
   height: ${pxToRem(12)};
   display: flex;
   align-items: center;
+  overflow: hidden;
 
   a {
     pointer-events: all;
     color: var(--colour-white);
+    text-overflow: ellipsis;
   }
 `;
 
@@ -88,6 +90,7 @@ const Text = styled.div`
   color: var(--colour-white);
   width: 100%;
   white-space: nowrap;
+  text-overflow: ellipsis;
 
   &:hover {
     text-decoration: underline;

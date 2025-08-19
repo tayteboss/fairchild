@@ -94,16 +94,16 @@ const Page = (props: Props) => {
 
         switch (sortConfig.key) {
           case "client":
-            aValue = a.client?.toLowerCase();
-            bValue = b.client?.toLowerCase();
+            aValue = a.client?.toLowerCase() || "";
+            bValue = b.client?.toLowerCase() || "";
             break;
           case "project":
-            aValue = a.title?.toLowerCase();
-            bValue = b.title?.toLowerCase();
+            aValue = a.title?.toLowerCase() || "";
+            bValue = b.title?.toLowerCase() || "";
             break;
           case "type":
-            aValue = a.type[0]?.name.toLowerCase() || "";
-            bValue = b.type[0]?.name.toLowerCase() || "";
+            aValue = a.type[0]?.name?.toLowerCase() || "";
+            bValue = b.type[0]?.name?.toLowerCase() || "";
             break;
           case "year":
             aValue = a.year;
@@ -178,8 +178,8 @@ export async function getStaticProps() {
   const projectStyles = await client.fetch(projectStylesQueryString);
 
   projects = projects.sort((a: ProjectType, b: ProjectType) => {
-    const clientA = a.client.toLowerCase();
-    const clientB = b.client.toLowerCase();
+    const clientA = a.client?.toLowerCase() || "";
+    const clientB = b.client?.toLowerCase() || "";
     return clientA.localeCompare(clientB);
   });
 
