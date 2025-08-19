@@ -236,7 +236,7 @@ const GalleryCard = ({
                       quality={60}
                     />
                     <ColorOverlay
-                      $color={gallery.thumbnailColor.hex}
+                      $color={gallery?.thumbnailColor?.hex || "#FFF"}
                       $isSelected={isSelected}
                       $animationPhase={animationPhase}
                       $hasMouseMoved={hasMouseMoved}
