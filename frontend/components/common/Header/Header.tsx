@@ -36,6 +36,10 @@ const LogoWrapper = styled(motion.div)`
   align-items: center;
   overflow: hidden;
 
+  @media ${(props) => props.theme.mediaBreakpoints.tabletPortrait} {
+    grid-column: 1 / 4;
+  }
+
   a {
     pointer-events: all;
     color: var(--colour-white);

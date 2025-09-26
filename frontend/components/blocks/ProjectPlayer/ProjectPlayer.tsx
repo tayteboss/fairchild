@@ -44,14 +44,7 @@ const Outer = styled.div<{ $isFullScreen: boolean }>`
   padding: ${pxToRem(8)};
 
   @media ${(props) => props.theme.mediaBreakpoints.tabletPortrait} {
-    /* bottom: 50%;
-    left: 50%;
-    transform: translate(-50%, 50%); */
-    /* width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center; */
+    bottom: 32px;
   }
 
   transition: all var(--transition-speed-slow) var(--transition-ease);

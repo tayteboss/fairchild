@@ -136,8 +136,8 @@ const FeaturedProjects = (props: Props) => {
       setHeaderText({
         logo: project.client,
         tagline: project.title,
-        type: project.type,
-        year: project.year,
+        // type: project.type,
+        // year: project.year,
       });
       setIsHovering(true);
     },
