@@ -95,6 +95,7 @@ const Text = styled.div`
   width: 100%;
   white-space: nowrap;
   text-overflow: ellipsis;
+  overflow: hidden;
 
   &:hover {
     text-decoration: underline;
