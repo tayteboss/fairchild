@@ -43,8 +43,8 @@ const Page = (props: Props) => {
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
   const [sortConfig, setSortConfig] = useState({
-    key: "client",
-    direction: "asc",
+    key: "year",
+    direction: "desc",
   });
   const [activeProject, setActiveProject] = useState<{
     project: ProjectType | null;
@@ -176,12 +176,6 @@ export async function getStaticProps() {
   let projects = await client.fetch(projectsQueryString);
   const projectTypes = await client.fetch(projectTypesQueryString);
   const projectStyles = await client.fetch(projectStylesQueryString);
-
-  projects = projects.sort((a: ProjectType, b: ProjectType) => {
-    const clientA = a.client?.toLowerCase() || "";
-    const clientB = b.client?.toLowerCase() || "";
-    return clientA.localeCompare(clientB);
-  });
 
   return {
     props: {

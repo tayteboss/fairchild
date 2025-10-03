@@ -90,7 +90,7 @@ export const workPageQueryString = `
 `;
 
 export const projectsQueryString = `
-	*[_type == 'project'] | order(orderRank) [0...100] {
+	*[_type == 'project'] | order(year desc) [0...100] {
 		title,
 		client,
 		type[]-> {
