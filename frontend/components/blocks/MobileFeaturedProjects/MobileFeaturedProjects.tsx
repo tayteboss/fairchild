@@ -1,23 +1,42 @@
 import styled from "styled-components";
 import { ProjectType } from "../../../shared/types/types";
-import MobileFeaturedProjectCard from "../../elements/MobileFeaturedProjectCard/MobileFeaturedProjectCard";
-import { motion, useScroll } from "framer-motion";
-import DynamicWidthCard from "./DynamicWidthCard";
-import { ReactLenis, useLenis } from "@studio-freight/react-lenis";
-import { useEffect, useRef, useState, useCallback } from "react";
+import { motion } from "framer-motion";
+import {
+  useEffect,
+  useState,
+  useRef,
+  forwardRef,
+  useLayoutEffect,
+} from "react";
+import FeaturedProjectCard from "../../elements/FeaturedProjectCard";
+import { useHeader } from "../../layout/HeaderContext";
+import ReactLenis, { useLenis } from "@studio-freight/react-lenis";
 
-const MobileFeaturedProjectsWrapper = styled(motion.div)`
+const MobileFeaturedProjectsWrapper = styled.div`
   display: none;
-  transform-origin: center center;
+  position: relative;
 
   @media ${(props) => props.theme.mediaBreakpoints.tabletPortrait} {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 50vh 0;
-    width: 100%;
+    display: block;
+    padding-top: 50svh;
+    padding-bottom: 50svh;
   }
+`;
+
+const AnimatedContainer = styled(motion.div)`
+  display: flex;
+  flex-direction: column;
+  transform-origin: center;
+  position: relative;
+  z-index: 1;
+`;
+
+const CardWrapper = styled.div`
+  height: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
 `;
 
 type Props = {
@@ -27,105 +46,202 @@ type Props = {
 const MobileFeaturedProjects = (props: Props) => {
   const { data } = props;
 
-  const { scrollY } = useScroll();
-  const ref = useRef<HTMLDivElement>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [initialDelayComplete, setInitialDelayComplete] = useState(false);
+  const [isInitialScrollComplete, setIsInitialScrollComplete] = useState(false);
+  const [isReady, setIsReady] = useState(false);
+  const [targetScrollPosition, setTargetScrollPosition] = useState<
+    number | null
+  >(null);
+
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const lenis = useLenis();
-  const [cardLayouts, setCardLayouts] = useState<
-    { top: number; height: number }[]
-  >([]);
-  const didInitialScroll = useRef(false);
+  const { setHeaderText, setIsHovering } = useHeader();
 
-  const middleIndex = data.length > 0 ? Math.floor(data.length / 2) : 0;
-  const maxWidth = 100;
-  const minWidth = 40;
-
-  const recalculateLayout = useCallback(() => {
-    if (ref.current && data.length > 0) {
-      const cards = ref.current.children;
-      if (cards.length === 0) return;
-
-      const style = window.getComputedStyle(cards[0]);
-      const marginTop = parseFloat(style.marginTop) || 0;
-      const marginBottom = parseFloat(style.marginBottom) || 0;
-      const margin = marginTop + marginBottom;
-
-      const vw = window.innerWidth / 100;
-      let accumulatedTop = window.innerHeight / 2;
-
-      const newLayouts = Array.from(cards).map((_, index) => {
-        const isActive = index === middleIndex;
-        const cardWidthVw = isActive ? maxWidth : minWidth;
-        const cardWidthPx = cardWidthVw * vw;
-        const cardHeightPx = (cardWidthPx * 9) / 16;
-
-        const top = accumulatedTop;
-        accumulatedTop += cardHeightPx + margin;
-        return { top, height: cardHeightPx };
-      });
-
-      setCardLayouts(newLayouts);
-    }
-  }, [data, middleIndex]);
+  const hasData = data && data.length > 0;
 
   useEffect(() => {
-    const handleResize = () => {
-      recalculateLayout();
-    };
+    cardRefs.current = cardRefs.current.slice(0, data.length * 2);
+  }, [data]);
 
-    const timeoutId = setTimeout(() => {
-      recalculateLayout();
-    }, 100);
+  useEffect(() => {
+    if (isReady) {
+      const timer = setTimeout(() => {
+        setInitialDelayComplete(true);
+      }, 2000);
 
-    window.addEventListener("resize", handleResize);
+      return () => {
+        clearTimeout(timer);
+      };
+    }
+  }, [isReady]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (wrapperRef.current && lenis && hasData) {
+        const wrapperElement = wrapperRef.current;
+        const rect = wrapperElement.getBoundingClientRect();
+        const top = rect.top + lenis.scroll;
+        const wrapperHeight = wrapperElement.offsetHeight;
+
+        // The vertical center of the wrapper
+        const middleOfWrapper = top + wrapperHeight / 2;
+
+        // Scroll so that this point is in the middle of the viewport
+        const scrollToPosition = middleOfWrapper - window.innerHeight / 2;
+
+        setTargetScrollPosition(scrollToPosition);
+      }
+    }, 500);
 
     return () => {
-      clearTimeout(timeoutId);
-      window.removeEventListener("resize", handleResize);
+      clearTimeout(timer);
     };
-  }, [recalculateLayout]);
+  }, [lenis, hasData, wrapperRef]);
 
   useEffect(() => {
-    if (lenis && cardLayouts.length > 0 && !didInitialScroll.current) {
-      const timeout = setTimeout(() => {
-        if (!ref.current) return;
-
-        const targetLayout = cardLayouts[middleIndex];
-        if (targetLayout) {
-          didInitialScroll.current = true;
-          const deviceHeight = window.innerHeight;
-          const offset =
-            targetLayout.top - deviceHeight / 2 + targetLayout.height / 2;
-
-          lenis.scrollTo(offset, {
-            duration: 2,
-            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-          });
+    if (targetScrollPosition !== null) {
+      requestAnimationFrame(() => {
+        // Try all possible native scroll targets
+        if (document.scrollingElement) {
+          document.scrollingElement.scrollTop = targetScrollPosition;
         }
-      }, 100);
+        if (document.documentElement) {
+          document.documentElement.scrollTop = targetScrollPosition;
+        }
+        if (document.body) {
+          document.body.scrollTop = targetScrollPosition;
+        }
+        window.scrollTo(0, targetScrollPosition);
 
-      return () => clearTimeout(timeout);
+        setIsInitialScrollComplete(true);
+        setIsReady(true);
+      });
     }
-  }, [lenis, cardLayouts, middleIndex]);
+  }, [targetScrollPosition]);
+
+  useEffect(() => {
+    if (!lenis || !hasData) return;
+
+    const handleScroll = () => {
+      const viewportCenter = window.innerHeight / 2;
+      let minDistance = Infinity;
+      let newActiveIndex = -1;
+
+      cardRefs.current.forEach((card, index) => {
+        if (card) {
+          const rect = card.getBoundingClientRect();
+          const cardCenter = rect.top + rect.height / 2;
+          const distance = Math.abs(viewportCenter - cardCenter);
+
+          if (distance < minDistance) {
+            minDistance = distance;
+            newActiveIndex = index;
+          }
+        }
+      });
+
+      if (newActiveIndex !== -1 && activeIndex !== newActiveIndex) {
+        setActiveIndex(newActiveIndex);
+        const project = data[newActiveIndex % data.length];
+        if (project) {
+          setHeaderText({
+            logo: project.client,
+            tagline: project.title,
+            type: project.type,
+            year: project.year,
+          });
+          setIsHovering(true);
+        }
+      }
+    };
+
+    lenis.on("scroll", handleScroll);
+    handleScroll(); // Initial check
+
+    return () => {
+      lenis.off("scroll", handleScroll);
+    };
+  }, [activeIndex, data, hasData, setHeaderText, setIsHovering, lenis]);
+
+  useEffect(() => {
+    // Set initial header text
+    if (hasData) {
+      const project = data[0];
+      setHeaderText({
+        logo: project.client,
+        tagline: project.title,
+        type: project.type,
+        year: project.year,
+      });
+      setIsHovering(true);
+    }
+
+    return () => {
+      setIsHovering(false);
+    };
+  }, [hasData, data, setHeaderText, setIsHovering]);
 
   return (
-    <MobileFeaturedProjectsWrapper
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 1.5, ease: "easeInOut" }}
-      ref={ref}
-    >
-      {data.map((project, i) => (
-        <DynamicWidthCard
-          key={`mobile-featured-project-${i}`}
-          scrollY={scrollY}
-          maxWidth={100}
-          minWidth={40}
-        >
-          <MobileFeaturedProjectCard project={project} />
-        </DynamicWidthCard>
-      ))}
+    <MobileFeaturedProjectsWrapper ref={wrapperRef}>
+      <AnimatedContainer
+        initial={{ opacity: 0, scale: 0.25 }}
+        animate={{
+          opacity: isReady ? 1 : 0,
+          scale: initialDelayComplete ? 1 : 0.25,
+        }}
+        transition={{
+          scale: { duration: 0.5, ease: "easeInOut" },
+          opacity: { duration: 0.5, ease: "easeInOut" },
+        }}
+      >
+        {hasData &&
+          data.map((project, index) => (
+            <ScrollControlledCard
+              key={`${project.title}-${index}`}
+              ref={(el) => {
+                cardRefs.current[index] = el;
+              }}
+              project={project}
+              index={index}
+              activeIndex={activeIndex}
+              initialDelayComplete={initialDelayComplete}
+            />
+          ))}
+      </AnimatedContainer>
     </MobileFeaturedProjectsWrapper>
   );
 };
+
+type ScrollControlledCardProps = {
+  project: ProjectType;
+  index: number;
+  activeIndex: number;
+  initialDelayComplete: boolean;
+};
+
+const ScrollControlledCard = forwardRef<
+  HTMLDivElement,
+  ScrollControlledCardProps
+>(({ project, index, activeIndex, initialDelayComplete }, ref) => {
+  const isCardActive = activeIndex === index;
+
+  return (
+    <CardWrapper ref={ref}>
+      <FeaturedProjectCard
+        {...project}
+        index={index}
+        isHovered={initialDelayComplete && isCardActive}
+        onHoverStart={() => {}}
+        onHoverEnd={() => {}}
+        hoveredIndex={activeIndex}
+        initialDelayComplete={initialDelayComplete}
+      />
+    </CardWrapper>
+  );
+});
+
+ScrollControlledCard.displayName = "ScrollControlledCard";
 
 export default MobileFeaturedProjects;

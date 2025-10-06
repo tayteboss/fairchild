@@ -5,9 +5,9 @@ import { motion } from "framer-motion";
 import client from "../client";
 import { homePageQueryString } from "../lib/sanityQueries";
 import FeaturedProjects from "../components/blocks/FeaturedProjects";
-import TestMobileFeaturedProjects from "../components/blocks/TestMobileFeaturedProjects";
 import { useEffect } from "react";
 import { useHeader } from "../components/layout/HeaderContext";
+import MobileFeaturedProjects from "../components/blocks/MobileFeaturedProjects";
 
 const PageWrapper = styled(motion.div)``;
 
@@ -41,8 +41,7 @@ const Page = (props: Props) => {
         description={data?.seoDescription || ""}
       />
       <FeaturedProjects data={data?.featuredProjects} />
-      <TestMobileFeaturedProjects data={data?.featuredProjects} />
-      {/* <MobileFeaturedProjects data={data?.featuredProjects} /> */}
+      <MobileFeaturedProjects data={data?.featuredProjects} />
     </PageWrapper>
   );
 };
