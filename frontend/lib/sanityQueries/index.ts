@@ -110,6 +110,83 @@ export const projectsQueryString = `
 			asset-> {
 				playbackId,
 				data {
+					duration,
+					aspect_ratio
+				}
+			}
+		},
+		fallbackImage {
+			asset-> {
+				url,
+				"lores": url + "?w=400&auto=format",
+				metadata {
+					lqip
+				}
+			}
+		},
+		snippetVideo {
+			asset-> {
+				playbackId,
+				data {
+					duration
+				}
+			}
+		},
+		snippetFallbackImage {
+			asset-> {
+				url,
+				metadata {
+					lqip
+				}
+			}
+		},
+		colorTempFilter {
+			minTemp,
+			maxTemp
+		},
+		saturationFilter,
+		galleryRatio[]-> {
+			label,
+			value
+		},
+		gallery[] {
+			image {
+				asset-> {
+					url
+				}
+			},
+			thumbnailColor,
+			colorTempFilter {
+				minTemp,
+				maxTemp
+			},
+			saturationFilter
+		},
+		slug
+	}
+`;
+export const projectsGalleryPageQueryString = `
+	*[_type == 'project'] | order(orderRank) [0...100] {
+		_orderRank,
+		title,
+		client,
+		type[]-> {
+			name
+		},
+		styles[]-> {
+			name
+		},
+		year,
+		credits[] {
+			role,
+			title,
+			link
+		},
+		thumbnailColor,
+		video {
+			asset-> {
+				playbackId,
+				data {
 					duration
 				}
 			}

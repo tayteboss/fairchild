@@ -9,11 +9,12 @@ import { motion } from "framer-motion";
 import client from "../client";
 import {
   galleryPageQueryString,
+  projectsGalleryPageQueryString,
   projectsQueryString,
 } from "../lib/sanityQueries";
 import GalleryList from "../components/blocks/GalleryList";
 import GalleryFilters from "../components/blocks/GalleryFilters";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import ProjectGalleryCarousel from "../components/blocks/ProjectGalleryCarousel/ProjectGalleryCarousel";
 import { useHeader } from "../components/layout/HeaderContext";
 import useViewportWidth from "../hooks/useViewportWidth";
@@ -33,7 +34,18 @@ const DEFAULT_SATURATION = { min: 0, max: 100 };
 const Page = (props: Props) => {
   const { data, projects, yearRange, pageTransitionVariants } = props;
 
-  const [filteredProjects, setFilteredProjects] = useState(projects);
+  const sortedProjects = useMemo(
+    () =>
+      [...projects].sort((a, b) => {
+        if (a._orderRank && b._orderRank) {
+          return a._orderRank.localeCompare(b._orderRank);
+        }
+        return 0;
+      }),
+    [projects]
+  );
+
+  const [filteredProjects, setFilteredProjects] = useState(sortedProjects);
   const [isDragging, setIsDragging] = useState(false);
   const [filtersIsOpen, setFiltersIsOpen] = useState(false);
   const [filtersAreOn, setFiltersAreOn] = useState(false);
@@ -120,14 +132,14 @@ const Page = (props: Props) => {
       year.max === yearRange.max;
 
     if (isDefaultState) {
-      setFilteredProjects(projects);
+      setFilteredProjects(sortedProjects);
       setFiltersAreOn(false);
       return;
     }
 
     setFiltersAreOn(true);
 
-    const projectsWithFilteredGalleries = projects
+    const projectsWithFilteredGalleries = sortedProjects
       .map((project) => {
         // Year filter at the project level
         const hasYear = project.year && !isNaN(parseInt(project.year));
@@ -187,7 +199,7 @@ const Page = (props: Props) => {
       );
 
     setFilteredProjects(projectsWithFilteredGalleries);
-  }, [colorTemp, saturation, year, projects, isDragging, yearRange]);
+  }, [colorTemp, saturation, year, sortedProjects, isDragging, yearRange]);
 
   const selectedProject =
     selectedProjectIndex !== null
@@ -240,7 +252,7 @@ const Page = (props: Props) => {
 
 export async function getStaticProps() {
   const data = await client.fetch(galleryPageQueryString);
-  let projects = await client.fetch(projectsQueryString);
+  let projects = await client.fetch(projectsGalleryPageQueryString);
 
   const yearRange = projects.reduce(
     (acc: { min: number; max: number }, project: ProjectType) => {

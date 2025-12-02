@@ -28,7 +28,7 @@ const Text = styled.p`
 `;
 
 type Props = {
-  project: ProjectType;
+  project: ProjectType | null;
   isActive: boolean;
 };
 
@@ -36,38 +36,44 @@ const MobileProjectDetails = (props: Props) => {
   const { project, isActive } = props;
 
   return (
-    <MobileProjectDetailsWrapper>
-      {project?.client && (
-        <Cell>
-          <Title>Client</Title>
-          <Text>{project.client}</Text>
-        </Cell>
+    <>
+      {project && (
+        <MobileProjectDetailsWrapper>
+          {project?.client && (
+            <Cell>
+              <Title>Client</Title>
+              <Text>{project.client}</Text>
+            </Cell>
+          )}
+          {project?.title && (
+            <Cell>
+              <Title>Project</Title>
+              <Text>{project.title}</Text>
+            </Cell>
+          )}
+          {project?.type[0].name && (
+            <Cell>
+              <Title>Type</Title>
+              <Text>{project.type[0].name}</Text>
+            </Cell>
+          )}
+          {project?.styles.length > 0 && (
+            <Cell>
+              <Title>Style</Title>
+              <Text>
+                {project.styles.map((style) => style.name).join(", ")}
+              </Text>
+            </Cell>
+          )}
+          {project?.year && (
+            <Cell>
+              <Title>Year</Title>
+              <Text>{project.year}</Text>
+            </Cell>
+          )}
+        </MobileProjectDetailsWrapper>
       )}
-      {project?.title && (
-        <Cell>
-          <Title>Project</Title>
-          <Text>{project.title}</Text>
-        </Cell>
-      )}
-      {project?.type[0].name && (
-        <Cell>
-          <Title>Type</Title>
-          <Text>{project.type[0].name}</Text>
-        </Cell>
-      )}
-      {project?.styles.length > 0 && (
-        <Cell>
-          <Title>Style</Title>
-          <Text>{project.styles.map((style) => style.name).join(", ")}</Text>
-        </Cell>
-      )}
-      {project?.year && (
-        <Cell>
-          <Title>Year</Title>
-          <Text>{project.year}</Text>
-        </Cell>
-      )}
-    </MobileProjectDetailsWrapper>
+    </>
   );
 };
 

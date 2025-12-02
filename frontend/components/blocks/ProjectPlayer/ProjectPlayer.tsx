@@ -1,13 +1,20 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { ProjectType } from "../../../shared/types/types";
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import type { CSSProperties } from "react";
+import Image from "next/image";
 import MuxPlayer from "@mux/mux-player-react/lazy";
 import pxToRem from "../../../utils/pxToRem";
 import VideoControls from "../VideoControls";
 import CreditsModal from "../CreditsModal";
 import MobileProjectDetails from "../MobileProjectDetails";
 import { useRouter } from "next/navigation";
+
+const calculateAspectRatio = (aspectRatio: string) => {
+  const [width, height] = aspectRatio.split(":");
+  return `${(parseInt(height) / parseInt(width)) * 100}%`;
+};
 
 const ProjectPlayerWrapper = styled(motion.section)<{ $isFullScreen: boolean }>`
   position: fixed;
@@ -50,10 +57,21 @@ const Outer = styled.div<{ $isFullScreen: boolean }>`
   transition: all var(--transition-speed-slow) var(--transition-ease);
 `;
 
-const Ratio = styled.div`
+const Ratio = styled.div<{ $aspectRatio: string; $isFullScreen: boolean }>`
   position: relative;
-  width: 100%;
-  padding-top: 56.25%;
+
+  ${({ $aspectRatio, $isFullScreen }) =>
+    $isFullScreen
+      ? css`
+          aspect-ratio: ${$aspectRatio.replace(":", " / ")};
+          max-height: 100vh;
+          max-width: 100vw;
+          margin: 0 auto;
+        `
+      : css`
+          width: 100%;
+          padding-top: ${calculateAspectRatio($aspectRatio)};
+        `};
 `;
 
 const Inner = styled.div`
@@ -64,11 +82,20 @@ const Inner = styled.div`
   overflow: hidden;
 
   mux-player {
-    object-fit: cover;
+    object-fit: contain;
     object-position: center;
     height: 100%;
     width: 100%;
   }
+`;
+
+const PosterOverlay = styled.div<{ $isVisible: boolean }>`
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: ${({ $isVisible }) => ($isVisible ? 1 : 0)};
+  transition: opacity var(--transition-speed-fast) var(--transition-ease);
 `;
 
 const CloseTrigger = styled(motion.button)`
@@ -128,8 +155,10 @@ const ProjectPlayer = (props: Props) => {
     activeProject?.project?.video?.asset?.data?.duration || 0
   );
   const [isCreditsOpen, setIsCreditsOpen] = useState(false);
+  const [showPosterOverlay, setShowPosterOverlay] = useState(true);
 
   const muxPlayerRef = useRef<any>(null);
+  const closeTimeoutRef = useRef<number | null>(null);
   const router = useRouter();
 
   const handleSeek = (time: number) => {
@@ -139,14 +168,33 @@ const ProjectPlayer = (props: Props) => {
     }
   };
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     if (useCloseLink) {
       router.push(`/projects`);
+      return;
+    }
+
+    // First transition out of fullscreen, then remove the project
+    setIsFullScreen(false);
+
+    if (activeProject?.project) {
+      setActiveProject({
+        project: activeProject.project,
+        action: "hover",
+      });
+
+      if (closeTimeoutRef.current) {
+        window.clearTimeout(closeTimeoutRef.current);
+      }
+
+      closeTimeoutRef.current = window.setTimeout(() => {
+        setActiveProject({ project: null, action: "inactive" });
+        closeTimeoutRef.current = null;
+      }, 300);
     } else {
-      setIsFullScreen(false);
       setActiveProject({ project: null, action: "inactive" });
     }
-  };
+  }, [activeProject, router, setActiveProject, setIsFullScreen, useCloseLink]);
 
   useEffect(() => {
     if (muxPlayerRef.current) {
@@ -161,6 +209,14 @@ const ProjectPlayer = (props: Props) => {
   useEffect(() => {
     setVideoLength(activeProject?.project?.video?.asset?.data?.duration || 0);
   }, [activeProject]);
+
+  useEffect(() => {
+    // Reset poster for each new active project / playback id
+    setShowPosterOverlay(true);
+  }, [
+    activeProject?.project,
+    activeProject?.project?.video?.asset?.playbackId,
+  ]);
 
   useEffect(() => {
     if (!muxPlayerRef.current) return;
@@ -182,13 +238,48 @@ const ProjectPlayer = (props: Props) => {
       setIsActive(false);
       setIsFullScreen(false);
     }
-  }, [activeProject]);
+  }, [activeProject, setIsFullScreen]);
 
   useEffect(() => {
     if (!isFullScreen) {
       setIsMuted(true);
     }
   }, [isFullScreen]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && isFullScreen) {
+        handleClose();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isFullScreen, handleClose]);
+
+  useEffect(
+    () => () => {
+      if (closeTimeoutRef.current) {
+        window.clearTimeout(closeTimeoutRef.current);
+      }
+    },
+    []
+  );
+
+  console.log("activeProject?.project?.title", activeProject?.project?.title);
+
+  const aspectRatioString =
+    activeProject?.project?.video?.asset?.data?.aspect_ratio || "16:9";
+
+  const posterUrl = activeProject?.project?.fallbackImage?.asset.lores;
+
+  const handleVideoReady = () => {
+    setTimeout(() => {
+      setShowPosterOverlay(false);
+    }, 500);
+  };
 
   return (
     <AnimatePresence>
@@ -211,8 +302,22 @@ const ProjectPlayer = (props: Props) => {
             isActive={isFullScreen}
           />
           <Outer $isFullScreen={isFullScreen}>
-            <Ratio>
+            <Ratio
+              $aspectRatio={aspectRatioString}
+              $isFullScreen={isFullScreen}
+            >
               <Inner>
+                {posterUrl && (
+                  <PosterOverlay $isVisible={showPosterOverlay}>
+                    <Image
+                      src={posterUrl}
+                      alt={activeProject?.project?.title || "Project poster"}
+                      fill
+                      sizes="100vw"
+                      priority={isFullScreen}
+                    />
+                  </PosterOverlay>
+                )}
                 <AnimatePresence>
                   {isFullScreen && (
                     <CloseTrigger
@@ -248,9 +353,14 @@ const ProjectPlayer = (props: Props) => {
                     muted={isMuted}
                     playsInline={true}
                     loading="viewport"
-                    poster={
-                      activeProject?.project?.fallbackImage?.asset.metadata.lqip
+                    poster={posterUrl}
+                    style={
+                      {
+                        "--media-object-fit": "contain",
+                      } as CSSProperties
                     }
+                    onLoadedData={handleVideoReady}
+                    onPlay={handleVideoReady}
                     onTimeUpdate={() => {
                       if (muxPlayerRef.current) {
                         setCurrentTime(muxPlayerRef.current.currentTime);

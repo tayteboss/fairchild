@@ -75,10 +75,12 @@ export type ProjectType = {
   video: {
     asset: {
       playbackId: string;
-      data: { duration: number };
+      data: { aspect_ratio: string; duration: number };
     };
   };
-  fallbackImage: { asset: { url: string; metadata: { lqip: string } } };
+  fallbackImage: {
+    asset: { lores: string; url: string; metadata: { lqip: string } };
+  };
   snippetVideo: {
     asset: {
       playbackId: string;
@@ -114,6 +116,7 @@ export type ProjectType = {
     };
   }[];
   medianColorTemp?: number;
+  _orderRank?: string;
 };
 
 export type GalleryPageType = {
