@@ -268,8 +268,6 @@ const ProjectPlayer = (props: Props) => {
     []
   );
 
-  console.log("activeProject?.project?.title", activeProject?.project?.title);
-
   const aspectRatioString =
     activeProject?.project?.video?.asset?.data?.aspect_ratio || "16:9";
 
