@@ -140,7 +140,7 @@ const Header = (props: Props) => {
   const { hasMoved } = useMouseMovement({
     initialDelay: 2000,
     movementThreshold: 5,
-    throttleMs: 100,
+    throttleMs: 25,
   });
 
   const isHomePage = router.pathname === "/";
@@ -187,13 +187,24 @@ const Header = (props: Props) => {
     }
   }, [isHomePage, setHeaderText, setIsHovering, tagline]);
 
+  const getYTransition = () => {
+    // On the homepage desktop view, keep the header very snappy to follow the cursor
+    if (isHomePage && !isMobile) {
+      return { type: "tween", duration: 0.06 };
+    }
+
+    // On all other pages (or on mobile), use a slower eased transition
+    return { type: "tween", duration: 0.4, ease: "easeOut" };
+  };
+
   const getAnimateY = () => {
     if (isProjectsPage) {
       return 0;
     }
 
     if (isHomePage && !isMobile) {
-      return y ? y - 12 : centerPosition;
+      // Follow the cursor closely on the homepage desktop view
+      return y !== null ? y - 12 : centerPosition;
     }
 
     return centerPosition;
@@ -220,14 +231,8 @@ const Header = (props: Props) => {
       }}
       exit={{ opacity: 0 }}
       transition={{
-        duration: 0.3,
-        ease: [0.16, 1, 0.3, 1],
-        y: {
-          type: "spring",
-          stiffness: 300,
-          damping: 20,
-          mass: 0.5,
-        },
+        opacity: { duration: 0.3 },
+        y: getYTransition(),
       }}
     >
       <LayoutWrapper>

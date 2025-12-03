@@ -96,6 +96,13 @@ const PosterOverlay = styled.div<{ $isVisible: boolean }>`
   pointer-events: none;
   opacity: ${({ $isVisible }) => ($isVisible ? 1 : 0)};
   transition: opacity var(--transition-speed-fast) var(--transition-ease);
+
+  img {
+    object-fit: cover;
+    object-position: center;
+    height: 100%;
+    width: 100%;
+  }
 `;
 
 const CloseTrigger = styled(motion.button)`
@@ -276,7 +283,7 @@ const ProjectPlayer = (props: Props) => {
   const handleVideoReady = () => {
     setTimeout(() => {
       setShowPosterOverlay(false);
-    }, 500);
+    }, 1000);
   };
 
   return (
@@ -304,18 +311,18 @@ const ProjectPlayer = (props: Props) => {
               $aspectRatio={aspectRatioString}
               $isFullScreen={isFullScreen}
             >
+              {posterUrl && (
+                <PosterOverlay $isVisible={showPosterOverlay}>
+                  <Image
+                    src={posterUrl}
+                    alt={activeProject?.project?.title || "Project poster"}
+                    fill
+                    sizes="25vw"
+                    priority={isFullScreen}
+                  />
+                </PosterOverlay>
+              )}
               <Inner>
-                {posterUrl && (
-                  <PosterOverlay $isVisible={showPosterOverlay}>
-                    <Image
-                      src={posterUrl}
-                      alt={activeProject?.project?.title || "Project poster"}
-                      fill
-                      sizes="100vw"
-                      priority={isFullScreen}
-                    />
-                  </PosterOverlay>
-                )}
                 <AnimatePresence>
                   {isFullScreen && (
                     <CloseTrigger
@@ -351,13 +358,11 @@ const ProjectPlayer = (props: Props) => {
                     muted={isMuted}
                     playsInline={true}
                     loading="viewport"
-                    poster={posterUrl}
                     style={
                       {
                         "--media-object-fit": "contain",
                       } as CSSProperties
                     }
-                    onLoadedData={handleVideoReady}
                     onPlay={handleVideoReady}
                     onTimeUpdate={() => {
                       if (muxPlayerRef.current) {
