@@ -10,6 +10,7 @@ import VideoControls from "../VideoControls";
 import CreditsModal from "../CreditsModal";
 import MobileProjectDetails from "../MobileProjectDetails";
 import { useRouter } from "next/navigation";
+import useViewportWidth from "../../../hooks/useViewportWidth";
 
 const calculateAspectRatio = (aspectRatio: string) => {
   const [width, height] = aspectRatio.split(":");
@@ -52,6 +53,7 @@ const Outer = styled.div<{ $isFullScreen: boolean }>`
 
   @media ${(props) => props.theme.mediaBreakpoints.tabletPortrait} {
     bottom: 32px;
+    width: 100%;
   }
 
   transition: all var(--transition-speed-slow) var(--transition-ease);
@@ -167,6 +169,9 @@ const ProjectPlayer = (props: Props) => {
   const muxPlayerRef = useRef<any>(null);
   const closeTimeoutRef = useRef<number | null>(null);
   const router = useRouter();
+  const viewportWidth = useViewportWidth();
+  const isMobile =
+    viewportWidth === "mobile" || viewportWidth === "tabletPortrait";
 
   const handleSeek = (time: number) => {
     if (muxPlayerRef?.current) {
@@ -184,23 +189,27 @@ const ProjectPlayer = (props: Props) => {
     // First transition out of fullscreen, then remove the project
     setIsFullScreen(false);
 
-    if (activeProject?.project) {
-      setActiveProject({
-        project: activeProject.project,
-        action: "hover",
-      });
-
-      if (closeTimeoutRef.current) {
-        window.clearTimeout(closeTimeoutRef.current);
-      }
-
-      closeTimeoutRef.current = window.setTimeout(() => {
-        setActiveProject({ project: null, action: "inactive" });
-        closeTimeoutRef.current = null;
-      }, 300);
-    } else {
-      setActiveProject({ project: null, action: "inactive" });
+    if (isMobile) {
+      setIsActive(false);
     }
+
+    // if (activeProject?.project) {
+    //   setActiveProject({
+    //     project: activeProject.project,
+    //     action: "hover",
+    //   });
+
+    //   if (closeTimeoutRef.current) {
+    //     window.clearTimeout(closeTimeoutRef.current);
+    //   }
+
+    //   closeTimeoutRef.current = window.setTimeout(() => {
+    //     setActiveProject({ project: null, action: "inactive" });
+    //     closeTimeoutRef.current = null;
+    //   }, 300);
+    // } else {
+    //   setActiveProject({ project: null, action: "inactive" });
+    // }
   }, [activeProject, router, setActiveProject, setIsFullScreen, useCloseLink]);
 
   useEffect(() => {
