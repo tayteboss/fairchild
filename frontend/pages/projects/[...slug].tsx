@@ -57,7 +57,6 @@ export async function getStaticPaths() {
 export async function getStaticProps({ params }: any) {
   const projectQuery = `
 		*[_type == 'project' && slug.current == "${params.slug[0]}"][0] {
-			...,
       title,
 		client,
 		type[]-> {
@@ -77,51 +76,19 @@ export async function getStaticProps({ params }: any) {
 			asset-> {
 				playbackId,
 				data {
-					duration
+					duration,
+                    aspect_ratio
 				}
 			}
 		},
 		fallbackImage {
 			asset-> {
 				url,
+                "lores": url + "?w=400&auto=format",
 				metadata {
 					lqip
 				}
 			}
-		},
-		snippetVideo {
-			asset-> {
-				playbackId,
-				data {
-					duration
-				}
-			}
-		},
-		snippetFallbackImage {
-			asset-> {
-				url,
-				metadata {
-					lqip
-				}
-			}
-		},
-		colorTempFilter {
-			minTemp,
-			maxTemp
-		},
-		saturationFilter,
-		gallery[] {
-			image {
-				asset-> {
-					url
-				}
-			},
-			thumbnailColor,
-			colorTempFilter {
-				minTemp,
-				maxTemp
-			},
-			saturationFilter
 		},
 		slug
 		}

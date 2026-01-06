@@ -105,7 +105,6 @@ export const projectsQueryString = `
 			title,
 			link
 		},
-		thumbnailColor,
 		video {
 			asset-> {
 				playbackId,
@@ -123,44 +122,6 @@ export const projectsQueryString = `
 					lqip
 				}
 			}
-		},
-		snippetVideo {
-			asset-> {
-				playbackId,
-				data {
-					duration
-				}
-			}
-		},
-		snippetFallbackImage {
-			asset-> {
-				url,
-				metadata {
-					lqip
-				}
-			}
-		},
-		colorTempFilter {
-			minTemp,
-			maxTemp
-		},
-		saturationFilter,
-		galleryRatio[]-> {
-			label,
-			value
-		},
-		gallery[] {
-			image {
-				asset-> {
-					url
-				}
-			},
-			thumbnailColor,
-			colorTempFilter {
-				minTemp,
-				maxTemp
-			},
-			saturationFilter
 		},
 		slug
 	}
