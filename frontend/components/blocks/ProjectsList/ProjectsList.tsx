@@ -5,7 +5,7 @@ import pxToRem from "../../../utils/pxToRem";
 import LayoutWrapper from "../../layout/LayoutWrapper";
 import ProjectListCard from "../../elements/ProjectListCard";
 import useViewportWidth from "../../../hooks/useViewportWidth";
-import { useState } from "react";
+import { memo } from "react";
 import MobileProjectPlayer from "../MobileProjectPlayer";
 
 const ProjectsListWrapper = styled.section`
@@ -36,7 +36,7 @@ type Props = {
   isFullScreen: boolean;
 };
 
-const ProjectsList = (props: Props) => {
+const ProjectsList = memo((props: Props) => {
   const { projects, handleSort, sortConfig, setActiveProject, isFullScreen } =
     props;
 
@@ -66,6 +66,8 @@ const ProjectsList = (props: Props) => {
       </LayoutWrapper>
     </ProjectsListWrapper>
   );
-};
+});
+
+ProjectsList.displayName = "ProjectsList";
 
 export default ProjectsList;

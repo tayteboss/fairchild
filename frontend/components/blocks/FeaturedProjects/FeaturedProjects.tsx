@@ -4,6 +4,7 @@ import FeaturedProjectCard from "../../elements/FeaturedProjectCard";
 import { motion, useMotionValue, useTransform, useSpring } from "framer-motion";
 import { useEffect, useState, useCallback } from "react";
 import { useHeader } from "../../layout/HeaderContext";
+import useViewportWidth from "../../../hooks/useViewportWidth";
 
 const FeaturedProjectsWrapper = styled.div`
   position: fixed;
@@ -86,6 +87,9 @@ const FeaturedProjects = (props: Props) => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [initialDelayComplete, setInitialDelayComplete] = useState(false);
 
+  const viewport = useViewportWidth();
+  const isMobile = viewport === "mobile" || viewport === "tabletPortrait";
+
   const PARALLAX_STRENGTH = 1000;
   const motionY = useMotionValue(0);
 
@@ -167,10 +171,11 @@ const FeaturedProjects = (props: Props) => {
                   {...project}
                   index={index}
                   isHovered={hoveredIndex === index}
-                  onHoverStart={() => handleHoverStart(index)}
+                  onHoverStart={handleHoverStart}
                   onHoverEnd={handleHoverEnd}
                   hoveredIndex={hoveredIndex}
                   initialDelayComplete={initialDelayComplete}
+                  isMobile={isMobile}
                 />
               </motion.div>
             ))}

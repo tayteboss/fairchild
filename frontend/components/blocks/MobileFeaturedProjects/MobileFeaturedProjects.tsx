@@ -61,6 +61,9 @@ const MobileFeaturedProjects = (props: Props) => {
 
   const hasData = data && data.length > 0;
 
+  // Stable no-op function for hover handlers in mobile view
+  const handleHoverNoOp = () => {};
+
   useEffect(() => {
     cardRefs.current = cardRefs.current.slice(0, data.length * 2);
   }, [data]);
@@ -122,48 +125,43 @@ const MobileFeaturedProjects = (props: Props) => {
   }, [targetScrollPosition]);
 
   useEffect(() => {
-    if (!lenis || !hasData) return;
+    if (!hasData) return;
 
-    const handleScroll = () => {
-      const viewportCenter = window.innerHeight / 2;
-      let minDistance = Infinity;
-      let newActiveIndex = -1;
-
-      cardRefs.current.forEach((card, index) => {
-        if (card) {
-          const rect = card.getBoundingClientRect();
-          const cardCenter = rect.top + rect.height / 2;
-          const distance = Math.abs(viewportCenter - cardCenter);
-
-          if (distance < minDistance) {
-            minDistance = distance;
-            newActiveIndex = index;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const index = Number((entry.target as HTMLElement).dataset.index);
+            if (!isNaN(index)) {
+              setActiveIndex(index);
+              const project = data[index % data.length];
+              if (project) {
+                setHeaderText({
+                  logo: project.client,
+                  tagline: project.title,
+                  type: project.type,
+                  year: project.year,
+                });
+                setIsHovering(true);
+              }
+            }
           }
-        }
-      });
-
-      if (newActiveIndex !== -1 && activeIndex !== newActiveIndex) {
-        setActiveIndex(newActiveIndex);
-        const project = data[newActiveIndex % data.length];
-        if (project) {
-          setHeaderText({
-            logo: project.client,
-            tagline: project.title,
-            type: project.type,
-            year: project.year,
-          });
-          setIsHovering(true);
-        }
+        });
+      },
+      {
+        rootMargin: "-50% 0px -50% 0px",
+        threshold: 0,
       }
-    };
+    );
 
-    lenis.on("scroll", handleScroll);
-    handleScroll(); // Initial check
+    cardRefs.current.forEach((card) => {
+      if (card) observer.observe(card);
+    });
 
     return () => {
-      lenis.off("scroll", handleScroll);
+      observer.disconnect();
     };
-  }, [activeIndex, data, hasData, setHeaderText, setIsHovering, lenis]);
+  }, [data, hasData, setHeaderText, setIsHovering]);
 
   useEffect(() => {
     // Set initial header text
@@ -207,6 +205,7 @@ const MobileFeaturedProjects = (props: Props) => {
               index={index}
               activeIndex={activeIndex}
               initialDelayComplete={initialDelayComplete}
+              onHover={handleHoverNoOp}
             />
           ))}
       </AnimatedContainer>
@@ -219,24 +218,26 @@ type ScrollControlledCardProps = {
   index: number;
   activeIndex: number;
   initialDelayComplete: boolean;
+  onHover: () => void;
 };
 
 const ScrollControlledCard = forwardRef<
   HTMLDivElement,
   ScrollControlledCardProps
->(({ project, index, activeIndex, initialDelayComplete }, ref) => {
+>(({ project, index, activeIndex, initialDelayComplete, onHover }, ref) => {
   const isCardActive = activeIndex === index;
 
   return (
-    <CardWrapper ref={ref}>
+    <CardWrapper ref={ref} data-index={index}>
       <FeaturedProjectCard
         {...project}
         index={index}
         isHovered={initialDelayComplete && isCardActive}
-        onHoverStart={() => {}}
-        onHoverEnd={() => {}}
+        onHoverStart={onHover}
+        onHoverEnd={onHover}
         hoveredIndex={activeIndex}
         initialDelayComplete={initialDelayComplete}
+        isMobile={true}
       />
     </CardWrapper>
   );

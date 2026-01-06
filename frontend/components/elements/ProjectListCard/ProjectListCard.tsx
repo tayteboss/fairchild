@@ -6,6 +6,7 @@ import FullScreenSvg from "../../svgs/FullScreenSvg";
 import MuxPlayer from "@mux/mux-player-react";
 import { useInView } from "react-intersection-observer";
 import { AnimatePresence, motion } from "framer-motion";
+import { memo } from "react";
 
 const DesktopProjectListCardWrapper = styled.div`
   opacity: 0.4;
@@ -150,7 +151,7 @@ type Props = {
   isFullScreen: boolean;
 };
 
-const ProjectListCard = (props: Props) => {
+const ProjectListCard = memo((props: Props) => {
   const { project, isFullScreen, setActiveProject } = props;
 
   const { ref, inView } = useInView({
@@ -223,6 +224,8 @@ const ProjectListCard = (props: Props) => {
       </MobileProjectListCardWrapper>
     </>
   );
-};
+});
+
+ProjectListCard.displayName = "ProjectListCard";
 
 export default ProjectListCard;

@@ -4,7 +4,6 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState, memo } from "react";
 import MuxPlayer from "@mux/mux-player-react/lazy";
-import useViewportWidth from "../../../hooks/useViewportWidth";
 
 // Base and max width variables for easy adjustment
 const BASE_MOBILE_WIDTH = "100vw";
@@ -78,10 +77,11 @@ type Props = {
   snippetFallbackImage: ProjectType["snippetFallbackImage"];
   index: number;
   isHovered: boolean;
-  onHoverStart: () => void;
+  onHoverStart: (index: number) => void;
   onHoverEnd: () => void;
   hoveredIndex: number | null;
   initialDelayComplete: boolean;
+  isMobile: boolean;
 };
 
 const FeaturedProjectCard = memo((props: Props) => {
@@ -98,10 +98,10 @@ const FeaturedProjectCard = memo((props: Props) => {
     onHoverEnd,
     hoveredIndex,
     initialDelayComplete,
+    isMobile,
   } = props;
 
-  const viewport = useViewportWidth();
-  const isMobile = viewport === "mobile" || viewport === "tabletPortrait";
+  const [isVideoReady, setIsVideoReady] = useState(false);
 
   // Prioritize snippet video/image over regular video/image
   const hasVideo = snippetVideo?.asset?.playbackId || video?.asset?.playbackId;
@@ -153,7 +153,7 @@ const FeaturedProjectCard = memo((props: Props) => {
   return (
     <FeaturedProjectCardWrapper
       $bgColor={thumbnailColor?.hex || "#000"}
-      onMouseEnter={onHoverStart}
+      onMouseEnter={() => onHoverStart(index)}
       onMouseLeave={onHoverEnd}
       style={{
         width: isMobile ? BASE_MOBILE_WIDTH : getStaggeredWidth(),
@@ -169,14 +169,29 @@ const FeaturedProjectCard = memo((props: Props) => {
           }}
           transition={{ duration: 0.3 }}
         />
+        {isHovered && hasFallbackImage && (
+          <Image
+            src={fallbackImageUrl}
+            alt={title}
+            priority={false}
+            fill
+            style={{
+              objectFit: "cover",
+              transform: "translateZ(0)",
+              zIndex: 1,
+            }}
+            sizes="(max-width: 1024px) 100vw, 50vw"
+          />
+        )}
         {hasVideo && (
           <VideoWrapper
             initial={{ opacity: 0 }}
             animate={{
-              opacity: isHovered ? 1 : 0,
+              opacity: isHovered && isVideoReady ? 1 : 0,
               display: isHovered ? "block" : "none",
             }}
             transition={{ duration: 0.2 }}
+            style={{ zIndex: 2 }}
           >
             <MuxPlayer
               ref={playerRef}
@@ -190,21 +205,9 @@ const FeaturedProjectCard = memo((props: Props) => {
               playsInline={true}
               minResolution="720p"
               poster={fallbackImageUrl}
+              onPlaying={() => setIsVideoReady(true)}
             />
           </VideoWrapper>
-        )}
-        {!hasVideo && isHovered && hasFallbackImage && (
-          <Image
-            src={fallbackImageUrl}
-            alt={title}
-            priority={false}
-            fill
-            style={{
-              objectFit: "cover",
-              transform: "translateZ(0)",
-            }}
-            sizes="(max-width: 1024px) 100vw, 50vw"
-          />
         )}
       </Inner>
     </FeaturedProjectCardWrapper>

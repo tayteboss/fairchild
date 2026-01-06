@@ -165,6 +165,7 @@ const ProjectPlayer = (props: Props) => {
   );
   const [isCreditsOpen, setIsCreditsOpen] = useState(false);
   const [showPosterOverlay, setShowPosterOverlay] = useState(true);
+  const [isVideoReady, setIsVideoReady] = useState(false);
 
   const muxPlayerRef = useRef<any>(null);
   const closeTimeoutRef = useRef<number | null>(null);
@@ -228,7 +229,13 @@ const ProjectPlayer = (props: Props) => {
 
   useEffect(() => {
     // Reset poster for each new active project / playback id
-    setShowPosterOverlay(true);
+    if (!activeProject.project) {
+        setShowPosterOverlay(true);
+        setIsVideoReady(false);
+    } else {
+        setShowPosterOverlay(true);
+        setIsVideoReady(false);
+    }
   }, [
     activeProject?.project,
     activeProject?.project?.video?.asset?.playbackId,
@@ -284,15 +291,23 @@ const ProjectPlayer = (props: Props) => {
     []
   );
 
+  useEffect(() => {
+    if (!isActive) {
+      setShowPosterOverlay(true);
+      setIsVideoReady(false);
+    }
+  }, [isActive]);
+
   const aspectRatioString =
     activeProject?.project?.video?.asset?.data?.aspect_ratio || "16:9";
 
   const posterUrl = activeProject?.project?.fallbackImage?.asset.lores;
 
   const handleVideoReady = () => {
+    setIsVideoReady(true);
     setTimeout(() => {
       setShowPosterOverlay(false);
-    }, 1000);
+    }, 200);
   };
 
   return (
@@ -331,7 +346,7 @@ const ProjectPlayer = (props: Props) => {
                   />
                 </PosterOverlay>
               )}
-              <Inner>
+              <Inner style={{ opacity: isVideoReady ? 1 : 0, transition: 'opacity 0.2s ease' }}>
                 <AnimatePresence>
                   {isFullScreen && (
                     <CloseTrigger
@@ -370,9 +385,11 @@ const ProjectPlayer = (props: Props) => {
                     style={
                       {
                         "--media-object-fit": "contain",
+                        aspectRatio: aspectRatioString.replace(":", " / "),
+                        height: "100%",
                       } as CSSProperties
                     }
-                    onPlay={handleVideoReady}
+                    onPlaying={handleVideoReady}
                     onTimeUpdate={() => {
                       if (muxPlayerRef.current) {
                         setCurrentTime(muxPlayerRef.current.currentTime);

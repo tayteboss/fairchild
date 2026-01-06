@@ -15,7 +15,7 @@ import {
 } from "../../lib/sanityQueries";
 import ProjectsList from "../../components/blocks/ProjectsList";
 import ProjectFilters from "../../components/blocks/ProjectFilters";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import ProjectPlayer from "../../components/blocks/ProjectPlayer";
 
 const PageWrapper = styled(motion.div)``;
@@ -56,21 +56,23 @@ const Page = (props: Props) => {
   const [isFullScreen, setIsFullScreen] = useState(false);
 
   // Toggle filters panel
-  const handleToggleFilters = () => {
-    setFiltersIsOpen(!filtersIsOpen);
-  };
+  const handleToggleFilters = useCallback(() => {
+    setFiltersIsOpen((prev) => !prev);
+  }, []);
 
-  const handleSort = (key: string) => {
-    let direction = "asc";
-    if (sortConfig.key === key && sortConfig.direction === "asc") {
-      direction = "desc";
-    } else if (key === "year" && sortConfig.key !== "year") {
-      direction = "desc";
-    }
-    setSortConfig({ key, direction });
-  };
+  const handleSort = useCallback((key: string) => {
+    setSortConfig((prevConfig) => {
+      let direction = "asc";
+      if (prevConfig.key === key && prevConfig.direction === "asc") {
+        direction = "desc";
+      } else if (key === "year" && prevConfig.key !== "year") {
+        direction = "desc";
+      }
+      return { key, direction };
+    });
+  }, []);
 
-  useEffect(() => {
+  const sortedAndFilteredProjects = useMemo(() => {
     let tempProjects = [...projects];
 
     if (selectedTypes.length > 0) {
@@ -123,14 +125,18 @@ const Page = (props: Props) => {
       });
     }
 
-    setFilteredProjects(tempProjects);
+    return tempProjects;
+  }, [projects, selectedTypes, selectedStyles, sortConfig]);
+
+  useEffect(() => {
+    setFilteredProjects(sortedAndFilteredProjects);
 
     if (selectedTypes.length > 0 || selectedStyles.length > 0) {
       setFiltersAreOn(true);
     } else {
       setFiltersAreOn(false);
     }
-  }, [selectedTypes, selectedStyles, projects, sortConfig]);
+  }, [sortedAndFilteredProjects, selectedTypes.length, selectedStyles.length]);
 
   return (
     <PageWrapper
