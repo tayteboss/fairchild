@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { ProjectType } from "../../../shared/types/types";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, MotionValue } from "framer-motion";
 import { useEffect, useRef, useState, memo } from "react";
 import MuxPlayer from "@mux/mux-player-react/lazy";
 
@@ -16,10 +16,14 @@ const MAX_WIDTH = "50vw";
 
 const STAGGER_CARDS = 10;
 
-const FeaturedProjectCardWrapper = styled(motion.div)<{ $bgColor: string }>`
+const FeaturedProjectCardWrapper = styled(motion.div)<{
+  $bgColor: string;
+  $useCustomWidth?: boolean;
+}>`
   width: ${INITIAL_WIDTH};
   background: ${({ $bgColor }) => $bgColor || "#000"};
-  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: ${({ $useCustomWidth }) =>
+    $useCustomWidth ? "none" : "width 0.5s cubic-bezier(0.4, 0, 0.2, 1)"};
   position: relative;
   z-index: 1;
   transform-origin: top;
@@ -82,6 +86,7 @@ type Props = {
   hoveredIndex: number | null;
   initialDelayComplete: boolean;
   isMobile: boolean;
+  customWidth?: MotionValue<string> | string;
 };
 
 const FeaturedProjectCard = memo((props: Props) => {
@@ -99,6 +104,7 @@ const FeaturedProjectCard = memo((props: Props) => {
     hoveredIndex,
     initialDelayComplete,
     isMobile,
+    customWidth,
   } = props;
 
   const [isVideoReady, setIsVideoReady] = useState(false);
@@ -150,13 +156,19 @@ const FeaturedProjectCard = memo((props: Props) => {
     }vw`;
   };
 
+  const getWidth = () => {
+    if (customWidth) return customWidth;
+    return isMobile ? BASE_MOBILE_WIDTH : getStaggeredWidth();
+  };
+
   return (
     <FeaturedProjectCardWrapper
       $bgColor={thumbnailColor?.hex || "#000"}
+      $useCustomWidth={!!customWidth}
       onMouseEnter={() => onHoverStart(index)}
       onMouseLeave={onHoverEnd}
       style={{
-        width: isMobile ? BASE_MOBILE_WIDTH : getStaggeredWidth(),
+        width: getWidth(),
         zIndex: isHovered ? 2 : 1,
         transform: "translateZ(0)",
       }}

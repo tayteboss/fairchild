@@ -3,6 +3,7 @@ import { ProjectType } from "../../../shared/types/types";
 import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
+import Image from "next/image";
 import MuxPlayer from "@mux/mux-player-react";
 import pxToRem from "../../../utils/pxToRem";
 import VideoControls from "../VideoControls";
@@ -90,14 +91,30 @@ const Inner = styled.div`
   }
 `;
 
-const PosterOverlay = styled.div<{ $isVisible: boolean; $color?: string }>`
+const ColorOverlay = styled.div<{ $isVisible: boolean; $color?: string }>`
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  opacity: ${({ $isVisible }) => ($isVisible ? 1 : 0)};
+  transition: opacity var(--transition-speed-fast) var(--transition-ease);
+  background-color: ${({ $color }) => $color || "transparent"};
+`;
+
+const ImageOverlay = styled.div<{ $isVisible: boolean }>`
   position: absolute;
   inset: 0;
   z-index: 2;
   pointer-events: none;
   opacity: ${({ $isVisible }) => ($isVisible ? 1 : 0)};
   transition: opacity var(--transition-speed-fast) var(--transition-ease);
-  background-color: ${({ $color }) => $color || "transparent"};
+
+  img {
+    object-fit: cover;
+    object-position: center;
+    height: 100%;
+    width: 100%;
+  }
 `;
 
 const CloseTrigger = styled(motion.button)`
@@ -157,11 +174,14 @@ const ProjectPlayer = (props: Props) => {
     activeProject?.project?.video?.asset?.data?.duration || 0
   );
   const [isCreditsOpen, setIsCreditsOpen] = useState(false);
-  const [showPosterOverlay, setShowPosterOverlay] = useState(true);
+  const [showColorOverlay, setShowColorOverlay] = useState(true);
+  const [showImageOverlay, setShowImageOverlay] = useState(false);
   const [isVideoReady, setIsVideoReady] = useState(false);
 
   const muxPlayerRef = useRef<any>(null);
   const closeTimeoutRef = useRef<number | null>(null);
+  const colorToImageTimeoutRef = useRef<number | null>(null);
+  const isVideoReadyRef = useRef<boolean>(false);
   const router = useRouter();
   const viewportWidth = useViewportWidth();
   const isMobile =
@@ -221,14 +241,49 @@ const ProjectPlayer = (props: Props) => {
   }, [activeProject]);
 
   useEffect(() => {
-    // Reset poster for each new active project / playback id
+    // Reset overlays for each new active project / playback id
     if (!activeProject.project) {
-      setShowPosterOverlay(true);
+      setShowColorOverlay(true);
+      setShowImageOverlay(false);
       setIsVideoReady(false);
+      isVideoReadyRef.current = false;
+      if (colorToImageTimeoutRef.current) {
+        window.clearTimeout(colorToImageTimeoutRef.current);
+        colorToImageTimeoutRef.current = null;
+      }
     } else {
-      setShowPosterOverlay(true);
+      // Start with color overlay
+      setShowColorOverlay(true);
+      setShowImageOverlay(false);
       setIsVideoReady(false);
+      isVideoReadyRef.current = false;
+
+      // Clear any existing timeout
+      if (colorToImageTimeoutRef.current) {
+        window.clearTimeout(colorToImageTimeoutRef.current);
+      }
+
+      // After 0.5s, switch to image overlay
+      colorToImageTimeoutRef.current = window.setTimeout(() => {
+        setShowColorOverlay(false);
+        setShowImageOverlay(true);
+        colorToImageTimeoutRef.current = null;
+
+        // If video is already ready, hide image overlay after it fades in
+        if (isVideoReadyRef.current) {
+          setTimeout(() => {
+            setShowImageOverlay(false);
+          }, 200);
+        }
+      }, 500);
     }
+
+    return () => {
+      if (colorToImageTimeoutRef.current) {
+        window.clearTimeout(colorToImageTimeoutRef.current);
+        colorToImageTimeoutRef.current = null;
+      }
+    };
   }, [
     activeProject?.project,
     activeProject?.project?.video?.asset?.playbackId,
@@ -280,14 +335,23 @@ const ProjectPlayer = (props: Props) => {
       if (closeTimeoutRef.current) {
         window.clearTimeout(closeTimeoutRef.current);
       }
+      if (colorToImageTimeoutRef.current) {
+        window.clearTimeout(colorToImageTimeoutRef.current);
+      }
     },
     []
   );
 
   useEffect(() => {
     if (!isActive) {
-      setShowPosterOverlay(true);
+      setShowColorOverlay(true);
+      setShowImageOverlay(false);
       setIsVideoReady(false);
+      isVideoReadyRef.current = false;
+      if (colorToImageTimeoutRef.current) {
+        window.clearTimeout(colorToImageTimeoutRef.current);
+        colorToImageTimeoutRef.current = null;
+      }
     }
   }, [isActive]);
 
@@ -295,12 +359,19 @@ const ProjectPlayer = (props: Props) => {
     activeProject?.project?.video?.asset?.data?.aspect_ratio || "16:9";
 
   const thumbnailColor = activeProject?.project?.thumbnailColor?.hex;
+  const fallbackImageUrl = activeProject?.project?.fallbackImage?.asset?.lores;
 
   const handleVideoReady = () => {
     setIsVideoReady(true);
-    setTimeout(() => {
-      setShowPosterOverlay(false);
-    }, 200);
+    isVideoReadyRef.current = true;
+    // If image overlay is visible, hide it after video fades in
+    // Otherwise, it will be hidden when the timeout fires
+    if (showImageOverlay) {
+      // Wait for video to fade in before hiding image overlay to prevent gaps
+      setTimeout(() => {
+        setShowImageOverlay(false);
+      }, 0);
+    }
   };
 
   return (
@@ -328,11 +399,22 @@ const ProjectPlayer = (props: Props) => {
               $aspectRatio={aspectRatioString}
               $isFullScreen={isFullScreen}
             >
-              {thumbnailColor && (
-                <PosterOverlay
-                  $isVisible={showPosterOverlay}
+              {/* {thumbnailColor && (
+                <ColorOverlay
+                  $isVisible={showColorOverlay}
                   $color={thumbnailColor}
                 />
+              )} */}
+              {fallbackImageUrl && activeProject?.project && (
+                <ImageOverlay $isVisible={showImageOverlay}>
+                  <Image
+                    src={fallbackImageUrl}
+                    alt={activeProject.project.title || "Project poster"}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                    priority={true}
+                  />
+                </ImageOverlay>
               )}
               <Inner
                 style={{
@@ -374,7 +456,6 @@ const ProjectPlayer = (props: Props) => {
                     preload="auto"
                     muted={isMuted}
                     playsInline={true}
-                    poster={activeProject?.project?.fallbackImage?.asset.url}
                     style={
                       {
                         "--media-object-fit": "contain",

@@ -165,6 +165,9 @@ const ProjectListCard = memo((props: Props) => {
         onMouseOver={() =>
           setActiveProject({ project: project, action: "hover" })
         }
+        onMouseLeave={() =>
+          setActiveProject({ project: null, action: "inactive" })
+        }
         onClick={() =>
           setActiveProject({ project: project, action: "fullscreen" })
         }

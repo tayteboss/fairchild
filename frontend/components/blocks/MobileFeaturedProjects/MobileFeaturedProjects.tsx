@@ -1,13 +1,20 @@
 import styled from "styled-components";
 import { ProjectType } from "../../../shared/types/types";
-import { motion } from "framer-motion";
+import {
+  motion,
+  useMotionValue,
+  useTransform,
+  MotionValue,
+} from "framer-motion";
 import {
   useEffect,
   useState,
   useRef,
   forwardRef,
   useLayoutEffect,
+  MutableRefObject,
 } from "react";
+import React from "react";
 import FeaturedProjectCard from "../../elements/FeaturedProjectCard";
 import { useHeader } from "../../layout/HeaderContext";
 import ReactLenis, { useLenis } from "@studio-freight/react-lenis";
@@ -43,6 +50,10 @@ type Props = {
   data: ProjectType[];
 };
 
+const MAX_WIDTH_MOBILE = 100;
+const MIN_WIDTH_MOBILE = 50;
+const SCALE_THRESHOLD = 0.5;
+
 const MobileFeaturedProjects = (props: Props) => {
   const { data } = props;
 
@@ -50,19 +61,29 @@ const MobileFeaturedProjects = (props: Props) => {
   const [initialDelayComplete, setInitialDelayComplete] = useState(false);
   const [isInitialScrollComplete, setIsInitialScrollComplete] = useState(false);
   const [isReady, setIsReady] = useState(false);
-  const [targetScrollPosition, setTargetScrollPosition] = useState<
-    number | null
-  >(null);
+  const [viewportHeight, setViewportHeight] = useState(0);
 
   const wrapperRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const lenis = useLenis();
   const { setHeaderText, setIsHovering } = useHeader();
+  const scrollY = useMotionValue(0);
 
   const hasData = data && data.length > 0;
 
   // Stable no-op function for hover handlers in mobile view
   const handleHoverNoOp = () => {};
+
+  useLenis(({ scroll }: { scroll: number }) => {
+    scrollY.set(scroll);
+  });
+
+  useEffect(() => {
+    setViewportHeight(window.innerHeight);
+    const handleResize = () => setViewportHeight(window.innerHeight);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     cardRefs.current = cardRefs.current.slice(0, data.length * 2);
@@ -70,59 +91,68 @@ const MobileFeaturedProjects = (props: Props) => {
 
   useEffect(() => {
     if (isReady) {
-      const timer = setTimeout(() => {
-        setInitialDelayComplete(true);
-      }, 2000);
-
-      return () => {
-        clearTimeout(timer);
-      };
+      setInitialDelayComplete(true);
     }
   }, [isReady]);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (wrapperRef.current && lenis && hasData) {
-        const wrapperElement = wrapperRef.current;
-        const rect = wrapperElement.getBoundingClientRect();
-        const top = rect.top + lenis.scroll;
-        const wrapperHeight = wrapperElement.offsetHeight;
+    if (!lenis || !hasData || !wrapperRef.current || isInitialScrollComplete)
+      return;
 
-        // The vertical center of the wrapper
-        const middleOfWrapper = top + wrapperHeight / 2;
+    const performCentering = () => {
+      const middleIndex = Math.floor(data.length / 2);
+      const targetCard = cardRefs.current[middleIndex];
 
-        // Scroll so that this point is in the middle of the viewport
-        const scrollToPosition = middleOfWrapper - window.innerHeight / 2;
+      if (!targetCard) return;
 
-        setTargetScrollPosition(scrollToPosition);
-      }
-    }, 500);
+      // Force initial width update for correct measurement
+      // We need to simulate the scroll position check once before reading rects
+      // effectively, we assume we are at some scroll position, calculate target, move there.
+
+      // First pass
+      let rect = targetCard.getBoundingClientRect();
+      let currentScroll = lenis.scroll;
+      const CENTER_OFFSET = -20;
+      let targetScroll =
+        rect.top +
+        currentScroll +
+        rect.height / 2 -
+        (window.innerHeight / 2 + CENTER_OFFSET);
+
+      lenis.scrollTo(targetScroll, { immediate: true });
+
+      // Second pass (after layout update)
+      requestAnimationFrame(() => {
+        // Re-measure after width/height adjustments from scroll
+        rect = targetCard.getBoundingClientRect();
+
+        // Target slightly below exact center to account for browser chrome/optical center
+        // "Slightly higher" observation suggests we need to push it down.
+        // Adding a small offset to the target center position.
+        const CENTER_OFFSET = 20;
+        const targetCenter = window.innerHeight / 2 + CENTER_OFFSET;
+
+        const deviation = rect.top + rect.height / 2 - targetCenter;
+
+        if (Math.abs(deviation) > 2) {
+          lenis.scrollTo(lenis.scroll + deviation, { immediate: true });
+        }
+
+        // Finalize
+        requestAnimationFrame(() => {
+          setIsInitialScrollComplete(true);
+          setIsReady(true);
+        });
+      });
+    };
+
+    // Small delay to ensure initial render and refs are ready
+    const timer = setTimeout(performCentering, 100);
 
     return () => {
       clearTimeout(timer);
     };
-  }, [lenis, hasData, wrapperRef]);
-
-  useEffect(() => {
-    if (targetScrollPosition !== null) {
-      requestAnimationFrame(() => {
-        // Try all possible native scroll targets
-        if (document.scrollingElement) {
-          document.scrollingElement.scrollTop = targetScrollPosition;
-        }
-        if (document.documentElement) {
-          document.documentElement.scrollTop = targetScrollPosition;
-        }
-        if (document.body) {
-          document.body.scrollTop = targetScrollPosition;
-        }
-        window.scrollTo(0, targetScrollPosition);
-
-        setIsInitialScrollComplete(true);
-        setIsReady(true);
-      });
-    }
-  }, [targetScrollPosition]);
+  }, [lenis, hasData, isInitialScrollComplete, data.length]);
 
   useEffect(() => {
     if (!hasData) return;
@@ -184,13 +214,11 @@ const MobileFeaturedProjects = (props: Props) => {
   return (
     <MobileFeaturedProjectsWrapper ref={wrapperRef}>
       <AnimatedContainer
-        initial={{ opacity: 0, scale: 0.25 }}
+        initial={{ opacity: 0 }}
         animate={{
           opacity: isReady ? 1 : 0,
-          scale: initialDelayComplete ? 1 : 0.25,
         }}
         transition={{
-          scale: { duration: 0.5, ease: "easeInOut" },
           opacity: { duration: 0.5, ease: "easeInOut" },
         }}
       >
@@ -206,6 +234,8 @@ const MobileFeaturedProjects = (props: Props) => {
               activeIndex={activeIndex}
               initialDelayComplete={initialDelayComplete}
               onHover={handleHoverNoOp}
+              scrollY={scrollY}
+              viewportHeight={viewportHeight}
             />
           ))}
       </AnimatedContainer>
@@ -219,29 +249,89 @@ type ScrollControlledCardProps = {
   activeIndex: number;
   initialDelayComplete: boolean;
   onHover: () => void;
+  scrollY: MotionValue<number>;
+  viewportHeight: number;
 };
 
 const ScrollControlledCard = forwardRef<
   HTMLDivElement,
   ScrollControlledCardProps
->(({ project, index, activeIndex, initialDelayComplete, onHover }, ref) => {
-  const isCardActive = activeIndex === index;
+>(
+  (
+    {
+      project,
+      index,
+      activeIndex,
+      initialDelayComplete,
+      onHover,
+      scrollY,
+      viewportHeight,
+    },
+    ref
+  ) => {
+    const isCardActive = activeIndex === index;
+    const localRef = useRef<HTMLDivElement | null>(null);
+    const width = useMotionValue(MIN_WIDTH_MOBILE);
 
-  return (
-    <CardWrapper ref={ref} data-index={index}>
-      <FeaturedProjectCard
-        {...project}
-        index={index}
-        isHovered={initialDelayComplete && isCardActive}
-        onHoverStart={onHover}
-        onHoverEnd={onHover}
-        hoveredIndex={activeIndex}
-        initialDelayComplete={initialDelayComplete}
-        isMobile={true}
-      />
-    </CardWrapper>
-  );
-});
+    useEffect(() => {
+      const updateWidth = () => {
+        if (!localRef.current || viewportHeight === 0) {
+          return;
+        }
+
+        const rect = localRef.current.getBoundingClientRect();
+        const cardCenter = rect.top + rect.height / 2;
+        const viewportCenter = viewportHeight / 2;
+
+        const distanceFromCenter = Math.abs(cardCenter - viewportCenter);
+        const normalizedDistance = Math.min(
+          distanceFromCenter / (viewportHeight * SCALE_THRESHOLD),
+          1
+        );
+        const newWidth =
+          MAX_WIDTH_MOBILE -
+          normalizedDistance * (MAX_WIDTH_MOBILE - MIN_WIDTH_MOBILE);
+        width.set(newWidth);
+      };
+
+      // Initial update
+      updateWidth();
+
+      const unsubscribe = scrollY.onChange(updateWidth);
+
+      return () => {
+        unsubscribe();
+      };
+    }, [scrollY, viewportHeight, width]);
+
+    const widthVw = useTransform(width, (w) => `${w}vw`);
+
+    return (
+      <CardWrapper
+        ref={(el) => {
+          localRef.current = el;
+          if (typeof ref === "function") ref(el);
+          else if (ref) {
+            (ref as any).current = el;
+          }
+        }}
+        data-index={index}
+      >
+        <FeaturedProjectCard
+          {...project}
+          index={index}
+          isHovered={initialDelayComplete && isCardActive}
+          onHoverStart={onHover}
+          onHoverEnd={onHover}
+          hoveredIndex={activeIndex}
+          initialDelayComplete={initialDelayComplete}
+          isMobile={true}
+          customWidth={widthVw}
+        />
+      </CardWrapper>
+    );
+  }
+);
 
 ScrollControlledCard.displayName = "ScrollControlledCard";
 
