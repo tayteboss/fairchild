@@ -96,6 +96,9 @@ export const projectsQueryString = `
 		type[]-> {
 			name
 		},
+		thumbnailColor {
+			hex
+		},
 		styles[]-> {
 			name
 		},
@@ -117,7 +120,7 @@ export const projectsQueryString = `
 		fallbackImage {
 			asset-> {
 				url,
-				"lores": url + "?w=400&auto=format",
+				"lores": url + "?w=240&auto=format",
 				metadata {
 					lqip
 				}
@@ -143,7 +146,9 @@ export const projectsGalleryPageQueryString = `
 			title,
 			link
 		},
-		thumbnailColor,
+		thumbnailColor {
+			hex
+		},
 		video {
 			asset-> {
 				playbackId,
@@ -191,7 +196,9 @@ export const projectsGalleryPageQueryString = `
 					url
 				}
 			},
-			thumbnailColor,
+			thumbnailColor {
+			hex
+		},
 			colorTempFilter {
 				minTemp,
 				maxTemp

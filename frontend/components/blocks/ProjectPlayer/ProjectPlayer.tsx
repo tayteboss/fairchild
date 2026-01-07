@@ -3,8 +3,7 @@ import { ProjectType } from "../../../shared/types/types";
 import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
-import Image from "next/image";
-import MuxPlayer from "@mux/mux-player-react/lazy";
+import MuxPlayer from "@mux/mux-player-react";
 import pxToRem from "../../../utils/pxToRem";
 import VideoControls from "../VideoControls";
 import CreditsModal from "../CreditsModal";
@@ -91,20 +90,14 @@ const Inner = styled.div`
   }
 `;
 
-const PosterOverlay = styled.div<{ $isVisible: boolean }>`
+const PosterOverlay = styled.div<{ $isVisible: boolean; $color?: string }>`
   position: absolute;
   inset: 0;
   z-index: 2;
   pointer-events: none;
   opacity: ${({ $isVisible }) => ($isVisible ? 1 : 0)};
   transition: opacity var(--transition-speed-fast) var(--transition-ease);
-
-  img {
-    object-fit: cover;
-    object-position: center;
-    height: 100%;
-    width: 100%;
-  }
+  background-color: ${({ $color }) => $color || "transparent"};
 `;
 
 const CloseTrigger = styled(motion.button)`
@@ -230,11 +223,11 @@ const ProjectPlayer = (props: Props) => {
   useEffect(() => {
     // Reset poster for each new active project / playback id
     if (!activeProject.project) {
-        setShowPosterOverlay(true);
-        setIsVideoReady(false);
+      setShowPosterOverlay(true);
+      setIsVideoReady(false);
     } else {
-        setShowPosterOverlay(true);
-        setIsVideoReady(false);
+      setShowPosterOverlay(true);
+      setIsVideoReady(false);
     }
   }, [
     activeProject?.project,
@@ -301,7 +294,7 @@ const ProjectPlayer = (props: Props) => {
   const aspectRatioString =
     activeProject?.project?.video?.asset?.data?.aspect_ratio || "16:9";
 
-  const posterUrl = activeProject?.project?.fallbackImage?.asset.lores;
+  const thumbnailColor = activeProject?.project?.thumbnailColor?.hex;
 
   const handleVideoReady = () => {
     setIsVideoReady(true);
@@ -335,18 +328,18 @@ const ProjectPlayer = (props: Props) => {
               $aspectRatio={aspectRatioString}
               $isFullScreen={isFullScreen}
             >
-              {posterUrl && (
-                <PosterOverlay $isVisible={showPosterOverlay}>
-                  <Image
-                    src={posterUrl}
-                    alt={activeProject?.project?.title || "Project poster"}
-                    fill
-                    sizes="25vw"
-                    priority={isFullScreen}
-                  />
-                </PosterOverlay>
+              {thumbnailColor && (
+                <PosterOverlay
+                  $isVisible={showPosterOverlay}
+                  $color={thumbnailColor}
+                />
               )}
-              <Inner style={{ opacity: isVideoReady ? 1 : 0, transition: 'opacity 0.2s ease' }}>
+              <Inner
+                style={{
+                  opacity: isVideoReady ? 1 : 0,
+                  transition: "opacity 0.2s ease",
+                }}
+              >
                 <AnimatePresence>
                   {isFullScreen && (
                     <CloseTrigger
@@ -381,7 +374,7 @@ const ProjectPlayer = (props: Props) => {
                     preload="auto"
                     muted={isMuted}
                     playsInline={true}
-                    loading="viewport"
+                    poster={activeProject?.project?.fallbackImage?.asset.url}
                     style={
                       {
                         "--media-object-fit": "contain",
