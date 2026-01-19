@@ -55,7 +55,7 @@ const MIN_WIDTH_MOBILE = 50;
 const SCALE_THRESHOLD = 0.5;
 
 // Toggle to enable/disable dynamic width scroll effect for performance testing
-const ENABLE_DYNAMIC_WIDTH = false;
+const ENABLE_DYNAMIC_WIDTH = true;
 
 const MobileFeaturedProjects = (props: Props) => {
   const { data } = props;

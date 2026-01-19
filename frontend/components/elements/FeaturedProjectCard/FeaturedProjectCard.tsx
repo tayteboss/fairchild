@@ -192,7 +192,7 @@ const FeaturedProjectCard = memo((props: Props) => {
               transform: "translateZ(0)",
               zIndex: 1,
             }}
-            sizes="(max-width: 1024px) 100vw, 50vw"
+            sizes="(max-width: 1024px) 80vw, 50vw"
           />
         )}
         {hasVideo && (
@@ -211,11 +211,11 @@ const FeaturedProjectCard = memo((props: Props) => {
               playbackId={videoPlaybackId}
               autoPlay="muted"
               loop={true}
-              preload="metadata"
+              preload="auto"
               loading="viewport"
               muted
               playsInline={true}
-              minResolution="720p"
+              maxResolution="720p"
               poster={fallbackImageUrl}
               onPlaying={() => setIsVideoReady(true)}
             />
