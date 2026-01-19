@@ -6,7 +6,8 @@ import FullScreenSvg from "../../svgs/FullScreenSvg";
 import MuxPlayer from "@mux/mux-player-react/lazy";
 import { useInView } from "react-intersection-observer";
 import { AnimatePresence, motion } from "framer-motion";
-import { memo, useRef, useEffect } from "react";
+import { memo, useRef, useEffect, useState } from "react";
+import Image from "next/image";
 
 const DesktopProjectListCardWrapper = styled.div`
   opacity: 0.4;
@@ -119,6 +120,22 @@ const MediaWrapper = styled(motion.div)`
   }
 `;
 
+const FallbackImageOverlay = styled.div<{ $isVisible: boolean }>`
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: ${({ $isVisible }) => ($isVisible ? 1 : 0)};
+  transition: opacity var(--transition-speed-fast) var(--transition-ease);
+
+  img {
+    object-fit: cover;
+    object-position: center;
+    height: 100%;
+    width: 100%;
+  }
+`;
+
 const ContentWrapper = styled.div`
   display: flex;
   justify-content: space-between;
@@ -160,6 +177,7 @@ const ProjectListCard = memo((props: Props) => {
   const { project, isFullScreen, setActiveProject, isActiveProject, activeProject } = props;
 
   const playerRef = useRef<any>(null);
+  const [isVideoReady, setIsVideoReady] = useState(false);
 
   const { ref, inView } = useInView({
     triggerOnce: true,
@@ -186,6 +204,15 @@ const ProjectListCard = memo((props: Props) => {
       }
     }
   }, [activeProject.project, inView]);
+
+  // Reset video ready state when project changes
+  useEffect(() => {
+    setIsVideoReady(false);
+  }, [project?.snippetVideo?.asset?.playbackId]);
+
+  const handleVideoReady = () => {
+    setIsVideoReady(true);
+  };
 
   return (
     <>
@@ -219,32 +246,55 @@ const ProjectListCard = memo((props: Props) => {
         }
       >
         <Inner ref={ref}>
-          <AnimatePresence>
-            {inView && (
-              <MediaWrapper
-                variants={wrapperVariants}
-                initial="hidden"
-                animate="visible"
-                exit="hidden"
-              >
-                {project?.snippetVideo?.asset?.playbackId && (
-                  <MuxPlayer
-                    ref={playerRef}
-                    streamType="on-demand"
-                    playbackId={project.snippetVideo.asset.playbackId}
-                    autoPlay="muted"
-                    loop={true}
-                    thumbnailTime={1}
-                    preload="auto"
-                    muted
-                    maxResolution="720p"
-                    playsInline={true}
-                    poster={project.fallbackImage.asset.url}
-                  />
-                )}
-              </MediaWrapper>
-            )}
-          </AnimatePresence>
+          <MediaWrapper
+            variants={wrapperVariants}
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+          >
+            {(() => {
+              const fallbackImageUrl =
+                project?.snippetFallbackImage?.asset?.url ||
+                project?.fallbackImage?.asset?.lores ||
+                project?.fallbackImage?.asset?.url;
+
+              return (
+                <>
+                  {fallbackImageUrl && (
+                    <FallbackImageOverlay $isVisible={!isVideoReady}>
+                      <Image
+                        src={fallbackImageUrl}
+                        alt={project.title || "Project thumbnail"}
+                        fill
+                        sizes="(max-width: 1024px) 80vw, 50vw"
+                        priority={false}
+                      />
+                    </FallbackImageOverlay>
+                  )}
+                  {project?.snippetVideo?.asset?.playbackId && (
+                    <MuxPlayer
+                      ref={playerRef}
+                      streamType="on-demand"
+                      playbackId={project.snippetVideo.asset.playbackId}
+                      autoPlay="muted"
+                      loop={true}
+                      thumbnailTime={1}
+                      preload="auto"
+                      muted
+                      loading="viewport"
+                      maxResolution="720p"
+                      playsInline={true}
+                      onPlay={handleVideoReady}
+                      style={{
+                        opacity: isVideoReady ? 1 : 0,
+                        transition: "opacity 0.2s ease",
+                      }}
+                    />
+                  )}
+                </>
+              );
+            })()}
+          </MediaWrapper>
         </Inner>
         <ContentWrapper
           className={`view-element-fade-in ${
