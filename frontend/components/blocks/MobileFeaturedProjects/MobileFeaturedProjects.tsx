@@ -54,6 +54,9 @@ const MAX_WIDTH_MOBILE = 100;
 const MIN_WIDTH_MOBILE = 50;
 const SCALE_THRESHOLD = 0.5;
 
+// Toggle to enable/disable dynamic width scroll effect for performance testing
+const ENABLE_DYNAMIC_WIDTH = false;
+
 const MobileFeaturedProjects = (props: Props) => {
   const { data } = props;
 
@@ -236,6 +239,7 @@ const MobileFeaturedProjects = (props: Props) => {
               onHover={handleHoverNoOp}
               scrollY={scrollY}
               viewportHeight={viewportHeight}
+              enableDynamicWidth={ENABLE_DYNAMIC_WIDTH}
             />
           ))}
       </AnimatedContainer>
@@ -251,6 +255,7 @@ type ScrollControlledCardProps = {
   onHover: () => void;
   scrollY: MotionValue<number>;
   viewportHeight: number;
+  enableDynamicWidth: boolean;
 };
 
 const ScrollControlledCard = forwardRef<
@@ -266,14 +271,19 @@ const ScrollControlledCard = forwardRef<
       onHover,
       scrollY,
       viewportHeight,
+      enableDynamicWidth,
     },
     ref
   ) => {
     const isCardActive = activeIndex === index;
     const localRef = useRef<HTMLDivElement | null>(null);
-    const width = useMotionValue(MIN_WIDTH_MOBILE);
+    const width = useMotionValue(
+      enableDynamicWidth ? MIN_WIDTH_MOBILE : MAX_WIDTH_MOBILE
+    );
 
     useEffect(() => {
+      if (!enableDynamicWidth) return;
+
       const updateWidth = () => {
         if (!localRef.current || viewportHeight === 0) {
           return;
@@ -302,9 +312,11 @@ const ScrollControlledCard = forwardRef<
       return () => {
         unsubscribe();
       };
-    }, [scrollY, viewportHeight, width]);
+    }, [scrollY, viewportHeight, width, enableDynamicWidth]);
 
-    const widthVw = useTransform(width, (w) => `${w}vw`);
+    const widthVw = enableDynamicWidth
+      ? useTransform(width, (w) => `${w}vw`)
+      : "100vw";
 
     return (
       <CardWrapper

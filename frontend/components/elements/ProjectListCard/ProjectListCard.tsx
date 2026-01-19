@@ -3,10 +3,10 @@ import LayoutGrid from "../../layout/LayoutGrid";
 import { ProjectType } from "../../../shared/types/types";
 import pxToRem from "../../../utils/pxToRem";
 import FullScreenSvg from "../../svgs/FullScreenSvg";
-import MuxPlayer from "@mux/mux-player-react";
+import MuxPlayer from "@mux/mux-player-react/lazy";
 import { useInView } from "react-intersection-observer";
 import { AnimatePresence, motion } from "framer-motion";
-import { memo } from "react";
+import { memo, useRef, useEffect } from "react";
 
 const DesktopProjectListCardWrapper = styled.div`
   opacity: 0.4;
@@ -149,15 +149,43 @@ type Props = {
     action: "hover" | "fullscreen" | "inactive";
   }) => void;
   isFullScreen: boolean;
+  isActiveProject: boolean;
+  activeProject: {
+    project: ProjectType | null;
+    action: "hover" | "fullscreen" | "inactive";
+  };
 };
 
 const ProjectListCard = memo((props: Props) => {
-  const { project, isFullScreen, setActiveProject } = props;
+  const { project, isFullScreen, setActiveProject, isActiveProject, activeProject } = props;
+
+  const playerRef = useRef<any>(null);
 
   const { ref, inView } = useInView({
     triggerOnce: true,
     threshold: 0.25,
   });
+
+  // Control playback based on active project and viewport visibility
+  useEffect(() => {
+    if (!playerRef.current) return;
+
+    const player = playerRef.current;
+
+    // If there's any active project, pause all ProjectListCard players
+    if (activeProject.project) {
+      player.pause();
+    } else {
+      // No active project - only play if in viewport
+      if (inView) {
+        player.play().catch(() => {
+          // Silently handle play errors
+        });
+      } else {
+        player.pause();
+      }
+    }
+  }, [activeProject.project, inView]);
 
   return (
     <>
@@ -199,15 +227,17 @@ const ProjectListCard = memo((props: Props) => {
                 animate="visible"
                 exit="hidden"
               >
-                {project?.video?.asset?.playbackId && (
+                {project?.snippetVideo?.asset?.playbackId && (
                   <MuxPlayer
+                    ref={playerRef}
                     streamType="on-demand"
-                    playbackId={project.video.asset.playbackId}
+                    playbackId={project.snippetVideo.asset.playbackId}
                     autoPlay="muted"
                     loop={true}
                     thumbnailTime={1}
                     preload="auto"
                     muted
+                    maxResolution="720p"
                     playsInline={true}
                     poster={project.fallbackImage.asset.url}
                   />

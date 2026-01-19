@@ -164,6 +164,17 @@ const Page = (props: Props) => {
           const hasColorTemp =
             galleryItem.colorTempFilter?.minTemp &&
             galleryItem.colorTempFilter?.maxTemp;
+          
+          // Check if colorTemp filter is adjusted from default
+          const isColorTempAdjusted =
+            colorTemp.min !== DEFAULT_COLOR_TEMP.min ||
+            colorTemp.max !== DEFAULT_COLOR_TEMP.max;
+          
+          // If colorTemp is adjusted and item doesn't have colorTemp data, exclude it
+          if (isColorTempAdjusted && !hasColorTemp) {
+            return false;
+          }
+          
           if (hasColorTemp) {
             const galleryColorTempMiddle =
               (galleryItem.colorTempFilter.minTemp +

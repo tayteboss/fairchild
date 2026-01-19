@@ -154,6 +154,7 @@ const Page = (props: Props) => {
         handleSort={handleSort}
         sortConfig={sortConfig}
         setActiveProject={setActiveProject}
+        activeProject={activeProject}
         isFullScreen={isFullScreen}
       />
       <ProjectPlayer

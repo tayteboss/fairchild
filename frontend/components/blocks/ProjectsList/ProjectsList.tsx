@@ -34,10 +34,14 @@ type Props = {
     action: "hover" | "fullscreen" | "inactive";
   }) => void;
   isFullScreen: boolean;
+  activeProject: {
+    project: ProjectType | null;
+    action: "hover" | "fullscreen" | "inactive";
+  };
 };
 
 const ProjectsList = memo((props: Props) => {
-  const { projects, handleSort, sortConfig, setActiveProject, isFullScreen } =
+  const { projects, handleSort, sortConfig, setActiveProject, isFullScreen, activeProject } =
     props;
 
   const hasProjects = projects && projects.length > 0;
@@ -56,7 +60,9 @@ const ProjectsList = memo((props: Props) => {
                 key={isMobile ? `mobile-${index}` : `desktop-${index}`}
                 project={project}
                 setActiveProject={setActiveProject}
+                isActiveProject={activeProject.project === project}
                 isFullScreen={isFullScreen}
+                activeProject={activeProject}
               />
             ))
           ) : (

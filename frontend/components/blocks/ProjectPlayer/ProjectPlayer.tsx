@@ -126,6 +126,32 @@ const CloseTrigger = styled(motion.button)`
   text-decoration: underline;
 `;
 
+const LoadingIndicator = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+  pointer-events: none;
+`;
+
+const LoadingDot = styled.div`
+  width: ${pxToRem(8)};
+  height: ${pxToRem(8)};
+  border-radius: 50%;
+  background-color: var(--colour-white);
+  animation: flash 0.5s ease-in-out infinite;
+
+  @keyframes flash {
+    0%, 100% {
+      opacity: 0;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+`;
+
 const wrapperVariants = {
   hidden: {
     opacity: 0,
@@ -422,6 +448,11 @@ const ProjectPlayer = (props: Props) => {
                   transition: "opacity 0.2s ease",
                 }}
               >
+                {!isVideoReady && activeProject?.project?.video?.asset?.playbackId && (
+                    <LoadingIndicator>
+                      <LoadingDot />
+                    </LoadingIndicator>
+                  )}
                 <AnimatePresence>
                   {isFullScreen && (
                     <CloseTrigger
@@ -463,7 +494,7 @@ const ProjectPlayer = (props: Props) => {
                         height: "100%",
                       } as CSSProperties
                     }
-                    onPlaying={handleVideoReady}
+                    onPlay={handleVideoReady}
                     onTimeUpdate={() => {
                       if (muxPlayerRef.current) {
                         setCurrentTime(muxPlayerRef.current.currentTime);

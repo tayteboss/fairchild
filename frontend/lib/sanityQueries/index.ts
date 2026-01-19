@@ -117,6 +117,11 @@ export const projectsQueryString = `
 				}
 			}
 		},
+		snippetVideo {
+			asset-> {
+				playbackId
+			}
+		},
 		fallbackImage {
 			asset-> {
 				url,
