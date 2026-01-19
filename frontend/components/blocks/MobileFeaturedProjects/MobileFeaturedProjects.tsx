@@ -55,7 +55,7 @@ const MIN_WIDTH_MOBILE = 50;
 const SCALE_THRESHOLD = 0.5;
 
 // Toggle to enable/disable dynamic width scroll effect for performance testing
-const ENABLE_DYNAMIC_WIDTH = true;
+const ENABLE_DYNAMIC_WIDTH = false;
 
 const MobileFeaturedProjects = (props: Props) => {
   const { data } = props;
@@ -277,12 +277,29 @@ const ScrollControlledCard = forwardRef<
   ) => {
     const isCardActive = activeIndex === index;
     const localRef = useRef<HTMLDivElement | null>(null);
-    const width = useMotionValue(
-      enableDynamicWidth ? MIN_WIDTH_MOBILE : MAX_WIDTH_MOBILE
-    );
+    
+    // Always create MotionValue (hooks must be called unconditionally)
+    // But it will only be used/updated when enableDynamicWidth is true
+    const width = useMotionValue(MAX_WIDTH_MOBILE);
+    
+    // Create a constant MotionValue for when dynamic width is disabled
+    // This ensures hooks are always called, but no calculations happen when disabled
+    const staticWidth = useMotionValue("100vw");
+    
+    // Always call useTransform (hooks must be called unconditionally)
+    // When disabled: transform from constant "100vw" (no calculations, always same value)
+    // When enabled: transform converts width number to vw string (active calculations)
+    const dynamicWidthVw = useTransform(width, (w: number) => `${w}vw`);
+    const staticWidthVw = useTransform(staticWidth, (w: string) => w);
+    const widthVw = enableDynamicWidth ? dynamicWidthVw : staticWidthVw;
 
     useEffect(() => {
-      if (!enableDynamicWidth) return;
+      // Early return - no calculations, subscriptions, or updates when disabled
+      if (!enableDynamicWidth) {
+        // Ensure width is set to max when disabled (one-time, no subscriptions)
+        width.set(MAX_WIDTH_MOBILE);
+        return;
+      }
 
       const updateWidth = () => {
         if (!localRef.current || viewportHeight === 0) {
@@ -307,16 +324,13 @@ const ScrollControlledCard = forwardRef<
       // Initial update
       updateWidth();
 
+      // Subscribe to scroll changes only when dynamic width is enabled
       const unsubscribe = scrollY.onChange(updateWidth);
 
       return () => {
         unsubscribe();
       };
     }, [scrollY, viewportHeight, width, enableDynamicWidth]);
-
-    const widthVw = enableDynamicWidth
-      ? useTransform(width, (w) => `${w}vw`)
-      : "100vw";
 
     return (
       <CardWrapper
