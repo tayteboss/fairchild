@@ -316,26 +316,20 @@ const ProjectPlayer = (props: Props) => {
   ]);
 
   useEffect(() => {
-    if (!muxPlayerRef.current) return;
-    muxPlayerRef.current.play();
-  }, []);
-
-  useEffect(() => {
-    muxPlayerRef?.current?.play();
-  }, []);
-
-  useEffect(() => {
     const isActiveAction =
       activeProject.action === "hover" || activeProject.action === "fullscreen";
-    setIsActive(isActiveAction);
-
+    
     if (activeProject.action === "fullscreen") {
+      setIsActive(true);
       setIsFullScreen(true);
+    } else if (activeProject.action === "hover") {
+      setIsActive(true);
+      setIsFullScreen(false);
     } else if (activeProject.action === "inactive") {
       setIsActive(false);
       setIsFullScreen(false);
     }
-  }, [activeProject, setIsFullScreen]);
+  }, [activeProject.action, setIsFullScreen]);
 
   useEffect(() => {
     if (!isFullScreen) {
@@ -400,9 +394,12 @@ const ProjectPlayer = (props: Props) => {
     }
   };
 
+  // Ensure player opens when action is fullscreen
+  const shouldShow = isActive || activeProject.action === "fullscreen";
+
   return (
     <AnimatePresence>
-      {isActive && (
+      {shouldShow && (
         <ProjectPlayerWrapper
           variants={wrapperVariants}
           initial="hidden"
