@@ -26,7 +26,7 @@ const ProjectPlayerWrapper = styled(motion.section)<{ $isFullScreen: boolean }>`
   pointer-events: ${({ $isFullScreen }) => ($isFullScreen ? "all" : "none")};
   z-index: 1000;
 
-  transition: all var(--transition-speed-default) var(--transition-ease);
+  /* transition: all var(--transition-speed-default) ease-in-out; */
 `;
 
 const Backdrop = styled.div<{ $isActive: boolean }>`
@@ -91,15 +91,6 @@ const Inner = styled.div`
   }
 `;
 
-const ColorOverlay = styled.div<{ $isVisible: boolean; $color?: string }>`
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  pointer-events: none;
-  opacity: ${({ $isVisible }) => ($isVisible ? 1 : 0)};
-  transition: opacity var(--transition-speed-fast) var(--transition-ease);
-  background-color: ${({ $color }) => $color || "transparent"};
-`;
 
 const ImageOverlay = styled.div<{ $isVisible: boolean }>`
   position: absolute;
@@ -107,7 +98,7 @@ const ImageOverlay = styled.div<{ $isVisible: boolean }>`
   z-index: 2;
   pointer-events: none;
   opacity: ${({ $isVisible }) => ($isVisible ? 1 : 0)};
-  transition: opacity var(--transition-speed-fast) var(--transition-ease);
+  /* transition: opacity var(--transition-speed-fast) var(--transition-ease); */
 
   img {
     object-fit: cover;
@@ -200,13 +191,12 @@ const ProjectPlayer = (props: Props) => {
     activeProject?.project?.video?.asset?.data?.duration || 0
   );
   const [isCreditsOpen, setIsCreditsOpen] = useState(false);
-  const [showColorOverlay, setShowColorOverlay] = useState(true);
   const [showImageOverlay, setShowImageOverlay] = useState(false);
   const [isVideoReady, setIsVideoReady] = useState(false);
 
   const muxPlayerRef = useRef<any>(null);
   const closeTimeoutRef = useRef<number | null>(null);
-  const colorToImageTimeoutRef = useRef<number | null>(null);
+  const imageTimeoutRef = useRef<number | null>(null);
   const isVideoReadyRef = useRef<boolean>(false);
   const router = useRouter();
   const viewportWidth = useViewportWidth();
@@ -226,31 +216,32 @@ const ProjectPlayer = (props: Props) => {
       return;
     }
 
-    // First transition out of fullscreen, then remove the project
+    // First transition out of fullscreen
     setIsFullScreen(false);
 
     if (isMobile) {
       setIsActive(false);
+      // Clear the active project immediately on mobile to ensure clean state for next open
+      setActiveProject({ project: null, action: "inactive" });
+    } else {
+      // On desktop, transition to hover mode - keep video playing until another project is hovered
+      if (activeProject?.project) {
+        // Clear any existing close timeout since we're keeping it in hover state
+        if (closeTimeoutRef.current) {
+          window.clearTimeout(closeTimeoutRef.current);
+          closeTimeoutRef.current = null;
+        }
+        
+        // Transition to hover state - video will keep playing
+        setActiveProject({
+          project: activeProject.project,
+          action: "hover",
+        });
+      } else {
+        setActiveProject({ project: null, action: "inactive" });
+      }
     }
-
-    // if (activeProject?.project) {
-    //   setActiveProject({
-    //     project: activeProject.project,
-    //     action: "hover",
-    //   });
-
-    //   if (closeTimeoutRef.current) {
-    //     window.clearTimeout(closeTimeoutRef.current);
-    //   }
-
-    //   closeTimeoutRef.current = window.setTimeout(() => {
-    //     setActiveProject({ project: null, action: "inactive" });
-    //     closeTimeoutRef.current = null;
-    //   }, 300);
-    // } else {
-    //   setActiveProject({ project: null, action: "inactive" });
-    // }
-  }, [activeProject, router, setActiveProject, setIsFullScreen, useCloseLink]);
+  }, [activeProject, router, setActiveProject, setIsFullScreen, useCloseLink, isMobile]);
 
   useEffect(() => {
     if (muxPlayerRef.current) {
@@ -269,45 +260,35 @@ const ProjectPlayer = (props: Props) => {
   useEffect(() => {
     // Reset overlays for each new active project / playback id
     if (!activeProject.project) {
-      setShowColorOverlay(true);
       setShowImageOverlay(false);
       setIsVideoReady(false);
       isVideoReadyRef.current = false;
-      if (colorToImageTimeoutRef.current) {
-        window.clearTimeout(colorToImageTimeoutRef.current);
-        colorToImageTimeoutRef.current = null;
+      if (imageTimeoutRef.current) {
+        window.clearTimeout(imageTimeoutRef.current);
+        imageTimeoutRef.current = null;
       }
     } else {
-      // Start with color overlay
-      setShowColorOverlay(true);
+      // Start with image overlay hidden, then show after 100ms delay
       setShowImageOverlay(false);
       setIsVideoReady(false);
       isVideoReadyRef.current = false;
 
       // Clear any existing timeout
-      if (colorToImageTimeoutRef.current) {
-        window.clearTimeout(colorToImageTimeoutRef.current);
+      if (imageTimeoutRef.current) {
+        window.clearTimeout(imageTimeoutRef.current);
       }
 
-      // After 0.5s, switch to image overlay
-      colorToImageTimeoutRef.current = window.setTimeout(() => {
-        setShowColorOverlay(false);
+      // Show fallback image after 100ms delay
+      imageTimeoutRef.current = window.setTimeout(() => {
         setShowImageOverlay(true);
-        colorToImageTimeoutRef.current = null;
-
-        // If video is already ready, hide image overlay after it fades in
-        if (isVideoReadyRef.current) {
-          setTimeout(() => {
-            setShowImageOverlay(false);
-          }, 200);
-        }
-      }, 500);
+        imageTimeoutRef.current = null;
+      }, 100);
     }
 
     return () => {
-      if (colorToImageTimeoutRef.current) {
-        window.clearTimeout(colorToImageTimeoutRef.current);
-        colorToImageTimeoutRef.current = null;
+      if (imageTimeoutRef.current) {
+        window.clearTimeout(imageTimeoutRef.current);
+        imageTimeoutRef.current = null;
       }
     };
   }, [
@@ -355,8 +336,8 @@ const ProjectPlayer = (props: Props) => {
       if (closeTimeoutRef.current) {
         window.clearTimeout(closeTimeoutRef.current);
       }
-      if (colorToImageTimeoutRef.current) {
-        window.clearTimeout(colorToImageTimeoutRef.current);
+      if (imageTimeoutRef.current) {
+        window.clearTimeout(imageTimeoutRef.current);
       }
     },
     []
@@ -364,13 +345,12 @@ const ProjectPlayer = (props: Props) => {
 
   useEffect(() => {
     if (!isActive) {
-      setShowColorOverlay(true);
       setShowImageOverlay(false);
       setIsVideoReady(false);
       isVideoReadyRef.current = false;
-      if (colorToImageTimeoutRef.current) {
-        window.clearTimeout(colorToImageTimeoutRef.current);
-        colorToImageTimeoutRef.current = null;
+      if (imageTimeoutRef.current) {
+        window.clearTimeout(imageTimeoutRef.current);
+        imageTimeoutRef.current = null;
       }
     }
   }, [isActive]);
@@ -378,24 +358,23 @@ const ProjectPlayer = (props: Props) => {
   const aspectRatioString =
     activeProject?.project?.video?.asset?.data?.aspect_ratio || "16:9";
 
-  const thumbnailColor = activeProject?.project?.thumbnailColor?.hex;
   const fallbackImageUrl = activeProject?.project?.fallbackImage?.asset?.lores;
 
-  const handleVideoReady = () => {
+  const handleVideoPlaying = () => {
+    // Video is actually playing now - show the video
     setIsVideoReady(true);
     isVideoReadyRef.current = true;
-    // If image overlay is visible, hide it after video fades in
-    // Otherwise, it will be hidden when the timeout fires
-    if (showImageOverlay) {
-      // Wait for video to fade in before hiding image overlay to prevent gaps
-      setTimeout(() => {
-        setShowImageOverlay(false);
-      }, 0);
-    }
+    // Hide fallback image only after video has fully faded in (200ms transition + 50ms buffer)
+    // This ensures no black gap between fallback and video
+    setTimeout(() => {
+      setShowImageOverlay(false);
+    }, 250);
   };
 
   // Ensure player opens when action is fullscreen
   const shouldShow = isActive || activeProject.action === "fullscreen";
+  // Ensure backdrop shows when in fullscreen mode or when action is fullscreen (for mobile)
+  const backdropIsActive = isFullScreen || activeProject.action === "fullscreen";
 
   return (
     <AnimatePresence>
@@ -407,7 +386,7 @@ const ProjectPlayer = (props: Props) => {
           exit="hidden"
           $isFullScreen={isFullScreen}
         >
-          <Backdrop $isActive={isFullScreen} />
+          <Backdrop $isActive={backdropIsActive} />
           <CreditsModal
             isOpen={isCreditsOpen}
             setIsOpen={setIsCreditsOpen}
@@ -422,19 +401,13 @@ const ProjectPlayer = (props: Props) => {
               $aspectRatio={aspectRatioString}
               $isFullScreen={isFullScreen}
             >
-              {/* {thumbnailColor && (
-                <ColorOverlay
-                  $isVisible={showColorOverlay}
-                  $color={thumbnailColor}
-                />
-              )} */}
-              {fallbackImageUrl && activeProject?.project && (
+              {fallbackImageUrl && (
                 <ImageOverlay $isVisible={showImageOverlay}>
                   <Image
                     src={fallbackImageUrl}
-                    alt={activeProject.project.title || "Project poster"}
+                    alt={activeProject?.project?.title || "Project poster"}
                     fill
-                    sizes="(max-width: 1024px) 100vw, 50vw"
+                    sizes="(max-width: 1024px) 50vw, 20vw"
                     priority={true}
                   />
                 </ImageOverlay>
@@ -480,18 +453,19 @@ const ProjectPlayer = (props: Props) => {
                     playbackId={activeProject?.project?.video.asset.playbackId}
                     autoPlay="muted"
                     loop={true}
-                    thumbnailTime={1}
                     preload="auto"
                     muted={isMuted}
                     playsInline={true}
+                    minResolution="1080p"
                     style={
                       {
                         "--media-object-fit": "contain",
                         aspectRatio: aspectRatioString.replace(":", " / "),
                         height: "100%",
+                        opacity: isVideoReady ? 1 : 0,
                       } as CSSProperties
                     }
-                    onPlay={handleVideoReady}
+                    onPlaying={handleVideoPlaying}
                     onTimeUpdate={() => {
                       if (muxPlayerRef.current) {
                         setCurrentTime(muxPlayerRef.current.currentTime);

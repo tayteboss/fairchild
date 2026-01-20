@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import { useProximityScale } from "../../../hooks/useProximityScale";
 import useViewportWidth from "../../../hooks/useViewportWidth";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 
 const CardWrapper = styled(motion.div)`
@@ -75,6 +75,7 @@ const ColorOverlay = styled(motion.div).attrs<{ $color: string }>((props) => ({
   $animationPhase: "idle" | "fade" | "center" | "carousel";
   $hasMouseMoved: boolean;
   $filtersIsOpen: boolean;
+  $shouldShowOverlayFromViewport: boolean;
 }>`
   position: absolute;
   top: 0;
@@ -90,6 +91,7 @@ const ColorOverlay = styled(motion.div).attrs<{ $color: string }>((props) => ({
       props.$animationPhase === "fade"
     )
       return 1;
+    if (props.$shouldShowOverlayFromViewport) return 1;
     if (!props.$hasMouseMoved) return 1;
     return 0;
   }};
@@ -171,6 +173,23 @@ const GalleryCard = ({
     threshold: 0.5,
   });
 
+  const [shouldShowOverlayFromViewport, setShouldShowOverlayFromViewport] =
+    useState(false);
+
+  useEffect(() => {
+    if (!inView) {
+      // Card went off-screen: show overlay immediately
+      setShouldShowOverlayFromViewport(true);
+    } else {
+      // Card came back on-screen: hide overlay after delay
+      const timer = setTimeout(() => {
+        setShouldShowOverlayFromViewport(false);
+      }, 500); // Same delay as initial mouse movement
+
+      return () => clearTimeout(timer);
+    }
+  }, [inView]);
+
   return (
     <CardWrapper ref={InViewRef}>
       <Outer>
@@ -241,6 +260,7 @@ const GalleryCard = ({
                       $animationPhase={animationPhase}
                       $hasMouseMoved={hasMouseMoved}
                       $filtersIsOpen={filtersIsOpen}
+                      $shouldShowOverlayFromViewport={shouldShowOverlayFromViewport}
                     />
                   </ImageInner>
                 </ImageOuter>

@@ -5,6 +5,7 @@ import {
   useTransform,
   MotionValue,
   useMotionValue,
+  useSpring,
 } from "framer-motion";
 import { useEffect, useRef } from "react";
 import CarouselCard from "../CarouselCard/CarouselCard";
@@ -16,6 +17,10 @@ export const CarouselCardWrapper = styled(motion.div)`
   justify-content: center;
   position: relative;
   margin: 0 auto;
+  /* Performance optimizations for smooth animations */
+  will-change: width;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 `;
 
 const SCALE_THRESHOLD = 0.5;
@@ -57,29 +62,51 @@ const AnimatedCarouselCard = ({
   selectedProjectRatio,
 }: AnimatedCarouselCardProps) => {
   const cardRef = useRef<HTMLDivElement>(null);
-  const width = useMotionValue(isSelected ? maxWidth : minWidth);
+  const rawWidth = useMotionValue(isSelected ? maxWidth : minWidth);
+  
+  // Use spring animation for smooth, natural width transitions
+  // This prevents jumpiness by smoothly interpolating between values
+  const width = useSpring(rawWidth, {
+    stiffness: isMobile ? 100 : 150,
+    damping: isMobile ? 25 : 30,
+    mass: 0.5,
+  });
 
   useEffect(() => {
+    // Use requestAnimationFrame to batch DOM reads and avoid layout thrashing
+    let rafId: number | null = null;
+    
     const updateWidth = (scroll: number) => {
-      if (!cardRef.current || viewportHeight === 0) {
-        width.set(isSelected ? maxWidth : minWidth);
-        return;
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
       }
 
-      const cardTop = cardRef.current.offsetTop;
-      const cardHeight = cardRef.current.offsetHeight;
-      const cardCenter = cardTop + cardHeight / 2;
-      const viewportCenterInScrollable = viewportHeight / 2 + scroll;
+      rafId = requestAnimationFrame(() => {
+        if (!cardRef.current || viewportHeight === 0) {
+          rawWidth.set(isSelected ? maxWidth : minWidth);
+          return;
+        }
 
-      const distanceFromCenter = Math.abs(
-        cardCenter - viewportCenterInScrollable
-      );
-      const normalizedDistance = Math.min(
-        distanceFromCenter / (viewportHeight * SCALE_THRESHOLD),
-        1
-      );
-      const newWidth = maxWidth - normalizedDistance * (maxWidth - minWidth);
-      width.set(newWidth);
+        // Use getBoundingClientRect instead of offsetTop/offsetHeight for better performance
+        // This batches layout reads and is more efficient
+        const rect = cardRef.current.getBoundingClientRect();
+        const cardCenter = rect.top + rect.height / 2;
+        const viewportCenter = viewportHeight / 2;
+
+        const distanceFromCenter = Math.abs(cardCenter - viewportCenter);
+        const normalizedDistance = Math.min(
+          distanceFromCenter / (viewportHeight * SCALE_THRESHOLD),
+          1
+        );
+        
+        // Smooth easing function for more natural width transitions
+        // Using easeOutCubic for smoother feel
+        const easedDistance = 1 - Math.pow(1 - normalizedDistance, 3);
+        const newWidth = maxWidth - easedDistance * (maxWidth - minWidth);
+        
+        // Update the raw width - spring will handle smooth interpolation
+        rawWidth.set(newWidth);
+      });
     };
 
     const unsubscribe = scrollY.onChange(updateWidth);
@@ -89,8 +116,11 @@ const AnimatedCarouselCard = ({
     return () => {
       unsubscribe();
       clearTimeout(timer);
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+      }
     };
-  }, [scrollY, viewportHeight, isSelected, maxWidth, minWidth, width]);
+  }, [scrollY, viewportHeight, isSelected, maxWidth, minWidth, rawWidth, isMobile]);
 
   const widthVw = useTransform(width, (w) => `${w}vw`);
 

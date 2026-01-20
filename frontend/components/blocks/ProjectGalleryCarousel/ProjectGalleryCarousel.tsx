@@ -134,8 +134,8 @@ const ProjectGalleryCarousel = (props: Props) => {
 
   const MAX_WIDTH = 50;
   const MIN_WIDTH = 30;
-  const MAX_WIDTH_MOBILE = 100;
-  const MIN_WIDTH_MOBILE = 50;
+  const MAX_WIDTH_MOBILE = 90;
+  const MIN_WIDTH_MOBILE = 70;
 
   const allGalleryItems = allProjects.flatMap((project) =>
     project.gallery ? project.gallery.map((item) => ({ ...item, project })) : []
@@ -305,8 +305,11 @@ const ProjectGalleryCarousel = (props: Props) => {
         wrapper: container,
         content: container,
         smoothWheel: true,
-        touchMultiplier: 1,
+        // Reduce touch multiplier on mobile for smoother animations
+        touchMultiplier: isMobile ? 0.1 : 1,
         wheelMultiplier: 0.5,
+        // Reduce touch inertia on mobile to prevent janky animations
+        touchInertiaMultiplier: isMobile ? 5 : 30,
       });
       lenisRef.current = lenis;
       lenis.on("scroll", ({ scroll }: { scroll: number }) =>

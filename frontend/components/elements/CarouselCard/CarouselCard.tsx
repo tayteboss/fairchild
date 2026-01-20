@@ -138,7 +138,7 @@ const CarouselCard = ({
                   style={{
                     objectFit: "cover",
                   }}
-                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  sizes="(max-width: 1024px) 80vw, 50vw"
                   loading="lazy"
                   onLoad={onLoad}
                 />

@@ -214,18 +214,46 @@ const ProjectListCard = memo((props: Props) => {
     setIsVideoReady(true);
   };
 
+  const handleMouseLeave = () => {
+    // Don't set to inactive if this project is in fullscreen mode
+    if (activeProject.project?.title === project.title && activeProject.action === "fullscreen") {
+      return;
+    }
+    // Don't set to inactive if any project is in fullscreen mode
+    if (isFullScreen || activeProject.action === "fullscreen") {
+      return;
+    }
+    setActiveProject({ project: null, action: "inactive" });
+  };
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // Set fullscreen immediately, preventing mouseLeave from interfering
+    setActiveProject({ project: project, action: "fullscreen" });
+  };
+
+  const handleMouseDown = () => {
+    // Set fullscreen on mousedown to prevent mouseLeave from interfering
+    // This fires before mouseLeave, so we can set the state earlier
+    setActiveProject({ project: project, action: "fullscreen" });
+  };
+
   return (
     <>
       <DesktopProjectListCardWrapper
-        onMouseOver={() =>
-          setActiveProject({ project: project, action: "hover" })
-        }
-        onMouseLeave={() =>
-          setActiveProject({ project: null, action: "inactive" })
-        }
-        onClick={() =>
-          setActiveProject({ project: project, action: "fullscreen" })
-        }
+        onMouseOver={() => {
+          // Don't set hover if already in fullscreen
+          if (activeProject.project?.title === project.title && activeProject.action === "fullscreen") {
+            return;
+          }
+          if (!isFullScreen && activeProject.action !== "fullscreen") {
+            setActiveProject({ project: project, action: "hover" });
+          }
+        }}
+        onMouseLeave={handleMouseLeave}
+        onMouseDown={handleMouseDown}
+        onClick={handleClick}
       >
         <LayoutGrid>
           <Client>{project.client || "N/A"}</Client>
