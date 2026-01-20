@@ -265,6 +265,16 @@ export async function getStaticProps() {
   const data = await client.fetch(galleryPageQueryString);
   let projects = await client.fetch(projectsGalleryPageQueryString);
 
+  // let amountOfImages = 0;
+  // for (const project of projects) {
+  //   if (project.gallery && Array.isArray(project.gallery)) {
+  //     amountOfImages += project.gallery.length;
+  //   }
+  // }
+
+  // console.log('amountOfImages', amountOfImages);
+  
+
   const yearRange = projects.reduce(
     (acc: { min: number; max: number }, project: ProjectType) => {
       const year = parseInt(project.year);

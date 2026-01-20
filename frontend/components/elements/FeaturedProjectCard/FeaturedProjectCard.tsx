@@ -179,7 +179,7 @@ const FeaturedProjectCard = memo((props: Props) => {
           animate={{
             opacity: isHovered ? 0 : 1,
           }}
-          transition={{ duration: 0.3 }}
+          transition={{ duration: 0.1 }}
         />
         {isHovered && hasFallbackImage && (
           <Image
