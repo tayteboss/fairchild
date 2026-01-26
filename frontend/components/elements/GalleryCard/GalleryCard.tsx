@@ -260,7 +260,9 @@ const GalleryCard = ({
                       $animationPhase={animationPhase}
                       $hasMouseMoved={hasMouseMoved}
                       $filtersIsOpen={filtersIsOpen}
-                      $shouldShowOverlayFromViewport={shouldShowOverlayFromViewport}
+                      $shouldShowOverlayFromViewport={
+                        shouldShowOverlayFromViewport
+                      }
                     />
                   </ImageInner>
                 </ImageOuter>

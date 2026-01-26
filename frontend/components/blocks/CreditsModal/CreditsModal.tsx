@@ -21,6 +21,10 @@ const CreditsModalWrapper = styled(motion.div)`
   flex-direction: column;
   gap: ${pxToRem(64)};
   cursor: pointer;
+
+  @media ${(props) => props.theme.mediaBreakpoints.tabletPortrait} {
+    gap: ${pxToRem(24)};
+  }
 `;
 
 const CreditsList = styled.div`
@@ -32,9 +36,18 @@ const CreditsList = styled.div`
   padding: ${pxToRem(16)};
   cursor: crosshair;
 
+  @media ${(props) => props.theme.mediaBreakpoints.tabletPortrait} {
+    width: 100%;
+    grid-row-gap: ${pxToRem(8)};
+  }
+
   a {
     grid-column: span 2;
     cursor: pointer;
+
+    @media ${(props) => props.theme.mediaBreakpoints.tabletPortrait} {
+      grid-column: 1 / -1;
+    }
 
     &:hover {
       .credit-title {
@@ -50,6 +63,10 @@ const CreditsItem = styled.div`
   align-items: center;
   justify-content: center;
   grid-column: span 2;
+
+  @media ${(props) => props.theme.mediaBreakpoints.tabletPortrait} {
+    grid-column: 1 / -1;
+  }
 `;
 
 const CreditsItemRole = styled.p`

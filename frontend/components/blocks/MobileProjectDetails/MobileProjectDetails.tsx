@@ -27,13 +27,20 @@ const Text = styled.p`
   color: var(--colour-white);
 `;
 
+const CreditsTrigger = styled.button`
+  text-align: left;
+  padding-top: ${pxToRem(8)};
+  color: var(--colour-white);
+`;
+
 type Props = {
   project: ProjectType | null;
   isActive: boolean;
+  setIsCreditsOpen: (isCreditsOpen: boolean) => void;
 };
 
 const MobileProjectDetails = (props: Props) => {
-  const { project, isActive } = props;
+  const { project, isActive, setIsCreditsOpen } = props;
 
   return (
     <>
@@ -71,6 +78,12 @@ const MobileProjectDetails = (props: Props) => {
               <Text>{project.year}</Text>
             </Cell>
           )}
+          <CreditsTrigger
+            onClick={() => setIsCreditsOpen(true)}
+            className="type-p"
+          >
+            Show Credits
+          </CreditsTrigger>
         </MobileProjectDetailsWrapper>
       )}
     </>

@@ -91,7 +91,6 @@ const Inner = styled.div`
   }
 `;
 
-
 const ImageOverlay = styled.div<{ $isVisible: boolean }>`
   position: absolute;
   inset: 0;
@@ -134,7 +133,8 @@ const LoadingDot = styled.div`
   animation: flash 0.5s ease-in-out infinite;
 
   @keyframes flash {
-    0%, 100% {
+    0%,
+    100% {
       opacity: 0;
     }
     50% {
@@ -231,7 +231,7 @@ const ProjectPlayer = (props: Props) => {
           window.clearTimeout(closeTimeoutRef.current);
           closeTimeoutRef.current = null;
         }
-        
+
         // Transition to hover state - video will keep playing
         setActiveProject({
           project: activeProject.project,
@@ -241,7 +241,14 @@ const ProjectPlayer = (props: Props) => {
         setActiveProject({ project: null, action: "inactive" });
       }
     }
-  }, [activeProject, router, setActiveProject, setIsFullScreen, useCloseLink, isMobile]);
+  }, [
+    activeProject,
+    router,
+    setActiveProject,
+    setIsFullScreen,
+    useCloseLink,
+    isMobile,
+  ]);
 
   useEffect(() => {
     if (muxPlayerRef.current) {
@@ -299,7 +306,7 @@ const ProjectPlayer = (props: Props) => {
   useEffect(() => {
     const isActiveAction =
       activeProject.action === "hover" || activeProject.action === "fullscreen";
-    
+
     if (activeProject.action === "fullscreen") {
       setIsActive(true);
       setIsFullScreen(true);
@@ -374,7 +381,8 @@ const ProjectPlayer = (props: Props) => {
   // Ensure player opens when action is fullscreen
   const shouldShow = isActive || activeProject.action === "fullscreen";
   // Ensure backdrop shows when in fullscreen mode or when action is fullscreen (for mobile)
-  const backdropIsActive = isFullScreen || activeProject.action === "fullscreen";
+  const backdropIsActive =
+    isFullScreen || activeProject.action === "fullscreen";
 
   return (
     <AnimatePresence>
@@ -395,6 +403,7 @@ const ProjectPlayer = (props: Props) => {
           <MobileProjectDetails
             project={activeProject?.project}
             isActive={isFullScreen}
+            setIsCreditsOpen={setIsCreditsOpen}
           />
           <Outer $isFullScreen={isFullScreen}>
             <Ratio
@@ -418,7 +427,8 @@ const ProjectPlayer = (props: Props) => {
                   transition: "opacity 0.2s ease",
                 }}
               >
-                {!isVideoReady && activeProject?.project?.video?.asset?.playbackId && (
+                {!isVideoReady &&
+                  activeProject?.project?.video?.asset?.playbackId && (
                     <LoadingIndicator>
                       <LoadingDot />
                     </LoadingIndicator>
