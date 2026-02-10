@@ -40,30 +40,30 @@ const ThemeSwitchBlock = () => {
   const colors = [
     {
       bg: "#000000",
-      // fg: "#FFFFFF",
+      fg: "#FFFFFF",
     },
     {
-      bg: "#8AC5DC",
-      // fg: "#CA1DD7",
+      bg: "#511B1B",
+      fg: "#D249BB",
     },
     {
-      bg: "#5F5236",
-      // fg: "#2A27D9",
+      bg: "#F1874A",
+      fg: "#BF2C25",
     },
     {
-      bg: "#464E3A",
-      // fg: "#9CA2A5",
+      bg: "#DCFDFF",
+      fg: "#898989",
     },
     {
-      bg: "#EEFF00",
-      // fg: "#C65F16",
+      bg: "#A869FF",
+      fg: "#511D0D",
     },
   ];
 
   const handleThemeSwitch = (index: number) => {
     setActiveIndex(index);
     document.documentElement.style.setProperty("--colour-bg", colors[index].bg);
-    // document.documentElement.style.setProperty("--colour-fg", colors[index].fg);
+    document.documentElement.style.setProperty("--colour-fg", colors[index].fg);
   };
 
   useEffect(() => {
