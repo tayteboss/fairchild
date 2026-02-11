@@ -1,3 +1,4 @@
-import ThemeSwitchBlock from "./ThemeSwitchBlock";
+import ThemeSwitchBlock, { themeColors } from "./ThemeSwitchBlock";
 
+export { themeColors };
 export default ThemeSwitchBlock;

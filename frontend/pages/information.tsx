@@ -15,7 +15,7 @@ import ThanksBlock from "../components/blocks/ThanksBlock";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useLenis } from "@studio-freight/react-lenis";
 import LayoutWrapper from "../components/layout/LayoutWrapper";
-import ThemeSwitchBlock from "../components/blocks/ThemeSwitchBlock";
+import ThemeSwitchBlock, { themeColors } from "../components/blocks/ThemeSwitchBlock";
 
 const PageWrapper = styled(motion.div)`
   padding: ${pxToRem(120)} 0;
@@ -71,6 +71,12 @@ const Page = (props: Props) => {
     lenis.on("scroll", handleScroll);
     return () => lenis.off("scroll", handleScroll);
   }, [lenis, handleScroll]);
+
+  // Reset theme on mount
+  useEffect(() => {
+    document.documentElement.style.setProperty("--colour-bg", themeColors[0].bg);
+    document.documentElement.style.setProperty("--colour-fg", themeColors[0].fg);
+  }, []);
 
   const renderContent = () => (
     <InnerWrapper>

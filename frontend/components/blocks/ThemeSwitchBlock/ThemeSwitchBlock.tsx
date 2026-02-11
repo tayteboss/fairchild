@@ -32,48 +32,49 @@ const ColorBlock = styled.div<{
   }
 `;
 
+export const themeColors = [
+  {
+    bg: "#000000",
+    fg: "#FFFFFF",
+  },
+  {
+    bg: "#4f0a0a",
+    fg: "#D249BB",
+  },
+  {
+    bg: "#F1874A",
+    fg: "#544600",
+  },
+  {
+    bg: "#DCFDFF",
+    fg: "#828490",
+  },
+  {
+    bg: "#B178FF",
+    fg: "#460D51",
+  },
+];
+
 const ThemeSwitchBlock = () => {
   const [activeIndex, setActiveIndex] = useState<number>(0);
 
   const router = useRouter();
 
-  const colors = [
-    {
-      bg: "#000000",
-      fg: "#FFFFFF",
-    },
-    {
-      bg: "#511B1B",
-      fg: "#D249BB",
-    },
-    {
-      bg: "#F1874A",
-      fg: "#BF2C25",
-    },
-    {
-      bg: "#DCFDFF",
-      fg: "#898989",
-    },
-    {
-      bg: "#A869FF",
-      fg: "#511D0D",
-    },
-  ];
-
   const handleThemeSwitch = (index: number) => {
     setActiveIndex(index);
-    document.documentElement.style.setProperty("--colour-bg", colors[index].bg);
-    document.documentElement.style.setProperty("--colour-fg", colors[index].fg);
+    document.documentElement.style.setProperty(
+      "--colour-bg",
+      themeColors[index].bg
+    );
+    document.documentElement.style.setProperty(
+      "--colour-fg",
+      themeColors[index].fg
+    );
   };
-
-  useEffect(() => {
-    document.documentElement.style.setProperty("--colour-bg", colors[0].bg);
-    document.documentElement.style.setProperty("--colour-fg", colors[0].fg);
-  }, [router]);
 
   return (
     <ThemeSwitchBlockWrapper>
-      {colors.map((color, i) => (
+      {themeColors.map((color, i) => (
         <ColorBlock
           key={i}
           $bgColor={color.bg}
