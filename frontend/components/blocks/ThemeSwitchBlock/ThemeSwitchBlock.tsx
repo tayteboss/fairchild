@@ -68,6 +68,7 @@ const ThemeSwitchBlock = () => {
 
   useEffect(() => {
     document.documentElement.style.setProperty("--colour-bg", colors[0].bg);
+    document.documentElement.style.setProperty("--colour-fg", colors[0].fg);
   }, [router]);
 
   return (

@@ -42,7 +42,7 @@ const LogoWrapper = styled(motion.div)`
 
   a {
     pointer-events: all;
-    color: var(--colour-white);
+    color: var(--colour-fg);
     text-overflow: ellipsis;
   }
 `;
@@ -91,7 +91,7 @@ const MenuTrigger = styled.button`
 `;
 
 const Text = styled.div`
-  color: var(--colour-white);
+  color: var(--colour-fg);
   width: 100%;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -104,7 +104,7 @@ const Text = styled.div`
 
 const LinkText = styled.div<{ $isActive?: boolean }>`
   text-decoration: ${({ $isActive }) => ($isActive ? "underline" : "none")};
-  color: var(--colour-white);
+  color: var(--colour-fg);
   pointer-events: all;
 
   &:hover {
